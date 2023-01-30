@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dmriqyur7nbu2"]
+
+[node name="Window" type="Window"]
+size = Vector2i(600, 400)
+unresizable = true
+always_on_top = true
+popup_window = true
+
+[node name="TabContainer" type="TabContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

@@ -1,0 +1,131 @@
+[gd_scene load_steps=2 format=3 uid="uid://cfvium7sqii0l"]
+
+[ext_resource type="Script" path="res://scenes/window_ui.gd" id="1_2770a"]
+
+[node name="WindowUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2770a")
+
+[node name="TopLeft" type="ReferenceRect" parent="."]
+layout_mode = 1
+offset_right = 16.0
+offset_bottom = 16.0
+mouse_default_cursor_shape = 12
+metadata/_edit_lock_ = true
+
+[node name="Top" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_right = -16.0
+offset_bottom = 8.0
+grow_horizontal = 2
+mouse_default_cursor_shape = 9
+metadata/_edit_lock_ = true
+
+[node name="TopRight" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -16.0
+offset_bottom = 16.0
+grow_horizontal = 0
+mouse_default_cursor_shape = 11
+metadata/_edit_lock_ = true
+
+[node name="Left" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_top = 16.0
+offset_right = 8.0
+offset_bottom = -16.0
+grow_vertical = 2
+mouse_default_cursor_shape = 10
+metadata/_edit_lock_ = true
+
+[node name="Right" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = 16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_default_cursor_shape = 10
+metadata/_edit_lock_ = true
+
+[node name="BottomLeft" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -16.0
+offset_right = 16.0
+grow_vertical = 0
+mouse_default_cursor_shape = 11
+metadata/_edit_lock_ = true
+
+[node name="Bottom" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -8.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_default_cursor_shape = 9
+metadata/_edit_lock_ = true
+
+[node name="BottomRight" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_default_cursor_shape = 12
+metadata/_edit_lock_ = true
+
+[node name="ScrollPad" type="ReferenceRect" parent="."]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = 16.0
+offset_right = -8.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+metadata/_edit_lock_ = true
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="gui_input" from="TopLeft" to="." method="_on_top_left_gui_input"]
+[connection signal="gui_input" from="Top" to="." method="_on_top_gui_input"]
+[connection signal="gui_input" from="TopRight" to="." method="_on_top_right_gui_input"]
+[connection signal="gui_input" from="Left" to="." method="_on_left_gui_input"]
+[connection signal="gui_input" from="Right" to="." method="_on_right_gui_input"]
+[connection signal="gui_input" from="BottomLeft" to="." method="_on_bottom_left_gui_input"]
+[connection signal="gui_input" from="Bottom" to="." method="_on_bottom_gui_input"]
+[connection signal="gui_input" from="BottomRight" to="." method="_on_bottom_right_gui_input"]
+[connection signal="gui_input" from="ScrollPad" to="." method="_on_scroll_pad_gui_input"]

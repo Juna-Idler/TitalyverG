@@ -1,0 +1,296 @@
+[gd_scene load_steps=9 format=3 uid="uid://dx2ed5lus0lqu"]
+
+[ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
+[ext_resource type="Script" path="res://addons/ruby_label/ruby_label.gd" id="2_ywyeg"]
+[ext_resource type="FontFile" uid="uid://deoykaw2557al" path="res://fonts/ShipporiAntique-Medium.otf" id="3_gtnpj"]
+[ext_resource type="PackedScene" uid="uid://cfvium7sqii0l" path="res://scenes/window_ui.tscn" id="4_tcylf"]
+[ext_resource type="PackedScene" uid="uid://dmriqyur7nbu2" path="res://scenes/settings_window.tscn" id="5_7w6ah"]
+[ext_resource type="Script" path="res://scenes/server.gd" id="6_tt1uy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_em36m"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6vx0g"]
+bg_color = Color(1, 0, 0, 0.501961)
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_25nab")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.415686, 0.415686, 0.415686, 0.584314)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="RubyLabel" type="Control" parent="ScrollContainer"]
+custom_minimum_size = Vector2(0, 3620)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+script = ExtResource("2_ywyeg")
+font_font = ExtResource("3_gtnpj")
+font_size = 32
+font_ruby_size = 16
+font_outline_width = 10
+font_ruby_outline_width = 10
+font_color = Color(1, 1, 1, 1)
+font_outline_color = Color(0, 0, 0, 1)
+ruby_alignment_ruby = 0
+ruby_alignment_parent = 0
+buffer_left_margin = 0
+buffer_right_margin = 0
+buffer_left_padding = 16
+buffer_right_padding = 16
+buffer_visible_border = false
+adjust_line_height = -8
+adjust_ruby_distance = -12
+adjust_no_ruby_space = 0
+text_input = "@offset=-300
+
+DMM GAMES \"Gemini Seed\" 主題歌
+Crystaliah『時空の終焉 ~ toki no owari ~ [full ver.]』
+
+vocal : y u r a
+song : Crystaliah
+
+https://crystaliah.jp
+
+画像 ©︎DMM GAMES
+---------------------------------------------------------
+
+まばゆい｜楽園《らくえん》をこの｜世界《せかい》に　｜取《と》り｜戻《もど》すまで　
+
+
+｜暗闇《くらやみ》に｜宿《やど》る｜閃光《せんこう》
+ほとばしる｜美《うつく》しい｜世界《せかい》よ　ここに
+
+｜鈍《にぶ》く｜光《ひか》る｜邪悪《じゃあく》の｜目《め》　
+｜迷《まよ》える｜女神《めがみ》　｜突《つ》き｜刺《さ》さる　｜哀《かな》しい｜刃《やいば》　
+
+｜星《ほし》の｜瞬《またた》き　この｜一瞬《いっしゅん》さえ｜惜《お》しい
+どんなに｜蔑《さげす》まれても　かまわない
+｜永遠《えいえん》の　｜夢《ゆめ》から｜醒《さ》めて　あなたについてゆく
+
+この｜広《ひろ》すぎる｜世界《せかい》でいま　｜虹《にじ》のように｜強《つよ》く｜光《ひか》る
+｜舞《ま》い｜降《お》りた　かすかな｜希望《きぼう》
+｜振《ふ》り｜返《かえ》らず｜大《おお》きな｜幻《まぼろし》に　｜大地《だいち》を｜蹴《け》って｜挑《いど》む
+あなたに　すべてを｜賭《か》けたいの
+まばゆい｜楽園《らくえん》をこの｜世界《せかい》に　｜取《と》り｜戻《もど》すまで　
+
+
+｜近《ちか》づく｜時空の終焉《ときのおわり》
+｜過《す》ぎ｜去《さ》りし｜過《あやま》ち｜悔《く》いて　｜祈《いの》る
+
+すべての｜罪《つみ》｜洗《あら》われ　｜別《わか》れに｜向《む》かう
+tearfully winding road あなたとともに
+
+キミたちを｜救《すく》えるのなら　それがボクの
+｜使命《しめい》だと｜語《かた》る｜横顔《よこがお》　｜優《ゆう》｜凛《りん》で　
+この｜危機《きき》にこそキラリ ｜輝《かがや》くこの｜命《いのち》
+
+しなやかによみがえれ｜今《いま》こそ　あの｜空《そら》のように｜気高《けだか》く
+｜降《ふ》り｜注《そそ》ぐ　｜大《おお》きな｜希望《きぼう》
+｜一歩《いっぽ》ずつたしかに｜踏《ふ》みしめて　｜幻惑《げんわく》の｜風《かぜ》に｜立《た》ち｜向《む》かう
+あなたに　すべてを｜預《あず》けたの
+｜解《と》かれた｜街《まち》の｜色《いろ》この｜世界《せかい》に　｜取《と》り｜戻《もど》すまで
+
+
+この｜広《ひろ》すぎる｜世界《せかい》でいま　｜虹《にじ》のように｜強《つよ》く｜光《ひか》り
+｜刻《きざ》まれる　｜遥《はる》かな｜伝説《でんせつ》
+｜振《ふ》り｜返《かえ》らず｜大《おお》きな｜幻《まぼろし》に　｜大地《だいち》を｜蹴《け》って｜挑《いど》む　
+あなたに　すべてを｜賭《か》けたいの
+まばゆい｜楽園《らくえん》をこの｜世界《せかい》に　｜取《と》り｜戻《もど》すまで
+
+---------------------------------------------------------
+
+@ruby_parent=｜
+@ruby_begin=《
+@ruby_end=》"
+text_ruby_parent = "｜"
+text_ruby_begin = "《"
+text_ruby_end = "》"
+display_horizontal_alignment = 1
+display_vertical_alignment = 1
+display_rate = 100.0
+display_rate_phonetic = true
+output_base_text = "@offset=-300
+
+DMM GAMES \"Gemini Seed\" 主題歌
+Crystaliah『時空の終焉 ~ toki no owari ~ [full ver.]』
+
+vocal : y u r a
+song : Crystaliah
+
+https://crystaliah.jp
+
+画像 ©︎DMM GAMES
+---------------------------------------------------------
+
+まばゆい楽園をこの世界に　取り戻すまで　
+
+
+暗闇に宿る閃光
+ほとばしる美しい世界よ　ここに
+
+鈍く光る邪悪の目　
+迷える女神　突き刺さる　哀しい刃　
+
+星の瞬き　この一瞬さえ惜しい
+どんなに蔑まれても　かまわない
+永遠の　夢から醒めて　あなたについてゆく
+
+この広すぎる世界でいま　虹のように強く光る
+舞い降りた　かすかな希望
+振り返らず大きな幻に　大地を蹴って挑む
+あなたに　すべてを賭けたいの
+まばゆい楽園をこの世界に　取り戻すまで　
+
+
+近づく時空の終焉
+過ぎ去りし過ち悔いて　祈る
+
+すべての罪洗われ　別れに向かう
+tearfully winding road あなたとともに
+
+キミたちを救えるのなら　それがボクの
+使命だと語る横顔　優凛で　
+この危機にこそキラリ 輝くこの命
+
+しなやかによみがえれ今こそ　あの空のように気高く
+降り注ぐ　大きな希望
+一歩ずつたしかに踏みしめて　幻惑の風に立ち向かう
+あなたに　すべてを預けたの
+解かれた街の色この世界に　取り戻すまで
+
+
+この広すぎる世界でいま　虹のように強く光り
+刻まれる　遥かな伝説
+振り返らず大きな幻に　大地を蹴って挑む　
+あなたに　すべてを賭けたいの
+まばゆい楽園をこの世界に　取り戻すまで
+
+---------------------------------------------------------
+
+@ruby_parent=｜
+@ruby_begin=《
+@ruby_end=》"
+output_phonetic_text = "@offset=-300
+
+DMM GAMES \"Gemini Seed\" 主題歌
+Crystaliah『時空の終焉 ~ toki no owari ~ [full ver.]』
+
+vocal : y u r a
+song : Crystaliah
+
+https://crystaliah.jp
+
+画像 ©︎DMM GAMES
+---------------------------------------------------------
+
+まばゆいらくえんをこのせかいに　とりもどすまで　
+
+
+くらやみにやどるせんこう
+ほとばしるうつくしいせかいよ　ここに
+
+にぶくひかるじゃあくのめ　
+まよえるめがみ　つきささる　かなしいやいば　
+
+ほしのまたたき　このいっしゅんさえおしい
+どんなにさげすまれても　かまわない
+えいえんの　ゆめからさめて　あなたについてゆく
+
+このひろすぎるせかいでいま　にじのようにつよくひかる
+まいおりた　かすかなきぼう
+ふりかえらずおおきなまぼろしに　だいちをけっていどむ
+あなたに　すべてをかけたいの
+まばゆいらくえんをこのせかいに　とりもどすまで　
+
+
+ちかづくときのおわり
+すぎさりしあやまちくいて　いのる
+
+すべてのつみあらわれ　わかれにむかう
+tearfully winding road あなたとともに
+
+キミたちをすくえるのなら　それがボクの
+しめいだとかたるよこがお　ゆうりんで　
+このききにこそキラリ かがやくこのいのち
+
+しなやかによみがえれいまこそ　あのそらのようにけだかく
+ふりそそぐ　おおきなきぼう
+いっぽずつたしかにふみしめて　げんわくのかぜにたちむかう
+あなたに　すべてをあずけたの
+とかれたまちのいろこのせかいに　とりもどすまで
+
+
+このひろすぎるせかいでいま　にじのようにつよくひかり
+きざまれる　はるかなでんせつ
+ふりかえらずおおきなまぼろしに　だいちをけっていどむ　
+あなたに　すべてをかけたいの
+まばゆいらくえんをこのせかいに　とりもどすまで
+
+---------------------------------------------------------
+
+@ruby_parent=｜
+@ruby_begin=《
+@ruby_end=》"
+clip_rect = false
+auto_fit_height = true
+
+[node name="WindowUI" parent="." instance=ExtResource("4_tcylf")]
+layout_mode = 1
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+size = Vector2i(100, 62)
+item_count = 2
+item_0/text = "file"
+item_0/id = 0
+item_1/text = "test"
+item_1/id = 1
+
+[node name="Window" parent="." instance=ExtResource("5_7w6ah")]
+visible = false
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -36.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = 36.0
+grow_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_em36m")
+theme_override_styles/hover = SubResource("StyleBoxFlat_6vx0g")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6vx0g")
+theme_override_styles/focus = SubResource("StyleBoxFlat_em36m")
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("6_tt1uy")
+
+[connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
+[connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
+[connection signal="wheel_moved" from="WindowUI" to="." method="_on_window_ui_wheel_moved"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
