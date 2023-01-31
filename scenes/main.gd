@@ -21,7 +21,7 @@ func _ready():
 	var lines : PackedStringArray
 	for l in lyrics.lines:
 		var line := l as LyricsContainer.LyricsLine
-		lines.append(line.get_phonetic_text())
+		lines.append(line.get_rubyed_text("｜","《","》"))
 	
 	$ScrollContainer/RubyLabel.text_input = "\n".join(lines)
 	pass # Replace with function body.

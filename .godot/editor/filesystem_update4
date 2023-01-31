@@ -1,8 +1,2 @@
 res://scenes/main.tscn
-res://scripts/lyrics_data.gd
-res://scenes/settings_window.tscn
-res://scripts/lyrics_ruby.gd
-res://scenes/window_ui.tscn
-res://scripts/lyrics_container.gd
-res://scripts/lyrics_time_tag.gd
-res://scenes/main.gd
+res://ruby_lyrics_view/ruby_lyrics_view.gd

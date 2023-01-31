@@ -179,15 +179,9 @@ func _get_property_list():
 	return properties
 
 
-func font_changed():
-#	font_font.update_changes()
-	build_words()
-
 var font_font : Font:
 	set(v):
 		font_font = v
-		if font_font:
-			font_font.changed.connect(font_changed)
 		build_words()
 
 var font_size : int :

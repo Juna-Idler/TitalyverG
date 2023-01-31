@@ -1,10 +1,10 @@
+Label
 VScrollBar
 Node
 ScrollContainer
 ColorRect
 ReferenceRect
 Control
-Label
 RubyLabel
 TabContainer
 Window
