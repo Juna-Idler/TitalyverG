@@ -1,2 +1,10 @@
-res://scenes/main.tscn
+res://ruby_lyrics_view/ruby_lyrics_view.tscn
+res://ruby_lyrics_view/line_break_word.gd
 res://ruby_lyrics_view/ruby_lyrics_view.gd
+res://ruby_lyrics_view/line_break.gd
+res://scenes/settings_window.tscn
+res://scenes/window_ui.tscn
+res://scenes/main.tscn
+res://ruby_lyrics_view/lyrics_container.gd
+res://test_control.gd
+res://test_control.tscn

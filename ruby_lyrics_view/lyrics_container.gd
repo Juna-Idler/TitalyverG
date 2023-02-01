@@ -17,7 +17,7 @@ var sync_mode : SyncMode
 func _init(lyrics_text : String):
 	at_tag_container = AtTagContainer.new(lyrics_text)
 	for l in at_tag_container.other_lines:
-		var line := LyricsLine.new(l,at_tag_container)
+		var line := LyricsLine.create(l,at_tag_container)
 		lines.append(line)
 		@warning_ignore(int_assigned_to_enum)
 		sync_mode = sync_mode | line.sync_mode

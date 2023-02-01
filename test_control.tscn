@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://c0h18rnnsw7eo"]
+
+[ext_resource type="Script" path="res://test_control.gd" id="1_8fwvf"]
+[ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="1_jsg5j"]
+
+[sub_resource type="SystemFont" id="SystemFont_48jfw"]
+font_names = PackedStringArray("Shippori Antique")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8fwvf")
+
+[node name="RubyLyricsView" parent="." instance=ExtResource("1_jsg5j")]
+layout_mode = 1
+font_font = SubResource("SystemFont_48jfw")
