@@ -1,3 +1,4 @@
+@tool
 extends Control
 
 class_name RubyLyricsView
@@ -17,92 +18,88 @@ class_name RubyLyricsView
 		font_ruby_size = v
 		build()
 		
-var font_outline_width : int :
+@export var font_outline_width : int :
 	set(v):
 		font_outline_width = v
 		queue_redraw()
-var font_ruby_outline_width : int :
+@export var font_ruby_outline_width : int :
 	set(v):
 		font_ruby_outline_width = v
 		queue_redraw()
 
-var font_sleep_color : Color = Color.WHITE :
+@export var font_sleep_color : Color = Color.WHITE :
 	set(v):
 		font_sleep_color = v
 		queue_redraw()
-var font_sleep_outline_color : Color = Color.BLACK :
+@export var font_sleep_outline_color : Color = Color.BLACK :
 	set(v):
 		font_sleep_outline_color = v
 		queue_redraw()
-var font_active_color : Color = Color.WHITE :
+@export var font_active_color : Color = Color.WHITE :
 	set(v):
 		font_active_color = v
 		queue_redraw()
-var font_active_outline_color : Color = Color.RED :
+@export var font_active_outline_color : Color = Color.RED :
 	set(v):
 		font_active_outline_color = v
 		queue_redraw()
-var font_standby_color : Color = Color.WHITE :
+@export var font_standby_color : Color = Color.WHITE :
 	set(v):
 		font_standby_color = v
 		queue_redraw()
-var font_standby_outline_color : Color = Color.BLUE :
+@export var font_standby_outline_color : Color = Color.BLUE :
 	set(v):
 		font_standby_outline_color = v
 		queue_redraw()
 
 
 enum RubyAlignment {CENTER,SPACE121,SPACE010}
-var ruby_alignment_ruby  : RubyAlignment :
+@export var ruby_alignment_ruby  : RubyAlignment :
 	set(v):
 		ruby_alignment_ruby = v
 		build()
 
 enum ParentAlignment {NOTHING,CENTER,SPACE121,SPACE010}
-var ruby_alignment_parent  : ParentAlignment :
+@export var ruby_alignment_parent  : ParentAlignment :
 	set(v):
 		ruby_alignment_parent = v
 		build()
 
-var buffer_left_padding : int :
+@export var buffer_left_padding : int :
 	set(v):
 		buffer_left_padding = v
 		layout()
-var buffer_right_padding : int :
+@export var buffer_right_padding : int :
 	set(v):
 		buffer_right_padding = v
 		layout()
 
-var adjust_line_height : int :
+@export var adjust_line_height : int :
 	set(v):
 		adjust_line_height = v
 		layout()
-var adjust_ruby_distance : int :
+@export var adjust_ruby_distance : int :
 	set(v):
 		adjust_ruby_distance = v
 		layout()
-var adjust_no_ruby_space : int :
+@export var adjust_no_ruby_space : int :
 	set(v):
 		adjust_no_ruby_space = v
 		layout()
 	
-var text_input : String :
-	set(value):
-		text_input = value
-		build()
 	
 enum HorizontalAlignment {LEFT,CENTER,RIGHT}
-var display_horizontal_alignment : HorizontalAlignment :
+@export var display_horizontal_alignment : HorizontalAlignment :
 	set(v):
 		display_horizontal_alignment = v
 		queue_redraw()
 enum VerticalAlignment {TOP,CENTER,BOTTOM}
-var display_vertical_alignment : VerticalAlignment :
+@export var display_vertical_alignment : VerticalAlignment :
 	set(v):
 		display_vertical_alignment = v
 		queue_redraw()
 	
-var display_time : float = 0 :
+@export var display_time : float = 0 :
 	set(v):
 		display_time = v
 		queue_redraw()
@@ -201,12 +198,13 @@ class BuiltLine:
 			b_time = end if b_time < 0 else b_time
 			var r_width := 0.0
 			var r_time := -1.0
-			for u in ruby:
-				if u.start >= 0:
-					r_time = u.start
-					break
-				r_width += u.width
-			r_time = end if r_time < 0 else r_time
+			if not ruby.is_empty():
+				for u in ruby:
+					if u.start >= 0:
+						r_time = u.start
+						break
+					r_width += u.width
+				r_time = end if r_time < 0 else r_time
 			if b_time >= 0:
 				if r_time >= 0:
 					if b_time < r_time:
@@ -363,7 +361,8 @@ func build():
 				if not part_base.is_empty():
 					parts.append(BuiltLine.Part.new(part_base,part_ruby,unit.get_start_time(),unit.get_end_time()))
 			var line_end : float = lines[i].get_end_time()
-			if line_end < 0:
+			var next = lines[i+1].get_start_time()
+			if line_end < 0 or next > line_end:
 				line_end = lines[i+1].get_start_time()
 			built_lines.append(BuiltLine.new(parts,lines[i].get_start_time(),line_end))
 		
@@ -400,8 +399,14 @@ func build():
 					Unit.interpolate(part.base,part.start,part.end)
 					if not part.ruby.is_empty():
 						Unit.interpolate(part.ruby,part.start,part.end)
-						
-	
+	layout()
+
+
+func layout():
+	var font := font_font
+	if not font:
+		return
+
 	linebreak_lines.clear()
 	for l in built_lines:
 		var line := l as BuiltLine
@@ -409,11 +414,10 @@ func build():
 		var unbreak_base : Array = []
 		var unbreak_ruby : Array = []
 
-		var prev : String = ""
 		var ubx : float = 0
 		for p in line.parts:
 			var part := p as BuiltLine.Part
-			if not prev.is_empty() and not line_break._is_link(prev,part.base[0].cluster):
+			if not unbreak_base.is_empty() and not line_break._is_link(unbreak_base.back().cluster,part.base[0].cluster):
 				var width : float = 0
 				for u in unbreak_base:
 					width += u.width
@@ -451,29 +455,27 @@ func build():
 					u.x = rx
 					unbreak_ruby.append(u)
 					rx += u.width
-			prev = part.base.back().cluster
-		
-		var width : float = 0
-		for u in unbreak_base:
-			width += u.width
-		linebreak_line.append(LinebreakLine.Unbreakable.new(unbreak_base,unbreak_ruby,width))
+
+		if not unbreak_base.is_empty():
+			var width : float = 0
+			for u in unbreak_base:
+				width += u.width
+			linebreak_line.append(LinebreakLine.Unbreakable.new(unbreak_base,unbreak_ruby,width))
 		linebreak_lines.append(LinebreakLine.new(linebreak_line,line.start,line.end))
-	layout()
 
-
-func layout():
-	var font := font_font
-	if not font:
-		return
 
 	displayed_lines.clear()
 	var y : float = 0
-
 	for l in linebreak_lines:
 		var line := l as LinebreakLine
 		
 		var ruby_height : float = font.get_height(font_ruby_size) + adjust_ruby_distance
 		var base_height : float = font.get_height(font_size) + adjust_line_height
+		
+		if line.unbreakables.is_empty():
+			y += base_height + adjust_no_ruby_space
+			continue
+		
 #		var ruby_buffer : float = buffer_left_padding
 
 		var displayed_base : Array = []
@@ -491,7 +493,7 @@ func layout():
 		for i in range(1,line.unbreakables.size()):
 			var unbreakable := line.unbreakables[i] as LinebreakLine.Unbreakable
 			if x + unbreakable.width > size.x - buffer_right_padding:
-				var base_y_distance = ruby_height if displayed_ruby.is_empty() else float(adjust_no_ruby_space)
+				var base_y_distance = float(adjust_no_ruby_space) if displayed_ruby.is_empty() else ruby_height
 				var by = y + base_y_distance + font.get_ascent(font_size)
 				var ry = y + font.get_ascent(font_ruby_size)
 				for u in displayed_base:
@@ -513,7 +515,7 @@ func layout():
 			x += unbreakable.width
 		
 		if not displayed_base.is_empty():
-			var base_y_distance = ruby_height if displayed_ruby.is_empty() else float(adjust_no_ruby_space)
+			var base_y_distance = float(adjust_no_ruby_space) if displayed_ruby.is_empty() else ruby_height
 			var by = y + base_y_distance + font.get_ascent(font_size)
 			var ry = y + font.get_ascent(font_ruby_size)
 			for u in displayed_base:
@@ -522,7 +524,10 @@ func layout():
 				u.y = ry
 			displayed_lines.append(DisplayedLine.new(displayed_base,displayed_ruby,line.start,line.end))
 			y += base_height + base_y_distance
-				
+
+	layout_height = (y - adjust_line_height) if adjust_line_height < 0 else y
+	custom_minimum_size.y = layout_height
+	size.y = layout_height
 
 func _draw():
 	var font := font_font
@@ -568,45 +573,47 @@ func _draw():
 					var slide = (size.x + buffer_left_padding - buffer_right_padding - width) / 2 - buffer_left_padding
 					slides[i] = slide
 
-	for i in displayed_lines.size():
-		var l := displayed_lines[i] as DisplayedLine
-		if l.start < display_time and display_time < l.end:
-			for c_ in l.base:
-				var c := c_ as Unit
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
-				if display_time < c.start:
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_standby_outline_color)
-				elif display_time > c.end:
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_active_outline_color)
-				else:
-					var rate := (display_time - c.start) / (c.end - c.start)
-					var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fadecolor)
-		else:
-			for c_ in l.base:
-				var c := c_ as Unit
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
-				font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_sleep_outline_color)
+	if font_outline_width > 0:
+		for i in displayed_lines.size():
+			var l := displayed_lines[i] as DisplayedLine
+			if l.start < display_time and display_time < l.end:
+				for c_ in l.base:
+					var c := c_ as Unit
+					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+					if display_time < c.start:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_standby_outline_color)
+					elif display_time > c.end:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_active_outline_color)
+					else:
+						var rate := (display_time - c.start) / (c.end - c.start)
+						var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fadecolor)
+			else:
+				for c_ in l.base:
+					var c := c_ as Unit
+					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_sleep_outline_color)
 
-	for i in displayed_lines.size():
-		var l := displayed_lines[i] as DisplayedLine
-		if l.start < display_time and display_time < l.end:
-			for c_ in l.ruby:
-				var c := c_ as Unit
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
-				if display_time < c.start:
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_standby_outline_color)
-				elif display_time > c.end:
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_active_outline_color)
-				else:
-					var rate := (display_time - c.start) / (c.end - c.start)
-					var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fadecolor)
-		else:
-			for c_ in l.ruby:
-				var c := c_ as Unit
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
-				font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_sleep_outline_color)
+	if font_ruby_outline_width > 0:
+		for i in displayed_lines.size():
+			var l := displayed_lines[i] as DisplayedLine
+			if l.start < display_time and display_time < l.end:
+				for c_ in l.ruby:
+					var c := c_ as Unit
+					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+					if display_time < c.start:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_standby_outline_color)
+					elif display_time > c.end:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_active_outline_color)
+					else:
+						var rate := (display_time - c.start) / (c.end - c.start)
+						var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fadecolor)
+			else:
+				for c_ in l.ruby:
+					var c := c_ as Unit
+					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_sleep_outline_color)
 
 	for i in displayed_lines.size():
 		var l := displayed_lines[i] as DisplayedLine

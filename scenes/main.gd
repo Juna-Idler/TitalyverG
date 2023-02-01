@@ -1,7 +1,20 @@
 extends Control
 
 
+@export_multiline var input : String :
+	set(v):
+		input = v
+		lyrics = LyricsContainer.new(v)
+		if ruby_lyrics_view:
+			ruby_lyrics_view.lyrics = lyrics
+			ruby_lyrics_view.build()
+
 var searcher := LyricsFileSearcher.new()
+@onready var ruby_lyrics_view : RubyLyricsView = $ScrollContainer/RubyLyricsView
+
+
+var lyrics : LyricsContainer
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -10,25 +23,25 @@ func _ready():
 
 	OS.get_executable_path().get_base_dir()
 
-	var file_path = "D:/Music/高本めぐみ/02 MELODIC TALK.flac"
+#	var file_path = "D:/Music/高本めぐみ/02 MELODIC TALK.flac"
+#
+#	var ExSearcher = load("D:/Documents/test_search.gd")
+#	var ex_searcher = ExSearcher.new()
+#
+#	var texts = searcher.search("",[""],"",file_path,"")
+#
+#
+#	var lyrics := LyricsContainer.new(texts[0])
 	
-	var ExSearcher = load("D:/Documents/test_search.gd")
-	var ex_searcher = ExSearcher.new()
+	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.build()
 	
-	var texts = searcher.search("",[""],"",file_path,"")
-	
-	var lyrics := LyricsContainer.new(texts[0])
-	var lines : PackedStringArray
-	for l in lyrics.lines:
-		var line := l as LyricsContainer.LyricsLine
-		lines.append(line.get_rubyed_text("｜","《","》"))
-	
-	$ScrollContainer/RubyLabel.text_input = "\n".join(lines)
 	pass # Replace with function body.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
+func _process(delta):
+	ruby_lyrics_view.display_time += delta
 	pass
 
 
@@ -47,4 +60,4 @@ func _on_window_ui_wheel_moved(delta):
 	pass # Replace with function body.
 
 func _on_window_ui_scroll_pad_dragging(delta):
-	$ScrollContainer.scroll_vertical -= delta * $ScrollContainer/RubyLabel.size.y / $WindowUI.size.y
+	$ScrollContainer.scroll_vertical -= delta * ruby_lyrics_view.size.y / $WindowUI.size.y
