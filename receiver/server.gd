@@ -1,5 +1,7 @@
 extends Node
 
+signal received(data : PlaybackData)
+
 @export var port_number = 14738
 
 var server := TCPServer.new()
@@ -11,6 +13,11 @@ func _ready():
 	server.listen(port_number,"127.0.0.1")
 	pass # Replace with function body.
 
+func _exit_tree():
+	if socket:
+		socket.close()
+		socket = null
+	server.stop()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
@@ -20,10 +27,13 @@ func _process(_delta):
 		match state:
 			WebSocketPeer.STATE_OPEN:
 				var count = socket.get_available_packet_count()
-				if count > 0:
+				while count > 0:
 					var packet = socket.get_packet()
-					print("recieved:",packet.get_string_from_utf8())
-			WebSocketPeer.STATE_CLOSING,WebSocketPeer.STATE_CLOSED:
+					received.emit(PlaybackData.deserialize(packet.get_string_from_utf8()))
+					count = socket.get_available_packet_count()
+			WebSocketPeer.STATE_CLOSING:
+				pass
+			WebSocketPeer.STATE_CLOSED:
 				socket = null
 				server.listen(port_number,"127.0.0.1")
 			WebSocketPeer.STATE_CONNECTING:

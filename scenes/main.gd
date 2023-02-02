@@ -4,6 +4,7 @@ extends Control
 @export_multiline var input : String :
 	set(v):
 		input = v
+		source_text = input
 		lyrics = LyricsContainer.new(v)
 		if ruby_lyrics_view:
 			ruby_lyrics_view.lyrics = lyrics
@@ -11,16 +12,18 @@ extends Control
 
 var searcher := LyricsFileSearcher.new()
 @onready var ruby_lyrics_view : RubyLyricsView = $ScrollContainer/RubyLyricsView
+@onready var scroll_container = $ScrollContainer
 
 
+var source_text : String
 var lyrics : LyricsContainer
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	get_viewport().transparent_bg = true
-#	get_window().files_dropped.connect(on_files_dropped)
-
+	get_viewport().gui_embed_subwindows = false
+	get_window().files_dropped.connect(on_files_dropped)
 	OS.get_executable_path().get_base_dir()
 
 #	var file_path = "D:/Music/高本めぐみ/02 MELODIC TALK.flac"
@@ -35,13 +38,17 @@ func _ready():
 	
 	ruby_lyrics_view.lyrics = lyrics
 	ruby_lyrics_view.build()
-	
+	var max_time := lyrics.get_end_time()
+	$HSlider.max_value = max_time if max_time >= 0 else 0.0
 	pass # Replace with function body.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	var scroll = scroll_container.scroll_vertical
+	ruby_lyrics_view.set_display_range(scroll,scroll + scroll_container.size.y)
 	ruby_lyrics_view.display_time += delta
+	$HSlider.value = ruby_lyrics_view.display_time
 	pass
 
 
@@ -49,15 +56,69 @@ func _on_button_pressed():
 	get_tree().quit()
 
 
+func on_files_dropped(files : PackedStringArray):
+	var file_path = files[0]
+	var texts = searcher.search("",[""],"",file_path,"")
+	if texts.is_empty() and source_text != texts[0]:
+		source_text = texts[0]
+		lyrics = LyricsContainer.new(source_text)
+		ruby_lyrics_view.lyrics = lyrics
+		ruby_lyrics_view.build()
+		
+		var max_time := lyrics.get_end_time()
+		$HSlider.max_value = max_time if max_time >= 0 else 0.0
+
 
 func _on_window_ui_right_clicked(position_):
 	var popup = $PopupMenu
-	popup.popup(Rect2(position_,Vector2.ZERO))
+	var pos := Vector2(DisplayServer.window_get_position())
+	popup.popup(Rect2(pos + position_,Vector2.ZERO))
 
 
 func _on_window_ui_wheel_moved(delta):
-	$ScrollContainer.scroll_vertical -= delta * 30
+	scroll_container.scroll_vertical -= delta * 30
 	pass # Replace with function body.
 
 func _on_window_ui_scroll_pad_dragging(delta):
-	$ScrollContainer.scroll_vertical -= delta * ruby_lyrics_view.size.y / $WindowUI.size.y
+	scroll_container.scroll_vertical -= delta * ruby_lyrics_view.size.y / $WindowUI.size.y
+
+
+func _on_popup_menu_id_pressed(id):
+	match id:
+		0: #Settings
+			%Window.hide()
+			var rect := Rect2i((size - Vector2(%Window.size))/2,%Window.size)
+			%Window.popup_on_parent(rect)
+	pass # Replace with function body.
+
+
+func _on_h_slider_value_changed(value):
+	ruby_lyrics_view.display_time = value
+	pass # Replace with function body.
+
+
+func _on_resized():
+	if ruby_lyrics_view:
+		ruby_lyrics_view.display_top_margin = int(size.y / 2)
+		ruby_lyrics_view.display_bottom_margin = int(size.y / 2)
+
+
+
+func _on_node_received(data : PlaybackData):
+	var texts = searcher.search(data.title,data.artists,data.album,data.file_path,"")
+	if texts.is_empty():
+		source_text = data.title + "\n" + ",".join(data.artists) + "\n" + data.album
+		lyrics = LyricsContainer.new(source_text)
+		ruby_lyrics_view.lyrics = lyrics
+		ruby_lyrics_view.build()
+		$HSlider.max_value = 0.0
+		return
+	if source_text != texts[0]:
+		source_text = texts[0]
+		lyrics = LyricsContainer.new(source_text)
+		ruby_lyrics_view.lyrics = lyrics
+		ruby_lyrics_view.build()
+		var max_time := lyrics.get_end_time()
+		$HSlider.max_value = max_time if max_time >= 0 else 0.0
+	
+

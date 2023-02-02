@@ -1,14 +1,68 @@
-[gd_scene format=3 uid="uid://dmriqyur7nbu2"]
+[gd_scene load_steps=4 format=3 uid="uid://dmriqyur7nbu2"]
+
+[ext_resource type="Script" path="res://scenes/settings_window.gd" id="1_54w0n"]
+[ext_resource type="FontFile" uid="uid://deoykaw2557al" path="res://fonts/ShipporiAntique-Medium.otf" id="2_g8f4r"]
+
+[sub_resource type="Theme" id="Theme_f3a41"]
+default_font = ExtResource("2_g8f4r")
+default_font_size = 20
 
 [node name="Window" type="Window"]
-size = Vector2i(600, 400)
+size = Vector2i(606, 400)
+wrap_controls = true
 unresizable = true
-always_on_top = true
-popup_window = true
+script = ExtResource("1_54w0n")
 
 [node name="TabContainer" type="TabContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 5.0
+offset_right = 5.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("Theme_f3a41")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="TabContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 33
+columns = 4
+
+[node name="Label" type="Label" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Fill"
+horizontal_alignment = 1
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerButton2" type="ColorPickerButton" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerButton3" type="ColorPickerButton" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Stroke"
+horizontal_alignment = 1
+
+[node name="ColorPickerButton4" type="ColorPickerButton" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerButton5" type="ColorPickerButton" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerButton6" type="ColorPickerButton" parent="TabContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]

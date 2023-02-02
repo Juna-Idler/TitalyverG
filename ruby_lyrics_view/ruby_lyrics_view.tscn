@@ -12,3 +12,6 @@ grow_vertical = 2
 script = ExtResource("1_g3lwn")
 font_size = 32
 font_ruby_size = 16
+ruby_alignment_ruby = 0
+ruby_alignment_parent = 0
+display_horizontal_alignment = 0

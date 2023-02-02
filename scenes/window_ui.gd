@@ -19,7 +19,7 @@ var _scroll_pad_dragging := false
 
 func _on_gui_input(event : InputEvent):
 	if event is InputEventMouseMotion and _dragging:
-		var pos = DisplayServer.window_get_position()
+		var pos := DisplayServer.window_get_position()
 		var move = pointer_position != pos + Vector2i(event.global_position)
 		if move:
 			var r := Vector2i(event.global_position) + pos - pointer_position
@@ -35,7 +35,7 @@ func _on_gui_input(event : InputEvent):
 			_dragging = false
 			if event.button_index == MOUSE_BUTTON_RIGHT:
 				if not event.pressed:
-					right_clicked.emit(event.position)
+					right_clicked.emit(event.global_position)
 			elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 				_dragging = true
 				pointer_position = Vector2i(event.global_position) + DisplayServer.window_get_position()
@@ -46,8 +46,8 @@ func _on_gui_input(event : InputEvent):
 
 func _on_top_left_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position != pos + Vector2i(event.global_position)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position != pos + Vector2i(event.global_position)
 		if sizing_direction == SizingDirection.TOP_LEFT and move:
 			var r := Vector2i(event.global_position) + pos - pointer_position
 			pointer_position = Vector2i(event.global_position) + pos
@@ -67,8 +67,8 @@ func _on_top_left_gui_input(event):
 
 func _on_top_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position.y != int(pos.y + event.global_position.y)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position.y != int(pos.y + event.global_position.y)
 		if sizing_direction == SizingDirection.TOP and move:
 			var r : int = event.global_position.y + pos.y - pointer_position.y
 			pointer_position = Vector2i(event.global_position) + pos
@@ -88,8 +88,8 @@ func _on_top_gui_input(event):
 
 func _on_top_right_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position != pos + Vector2i(event.global_position)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position != pos + Vector2i(event.global_position)
 		if sizing_direction == SizingDirection.TOP_RIGHT and move:
 			var r := Vector2i(event.global_position) + pos - pointer_position
 			pointer_position = Vector2i(event.global_position) + pos
@@ -110,8 +110,8 @@ func _on_top_right_gui_input(event):
 
 func _on_left_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position.x != int(pos.x + event.global_position.x)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position.x != int(pos.x + event.global_position.x)
 		if sizing_direction == SizingDirection.LEFT and move:
 			var r : int = event.global_position.x + pos.x - pointer_position.x
 			pointer_position = Vector2i(event.global_position) + pos
@@ -131,8 +131,8 @@ func _on_left_gui_input(event):
 
 func _on_right_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position.x != int(pos.x + event.global_position.x)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position.x != int(pos.x + event.global_position.x)
 		if sizing_direction == SizingDirection.RIGHT and move:
 			var r : int = pointer_position.x - (event.global_position.x + pos.x)
 			pointer_position = Vector2i(event.global_position) + pos
@@ -151,8 +151,8 @@ func _on_right_gui_input(event):
 
 func _on_bottom_left_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position != pos + Vector2i(event.global_position)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position != pos + Vector2i(event.global_position)
 		if sizing_direction == SizingDirection.BOTTOM_LEFT and move:
 			var r := Vector2i(event.global_position) + pos - pointer_position
 			pointer_position = Vector2i(event.global_position) + pos
@@ -173,8 +173,8 @@ func _on_bottom_left_gui_input(event):
 
 func _on_bottom_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position.y != int(pos.y + event.global_position.y)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position.y != int(pos.y + event.global_position.y)
 		if sizing_direction == SizingDirection.RIGHT and move:
 			var r : int = pointer_position.y - (event.global_position.y + pos.y)
 			pointer_position = Vector2i(event.global_position) + pos
@@ -193,8 +193,8 @@ func _on_bottom_gui_input(event):
 
 func _on_bottom_right_gui_input(event):
 	if event is InputEventMouseMotion:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position != pos + Vector2i(event.global_position)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position != pos + Vector2i(event.global_position)
 		if sizing_direction == SizingDirection.BOTTOM_RIGHT and move:
 			var r := Vector2i(event.global_position) + pos - pointer_position
 			pointer_position = Vector2i(event.global_position) + pos
@@ -213,8 +213,8 @@ func _on_bottom_right_gui_input(event):
 
 func _on_scroll_pad_gui_input(event):
 	if event is InputEventMouseMotion and _scroll_pad_dragging:
-		var pos = DisplayServer.window_get_position()
-		var move = pointer_position != pos + Vector2i(event.global_position)
+		var pos := DisplayServer.window_get_position()
+		var move := pointer_position != pos + Vector2i(event.global_position)
 		if move:
 			var r := Vector2i(event.global_position) + pos - pointer_position
 			pointer_position = Vector2i(event.global_position) + pos
@@ -228,7 +228,7 @@ func _on_scroll_pad_gui_input(event):
 			_scroll_pad_dragging = false
 			if event.button_index == MOUSE_BUTTON_RIGHT:
 				if not event.pressed:
-					right_clicked.emit(event.position)
+					right_clicked.emit(event.global_position)
 			elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 				_scroll_pad_dragging = true
 				pointer_position = Vector2i(event.global_position) + DisplayServer.window_get_position()

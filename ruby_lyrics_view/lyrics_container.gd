@@ -19,9 +19,17 @@ func _init(lyrics_text : String):
 	for l in at_tag_container.other_lines:
 		var line := LyricsLine.create(l,at_tag_container)
 		lines.append(line)
-		@warning_ignore(int_assigned_to_enum)
+
+		@warning_ignore("int_as_enum_without_cast")
 		sync_mode = sync_mode | line.sync_mode
 		
+
+func get_end_time() -> float:
+	for i in range(lines.size()-1,-1,-1):
+		var end : float = lines[i].force_get_end_time()
+		if end >= 0:
+			return end
+	return -1.0
 
 
 class LyricsLine:
@@ -92,6 +100,13 @@ class LyricsLine:
 
 	func get_end_time() -> float:
 		return units.back().get_end_time()
+		
+	func force_get_end_time() -> float:
+		for i in range(units.size()-1,-1,-1):
+			var end : float = units[i].force_get_end_time()
+			if end >= 0:
+				return end
+		return -1.0
 
 	class Unit:
 		var base : Array # of TimeTag
@@ -154,12 +169,12 @@ class LyricsLine:
 			if end >= 0:
 				return end
 			for i in range(base.size()-1,-1,-1):
-				if base[i].end_time >= 0:
-					end = base[i].end_time
+				if base[i].start_time >= 0:
+					end = base[i].start_time
 					break
 			for i in range(ruby.size()-1,-1,-1):
-				if ruby[i].end_time >= 0:
-					end = max(end,ruby[i].end_time)
+				if ruby[i].start_time >= 0:
+					end = max(end,ruby[i].start_time)
 					break
 			return end
 
@@ -285,6 +300,9 @@ class AtTagContainer:
 		return
 
 	func translate(text : String) -> Array:
+		
+		if ruby_parent.is_empty() || ruby_begin.is_empty() || ruby_end.is_empty():
+			return [RubyUnit.new(text)]
 		
 		var ruby_pattern = AtTagContainer.escape_regex(ruby_parent) + "(.+?)" +\
 				AtTagContainer.escape_regex(ruby_begin) + "(.+?)" +\

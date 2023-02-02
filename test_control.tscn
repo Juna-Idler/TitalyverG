@@ -19,4 +19,8 @@ script = ExtResource("1_8fwvf")
 
 [node name="RubyLyricsView" parent="." instance=ExtResource("1_jsg5j")]
 layout_mode = 1
+offset_top = -119.0
+offset_right = -296.0
+offset_bottom = -869.0
 font_font = SubResource("SystemFont_48jfw")
+display_fade_time = null
