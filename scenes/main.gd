@@ -11,8 +11,7 @@ extends Control
 			ruby_lyrics_view.build()
 
 var searcher := LyricsFileSearcher.new()
-@onready var ruby_lyrics_view : RubyLyricsView = $ScrollContainer/RubyLyricsView
-@onready var scroll_container = $ScrollContainer
+@onready var ruby_lyrics_view : RubyLyricsView = $RubyLyricsView
 
 
 var source_text : String
@@ -45,8 +44,6 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var scroll = scroll_container.scroll_vertical
-	ruby_lyrics_view.set_display_range(scroll,scroll + scroll_container.size.y)
 	ruby_lyrics_view.display_time += delta
 	$HSlider.value = ruby_lyrics_view.display_time
 	pass
@@ -76,11 +73,10 @@ func _on_window_ui_right_clicked(position_):
 
 
 func _on_window_ui_wheel_moved(delta):
-	scroll_container.scroll_vertical -= delta * 30
-	pass # Replace with function body.
+	ruby_lyrics_view.display_y_offset += delta * 30
 
 func _on_window_ui_scroll_pad_dragging(delta):
-	scroll_container.scroll_vertical -= delta * ruby_lyrics_view.size.y / $WindowUI.size.y
+	ruby_lyrics_view.display_y_offset += delta * ruby_lyrics_view.layout_height / ruby_lyrics_view.size.y
 
 
 func _on_popup_menu_id_pressed(id):
@@ -98,9 +94,7 @@ func _on_h_slider_value_changed(value):
 
 
 func _on_resized():
-	if ruby_lyrics_view:
-		ruby_lyrics_view.display_top_margin = int(size.y / 2)
-		ruby_lyrics_view.display_bottom_margin = int(size.y / 2)
+	pass
 
 
 

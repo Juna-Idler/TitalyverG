@@ -94,15 +94,11 @@ enum HorizontalAlignment {LEFT,CENTER,RIGHT}
 		display_horizontal_alignment = v
 		queue_redraw()
 
-@export var display_top_margin : int :
-	set(v):
-		display_top_margin = v
-		queue_redraw()
-@export var display_bottom_margin : int :
-	set(v):
-		display_bottom_margin = v
-		queue_redraw()
 
+@export var display_y_offset : int :
+	set(v):
+		display_y_offset = v
+		queue_redraw()
 
 @export var display_time : float = 0 :
 	set(v):
@@ -112,12 +108,7 @@ enum HorizontalAlignment {LEFT,CENTER,RIGHT}
 @export var display_fade_in_time : float = 0.5
 @export var display_fade_out_time : float = 1.0
 
-func set_display_range(min_,max_):
-	display_range_min = min_
-	display_range_max = max_
-
-var display_range_min : float = 0
-var display_range_max : float = 1.79769e308
+@export var display_scrolling : bool = false
 
 
 var splitter : Callable = func(text : String) :
@@ -131,7 +122,6 @@ var linebreak_lines : Array # of LinebreakLine
 var displayed_lines : Array # of DisplayedLine
 
 var layout_height : float
-
 
 
 func _ready():
@@ -350,7 +340,7 @@ func build():
 				continue
 			lines.append(l)
 		lines.append(LyricsContainer.LyricsLine.create_from_time_tag(LyricsContainer.TimeTag.new(24*60*60,"")))
-		for i in range(1,lines.size()-1):
+		for i in range(lines.size()-1):
 			var parts : Array = [] # of BuiltLine.Part
 			for u in lines[i].units:
 				var unit := u as LyricsContainer.LyricsLine.Unit
@@ -493,6 +483,7 @@ func layout():
 		var base_height : float = font.get_height(font_size) + adjust_line_height
 		
 		if line.unbreakables.is_empty():
+			displayed_lines.append(DisplayedLine.new([],[],line.start,line.end,y,base_height + adjust_no_ruby_space))
 			y += base_height + adjust_no_ruby_space
 			continue
 		
@@ -548,16 +539,82 @@ func layout():
 			y += height
 
 	layout_height = (y - adjust_line_height) if adjust_line_height < 0 else y
-	custom_minimum_size.y = layout_height + display_top_margin + display_bottom_margin
-#	size.y = layout_height
-	set_deferred("size:y",layout_height + display_top_margin + display_bottom_margin)
+
 
 func _draw():
 	var font := font_font
 	if not font:
 		return
+	
+	var time_y_offset : float
 
-	var y_offset : float = display_top_margin
+	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+		time_y_offset = 0
+		
+	else:
+		var active_top : float = 0
+		var active_bottom : float = 0
+		if display_scrolling:
+			for i in displayed_lines.size():
+				var line := displayed_lines[i] as DisplayedLine
+				if display_time <= line.end:
+					if display_time < line.start:
+						active_top = line.y
+					else:
+						var duration : float = line.end - line.start
+						var rate := (display_time - line.start) / duration 
+						active_top = line.y + line.height * rate
+					break
+			for i in range(displayed_lines.size()-1,0,-1):
+				var line := displayed_lines[i] as DisplayedLine
+				if display_time >= line.start:
+					var duration : float = line.end - line.start
+					var rate := (display_time - line.start) / duration 
+					active_bottom = line.y + line.height * rate
+					break
+		else:
+			for i in displayed_lines.size():
+				var line := displayed_lines[i] as DisplayedLine
+				if display_time <= line.end:
+					if display_time > line.end - display_fade_in_time:
+						var duration : float = min(line.end - line.start,display_fade_in_time)
+						var rate := (display_time - (line.end - duration)) / duration 
+						active_top = line.y + line.height * rate
+					else:
+						active_top = line.y
+					break
+			for i in range(displayed_lines.size()-1,0,-1):
+				var line := displayed_lines[i] as DisplayedLine
+				if display_time >= line.start - display_fade_in_time:
+					if display_time < line.start:
+						var prev := displayed_lines[i-1] as DisplayedLine
+						var duration : float = min(prev.end - prev.start,display_fade_in_time)
+						var rate := (display_time - (line.start - duration)) / duration 
+						active_bottom = line.y + line.height * rate
+					else:
+						active_bottom = line.y + line.height
+					break
+
+
+			
+		time_y_offset = -(active_top + active_bottom) / 2
+
+	var y_offset : float = display_y_offset + time_y_offset + size.y/2
+	
+	var display_start_line : int = 0
+	var display_end_line : int = displayed_lines.size()
+	
+	for i in displayed_lines.size():
+		var l := displayed_lines[i] as DisplayedLine
+		if l.y + l.height + y_offset > 0:
+			display_start_line = i
+			break
+	for i in range(displayed_lines.size()-1,-1,-1):
+		var l := displayed_lines[i] as DisplayedLine
+		if l.y + y_offset < size.y:
+			display_end_line = i + 1
+			break
+	
 
 	var slides := PackedFloat32Array()
 	slides.resize(displayed_lines.size())
@@ -590,12 +647,9 @@ func _draw():
 					slides[i] = slide
 
 	if font_outline_width > 0:
-		for i in displayed_lines.size():
+		for i in range(display_start_line,display_end_line):
 			var l := displayed_lines[i] as DisplayedLine
-			var y = l.y + y_offset
-			if y + l.height < display_range_min or display_range_max < y:
-				continue
-				
+			
 			if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
 				for c in l.base:
 					var pos = Vector2(c.x + slides[i],c.y + y_offset)
@@ -626,11 +680,8 @@ func _draw():
 						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fadecolor)
 
 	if font_ruby_outline_width > 0:
-		for i in displayed_lines.size():
+		for i in range(display_start_line,display_end_line):
 			var l := displayed_lines[i] as DisplayedLine
-			var y = l.y + y_offset
-			if y + l.height < display_range_min or display_range_max < y:
-				continue
 				
 			if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
 				for c in l.ruby:
@@ -661,12 +712,8 @@ func _draw():
 						var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
 						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fadecolor)
 
-	for i in displayed_lines.size():
+	for i in range(display_start_line,display_end_line):
 		var l := displayed_lines[i] as DisplayedLine
-		var y = l.y + y_offset
-		if y + l.height < display_range_min or display_range_max < y:
-			continue
-
 			
 		if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
 			for c in l.base:
@@ -697,12 +744,9 @@ func _draw():
 					var fadecolor := font_active_color * rate + font_standby_color * (1 - rate)
 					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fadecolor)
 
-	for i in displayed_lines.size():
+	for i in range(display_start_line,display_end_line):
 		var l := displayed_lines[i] as DisplayedLine
-		var y = l.y + y_offset
-		if y + l.height < display_range_min or display_range_max < y:
-			continue
-			
+
 		if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
 			for c in l.ruby:
 				var pos = Vector2(c.x + slides[i],c.y + y_offset)

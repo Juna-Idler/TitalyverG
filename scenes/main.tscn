@@ -91,20 +91,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.74902)
 
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-horizontal_scroll_mode = 0
-vertical_scroll_mode = 3
-
-[node name="RubyLyricsView" parent="ScrollContainer" instance=ExtResource("4_c1jr5")]
+[node name="RubyLyricsView" parent="." instance=ExtResource("4_c1jr5")]
 custom_minimum_size = Vector2(0, 400)
-layout_mode = 2
+layout_mode = 1
 size_flags_horizontal = 3
 font_font = SubResource("SystemFont_54pwe")
 font_outline_width = 2
@@ -114,10 +103,8 @@ font_standby_color = Color(0.890196, 0.890196, 0.890196, 1)
 buffer_left_padding = 12
 buffer_right_padding = 12
 adjust_ruby_distance = -10
-display_top_margin = 200
-display_bottom_margin = 200
-display_fade_in_time = 0.5
-display_fade_out_time = 1.0
+display_y_offset = 0
+display_scrolling = true
 
 [node name="WindowUI" parent="." instance=ExtResource("4_tcylf")]
 layout_mode = 1
