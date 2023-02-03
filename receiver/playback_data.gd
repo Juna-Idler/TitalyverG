@@ -39,6 +39,11 @@ func _init(pe,st,tod,fp,t,ar,al,d,md):
 	album = al
 	duration = d
 	meta_data = md
+	
+func same_song(other : PlaybackData) -> bool:
+	return (file_path == other.file_path and title == other.title and
+			artists == other.artists and album == other.album and duration == other.duration)
+
 
 func serialize() -> String:
 	var dic := {

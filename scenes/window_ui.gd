@@ -4,7 +4,7 @@ extends Control
 signal right_clicked(position : Vector2)
 signal wheel_moved(delta : int)
 signal scroll_pad_dragging(delta : int)
-
+signal middle_clicked()
 
 func _ready():
 	pass # Replace with function body.
@@ -36,6 +36,9 @@ func _on_gui_input(event : InputEvent):
 			if event.button_index == MOUSE_BUTTON_RIGHT:
 				if not event.pressed:
 					right_clicked.emit(event.global_position)
+			elif event.button_index == MOUSE_BUTTON_MIDDLE:
+				if event.pressed:
+					middle_clicked.emit()
 			elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 				_dragging = true
 				pointer_position = Vector2i(event.global_position) + DisplayServer.window_get_position()

@@ -1,9 +1,9 @@
 
-extends LyricsSearcher
+extends ILyricsFinder
 
-class_name LyricsFileSearcher
+class_name LyricsFileFinder
 
-func search(_title : String,_artists : PackedStringArray,_album : String,
+func _find(_title : String,_artists : PackedStringArray,_album : String,
 		file_path : String,_param : String) -> PackedStringArray:
 	if not file_path.is_absolute_path():
 		return PackedStringArray()

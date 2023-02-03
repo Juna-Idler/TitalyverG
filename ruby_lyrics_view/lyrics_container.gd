@@ -55,14 +55,12 @@ class LyricsLine:
 				tt_count += base.size()
 			if not ruby.is_empty() and (ruby[0].start_time >= 0 or ruby.size() > 1):
 				tt_count += ruby.size()
-		if tt_count > 1:
+		if units_[0].get_start_time() < 0:
+			sync_mode_ = SyncMode.UNSYNC
+		elif tt_count > 1:
 			sync_mode_ = SyncMode.KARAOKE
 		elif tt_count == 1:
-			if (units_[0].base[0].start_time > 0 or 
-				(not units_[0].ruby.is_empty() and units_[0].ruby[0].start_time > 0)):
-				sync_mode_ = SyncMode.LINE
-			else:
-				sync_mode_ = SyncMode.KARAOKE
+			sync_mode_ = SyncMode.LINE
 		else:
 			sync_mode_ = SyncMode.UNSYNC
 		return LyricsLine.new(units_,sync_mode_)

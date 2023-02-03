@@ -4,6 +4,8 @@ extends Control
 class_name RubyLyricsView
 
 
+@export_group("font","font_")
+
 @export var font_font : Font:
 	set(v):
 		font_font = v
@@ -53,6 +55,9 @@ class_name RubyLyricsView
 		queue_redraw()
 
 
+
+@export_group("adjust")
+
 enum RubyAlignment {CENTER,SPACE121,SPACE010}
 @export var ruby_alignment_ruby  : RubyAlignment :
 	set(v):
@@ -86,8 +91,10 @@ enum ParentAlignment {NOTHING,CENTER,SPACE121,SPACE010}
 	set(v):
 		adjust_no_ruby_space = v
 		layout()
-	
-	
+
+
+@export_group("display","display")
+
 enum HorizontalAlignment {LEFT,CENTER,RIGHT}
 @export var display_horizontal_alignment : HorizontalAlignment :
 	set(v):
@@ -100,15 +107,14 @@ enum HorizontalAlignment {LEFT,CENTER,RIGHT}
 		display_y_offset = v
 		queue_redraw()
 
-@export var display_time : float = 0 :
-	set(v):
-		display_time = v
-		queue_redraw()
+@export var display_time : float = 0
 
 @export var display_fade_in_time : float = 0.5
 @export var display_fade_out_time : float = 1.0
 
 @export var display_scrolling : bool = false
+
+@export var display_scroll_limit : float = 5
 
 
 var splitter : Callable = func(text : String) :
@@ -122,7 +128,7 @@ var linebreak_lines : Array # of LinebreakLine
 var displayed_lines : Array # of DisplayedLine
 
 var layout_height : float
-
+var time_y_offset : float
 
 func _ready():
 	layout()
@@ -414,7 +420,7 @@ func build():
 
 func layout():
 	var font := font_font
-	if not font:
+	if not font or not lyrics:
 		return
 
 	linebreak_lines.clear()
@@ -541,63 +547,65 @@ func layout():
 	layout_height = (y - adjust_line_height) if adjust_line_height < 0 else y
 
 
+func calculate_time_y_offset(time : float) -> float:
+	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+		return 0
+	var active_top : float = 0
+	var active_bottom : float = 0
+	if display_scrolling:
+		for i in displayed_lines.size():
+			var line := displayed_lines[i] as DisplayedLine
+			if time <= line.end:
+				if time < line.start:
+					active_top = line.y
+				else:
+					var duration : float = line.end - line.start
+					var rate := (time - line.start) / duration 
+					active_top = line.y + line.height * rate
+				break
+		for i in range(displayed_lines.size()-1,0,-1):
+			var line := displayed_lines[i] as DisplayedLine
+			if time >= line.start:
+				var duration : float = line.end - line.start
+				var rate := (time - line.start) / duration 
+				active_bottom = line.y + line.height * rate
+				break
+	else:
+		for i in displayed_lines.size():
+			var line := displayed_lines[i] as DisplayedLine
+			if time <= line.end:
+				var duration : float = min(line.end - line.start,display_fade_in_time)
+				if time > line.end - duration:
+					var rate := (time - (line.end - duration)) / duration 
+					active_top = line.y + line.height * rate
+				else:
+					active_top = line.y
+				break
+		for i in range(displayed_lines.size()-1,0,-1):
+			var line := displayed_lines[i] as DisplayedLine
+			var prev := displayed_lines[i-1] as DisplayedLine
+			var duration : float = min(prev.end - prev.start,display_fade_in_time)
+			if time >= line.start - duration:
+				if time < line.start:
+					var rate := (time - (line.start - duration)) / duration 
+					active_bottom = line.y + line.height * rate
+				else:
+					active_bottom = line.y + line.height
+				break
+	return -(active_top + active_bottom) / 2
+
+
 func _draw():
 	var font := font_font
-	if not font:
+	if not font or not lyrics:
 		return
 	
-	var time_y_offset : float
+	var target_time_y_offset : float = calculate_time_y_offset(display_time)
 
-	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
-		time_y_offset = 0
-		
+	if abs(target_time_y_offset - time_y_offset) > display_scroll_limit:
+		time_y_offset += sign(target_time_y_offset - time_y_offset) * display_scroll_limit
 	else:
-		var active_top : float = 0
-		var active_bottom : float = 0
-		if display_scrolling:
-			for i in displayed_lines.size():
-				var line := displayed_lines[i] as DisplayedLine
-				if display_time <= line.end:
-					if display_time < line.start:
-						active_top = line.y
-					else:
-						var duration : float = line.end - line.start
-						var rate := (display_time - line.start) / duration 
-						active_top = line.y + line.height * rate
-					break
-			for i in range(displayed_lines.size()-1,0,-1):
-				var line := displayed_lines[i] as DisplayedLine
-				if display_time >= line.start:
-					var duration : float = line.end - line.start
-					var rate := (display_time - line.start) / duration 
-					active_bottom = line.y + line.height * rate
-					break
-		else:
-			for i in displayed_lines.size():
-				var line := displayed_lines[i] as DisplayedLine
-				if display_time <= line.end:
-					if display_time > line.end - display_fade_in_time:
-						var duration : float = min(line.end - line.start,display_fade_in_time)
-						var rate := (display_time - (line.end - duration)) / duration 
-						active_top = line.y + line.height * rate
-					else:
-						active_top = line.y
-					break
-			for i in range(displayed_lines.size()-1,0,-1):
-				var line := displayed_lines[i] as DisplayedLine
-				if display_time >= line.start - display_fade_in_time:
-					if display_time < line.start:
-						var prev := displayed_lines[i-1] as DisplayedLine
-						var duration : float = min(prev.end - prev.start,display_fade_in_time)
-						var rate := (display_time - (line.start - duration)) / duration 
-						active_bottom = line.y + line.height * rate
-					else:
-						active_bottom = line.y + line.height
-					break
-
-
-			
-		time_y_offset = -(active_top + active_bottom) / 2
+		time_y_offset = target_time_y_offset
 
 	var y_offset : float = display_y_offset + time_y_offset + size.y/2
 	

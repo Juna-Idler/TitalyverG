@@ -103,8 +103,8 @@ font_standby_color = Color(0.890196, 0.890196, 0.890196, 1)
 buffer_left_padding = 12
 buffer_right_padding = 12
 adjust_ruby_distance = -10
-display_y_offset = 0
 display_scrolling = true
+display_scroll_limit = 4.0
 
 [node name="WindowUI" parent="." instance=ExtResource("4_tcylf")]
 layout_mode = 1
@@ -153,7 +153,51 @@ grow_horizontal = 2
 grow_vertical = 0
 step = 0.1
 
+[node name="LyricsCount" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = -34.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 0
+theme_override_font_sizes/font_size = 16
+text = "<>"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ButtonPrev" type="Button" parent="LyricsCount"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 8.0
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+flat = true
+
+[node name="ButtonNext" type="Button" parent="LyricsCount"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -12.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_default_cursor_shape = 2
+flat = true
+alignment = 0
+
 [connection signal="resized" from="." to="." method="_on_resized"]
+[connection signal="middle_clicked" from="WindowUI" to="." method="_on_window_ui_middle_clicked"]
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
 [connection signal="wheel_moved" from="WindowUI" to="." method="_on_window_ui_wheel_moved"]
@@ -161,3 +205,5 @@ step = 0.1
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
 [connection signal="received" from="Node" to="." method="_on_node_received"]
 [connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]
+[connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
+[connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]

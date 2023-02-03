@@ -4,18 +4,22 @@ extends Control
 @export_multiline var input : String :
 	set(v):
 		input = v
-		source_text = input
-		lyrics = LyricsContainer.new(v)
+		source_texts = [input]
+		source_text_index = 0
+		lyrics = LyricsContainer.new(input)
 		if ruby_lyrics_view:
 			ruby_lyrics_view.lyrics = lyrics
 			ruby_lyrics_view.build()
 
-var searcher := LyricsFileSearcher.new()
+var finder : ILyricsFinder = LyricsFileFinder.new()
 @onready var ruby_lyrics_view : RubyLyricsView = $RubyLyricsView
 
 
-var source_text : String
+var source_texts : PackedStringArray
+var source_text_index : int
 var lyrics : LyricsContainer
+
+var playback_data : PlaybackData = PlaybackData.new(0,0,0,"","",[],"",0,{})
 
 
 # Called when the node enters the scene tree for the first time.
@@ -45,8 +49,9 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	ruby_lyrics_view.display_time += delta
-	$HSlider.value = ruby_lyrics_view.display_time
-	pass
+	$HSlider.set_value_no_signal(ruby_lyrics_view.display_time)
+	$HSlider.queue_redraw()
+	ruby_lyrics_view.queue_redraw()
 
 
 func _on_button_pressed():
@@ -55,15 +60,23 @@ func _on_button_pressed():
 
 func on_files_dropped(files : PackedStringArray):
 	var file_path = files[0]
-	var texts = searcher.search("",[""],"",file_path,"")
-	if texts.is_empty() and source_text != texts[0]:
-		source_text = texts[0]
-		lyrics = LyricsContainer.new(source_text)
+	source_texts = finder._find("",[""],"",file_path,"")
+	if not source_texts.is_empty():
+		source_text_index = 0
+		lyrics = LyricsContainer.new(source_texts[0])
 		ruby_lyrics_view.lyrics = lyrics
 		ruby_lyrics_view.build()
-		
 		var max_time := lyrics.get_end_time()
 		$HSlider.max_value = max_time if max_time >= 0 else 0.0
+	else:
+		var text := "no data"
+		source_texts = [text]
+		source_text_index = 0
+		lyrics = LyricsContainer.new(text)
+		ruby_lyrics_view.lyrics = lyrics
+		ruby_lyrics_view.build()
+		$HSlider.max_value = 0.0
+	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 
 func _on_window_ui_right_clicked(position_):
@@ -77,6 +90,9 @@ func _on_window_ui_wheel_moved(delta):
 
 func _on_window_ui_scroll_pad_dragging(delta):
 	ruby_lyrics_view.display_y_offset += delta * ruby_lyrics_view.layout_height / ruby_lyrics_view.size.y
+
+func _on_window_ui_middle_clicked():
+	ruby_lyrics_view.display_y_offset = 0
 
 
 func _on_popup_menu_id_pressed(id):
@@ -99,20 +115,56 @@ func _on_resized():
 
 
 func _on_node_received(data : PlaybackData):
-	var texts = searcher.search(data.title,data.artists,data.album,data.file_path,"")
-	if texts.is_empty():
-		source_text = data.title + "\n" + ",".join(data.artists) + "\n" + data.album
-		lyrics = LyricsContainer.new(source_text)
+	if playback_data.same_song(data):
+		return
+
+	source_texts = finder._find(data.title,data.artists,data.album,data.file_path,"")
+	if source_texts.is_empty():
+		var text := data.title + "\n" + ",".join(data.artists) + "\n" + data.album
+		source_texts = [text]
+		source_text_index = 0
+		lyrics = LyricsContainer.new(text)
 		ruby_lyrics_view.lyrics = lyrics
 		ruby_lyrics_view.build()
 		$HSlider.max_value = 0.0
+		$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 		return
-	if source_text != texts[0]:
-		source_text = texts[0]
-		lyrics = LyricsContainer.new(source_text)
-		ruby_lyrics_view.lyrics = lyrics
-		ruby_lyrics_view.build()
-		var max_time := lyrics.get_end_time()
-		$HSlider.max_value = max_time if max_time >= 0 else 0.0
+	source_text_index = 0
+	lyrics = LyricsContainer.new(source_texts[0])
+	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.build()
+	var max_time := lyrics.get_end_time()
+	$HSlider.max_value = max_time if max_time >= 0 else 0.0
+	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 	
+
+
+
+func _on_button_prev_pressed():
+	if source_texts.size() <= 1:
+		return
+	source_text_index -= 1
+	if source_text_index < 0:
+		source_text_index = source_texts.size() - 1
+	lyrics = LyricsContainer.new(source_texts[source_text_index])
+	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.build()
+	var max_time := lyrics.get_end_time()
+	$HSlider.max_value = max_time if max_time >= 0 else 0.0
+	$LyricsCount/ButtonPrev.release_focus()
+	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
+
+func _on_button_next_pressed():
+	if source_texts.size() <= 1:
+		return
+	source_text_index += 1
+	if source_text_index >= source_texts.size():
+		source_text_index = 0
+	lyrics = LyricsContainer.new(source_texts[source_text_index])
+	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.build()
+	var max_time := lyrics.get_end_time()
+	$HSlider.max_value = max_time if max_time >= 0 else 0.0
+	$LyricsCount/ButtonNext.release_focus()
+	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
