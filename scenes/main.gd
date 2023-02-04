@@ -19,7 +19,7 @@ var source_texts : PackedStringArray
 var source_text_index : int
 var lyrics : LyricsContainer
 
-var playback_data : PlaybackData = PlaybackData.new(0,0,0,"","",[],"",0,{})
+var playback_data : PlaybackData = PlaybackData.new(false,0,0,0,"","",[],"",0,{})
 
 
 # Called when the node enters the scene tree for the first time.
@@ -115,9 +115,11 @@ func _on_resized():
 
 
 func _on_node_received(data : PlaybackData):
-	if playback_data.same_song(data):
+	if data.playback_only or playback_data.same_song(data):
+		ruby_lyrics_view.display_time = data.seek_time
 		return
 
+	ruby_lyrics_view.display_time = data.seek_time
 	source_texts = finder._find(data.title,data.artists,data.album,data.file_path,"")
 	if source_texts.is_empty():
 		var text := data.title + "\n" + ",".join(data.artists) + "\n" + data.album

@@ -19,6 +19,8 @@ class JapaneaseLineBreak extends ILineBreak:
 	var prev_break2 := "([{<";
 
 	func _is_link(left : String,right : String) -> bool:
+		if left.is_empty() or right.is_empty():
+			return false
 		var code1 := left.unicode_at(left.length() - 1)
 		var code2 := right.unicode_at(0)
 		var char1 = char(code1)

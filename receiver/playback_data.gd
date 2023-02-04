@@ -17,9 +17,12 @@ enum PlaybackEvent
 	SEEK_STOP = 6,
 }
 
+var playback_only : bool
+
 var playback_event : PlaybackEvent
 var seek_time : float # イベントが発生した時の再生位置
 var time_of_day : int # イベントが発生した24時間周期のミリ秒単位の時刻
+
 
 var file_path : String # おそらく音楽ファイルの多分フルパス
 var title : String
@@ -29,7 +32,8 @@ var duration : float
 
 var meta_data : Dictionary
 
-func _init(pe,st,tod,fp,t,ar,al,d,md):
+func _init(po,pe,st,tod,fp = "",t = "",ar = [""],al = "",d = 0,md = {}):
+	playback_only = po
 	playback_event = pe
 	seek_time = st
 	time_of_day = tod
@@ -60,6 +64,11 @@ func serialize() -> String:
 	return JSON.stringify(dic)
 
 static func deserialize(json : String) -> PlaybackData:
-	var dic := JSON.parse_string(json)
-	return PlaybackData.new(dic["event"],dic["seek"],dic["time"],
-			dic["path"],dic["title"],dic["artists"],dic["album"],dic["duration"],dic["meta"])
+	var dic : Dictionary = JSON.parse_string(json)
+	if dic.has("path"):
+		var artist = dic["artists"] as String
+		return PlaybackData.new(false,dic["event"],dic["seek"],dic["time"],
+				dic["path"],dic["title"],[artist] if artist != null else dic["artists"],dic["album"],dic["duration"],dic["meta"])
+	else:
+		return PlaybackData.new(true,dic["event"],dic["seek"],dic["time"])
+		

@@ -372,10 +372,7 @@ func build():
 					rubys[index].start = tt.start_time
 					if index - 1 >= 0 and rubys[index - 1].end < 0:
 						rubys[index - 1].end = tt.start_time
-				var part_base := bases.filter(func(u:Unit):return not u.cluster.is_empty())
-				var part_ruby := rubys.filter(func(u:Unit):return not u.cluster.is_empty())
-				if not part_base.is_empty():
-					parts.append(BuiltLine.Part.new(part_base,part_ruby,unit.get_start_time(),unit.get_end_time()))
+				parts.append(BuiltLine.Part.new(bases,rubys,unit.get_start_time(),unit.get_end_time()))
 			var line_end : float = lines[i].get_end_time()
 			var next = lines[i+1].get_start_time()
 			if line_end < 0 or next > line_end:
