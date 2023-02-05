@@ -21,24 +21,16 @@ var lyrics : LyricsContainer
 
 var playback_data : PlaybackData = PlaybackData.new(false,0,0,0,"","",[],"",0,{})
 
+var playing : bool = false
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	get_viewport().transparent_bg = true
 	get_viewport().gui_embed_subwindows = false
 	get_window().files_dropped.connect(on_files_dropped)
-	OS.get_executable_path().get_base_dir()
+#	OS.get_executable_path().get_base_dir()
 
-#	var file_path = "D:/Music/高本めぐみ/02 MELODIC TALK.flac"
-#
-#	var ExSearcher = load("D:/Documents/test_search.gd")
-#	var ex_searcher = ExSearcher.new()
-#
-#	var texts = searcher.search("",[""],"",file_path,"")
-#
-#
-#	var lyrics := LyricsContainer.new(texts[0])
-	
 	ruby_lyrics_view.lyrics = lyrics
 	ruby_lyrics_view.build()
 	var max_time := lyrics.get_end_time()
@@ -48,10 +40,11 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	ruby_lyrics_view.display_time += delta
-	$HSlider.set_value_no_signal(ruby_lyrics_view.display_time)
-	$HSlider.queue_redraw()
-	ruby_lyrics_view.queue_redraw()
+	if playing:
+		ruby_lyrics_view.display_time += delta
+		$HSlider.set_value_no_signal(ruby_lyrics_view.display_time)
+		$HSlider.queue_redraw()
+		ruby_lyrics_view.queue_redraw()
 
 
 func _on_button_pressed():
@@ -115,8 +108,15 @@ func _on_resized():
 
 
 func _on_node_received(data : PlaybackData):
+	ruby_lyrics_view.display_time = data.seek_time
+	if data.playback_event & PlaybackData.PlaybackEvent.PLAY_FLAG:
+		playing = true
+	else:
+		playing = false;
+#		if data.playback_event & PlaybackData.PlaybackEvent.STOP_FLAG:
+#			playing = false
+
 	if data.playback_only or playback_data.same_song(data):
-		ruby_lyrics_view.display_time = data.seek_time
 		return
 
 	ruby_lyrics_view.display_time = data.seek_time
@@ -139,7 +139,6 @@ func _on_node_received(data : PlaybackData):
 	$HSlider.max_value = max_time if max_time >= 0 else 0.0
 	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 	
-
 
 
 func _on_button_prev_pressed():

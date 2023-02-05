@@ -15,4 +15,5 @@ font_ruby_size = 16
 ruby_alignment_ruby = 0
 ruby_alignment_parent = 0
 display_horizontal_alignment = 0
-display_scroll_limit = null
+display_scroll_center = null
+display_active_back_color = null

@@ -112,9 +112,18 @@ enum HorizontalAlignment {LEFT,CENTER,RIGHT}
 @export var display_fade_in_time : float = 0.5
 @export var display_fade_out_time : float = 1.0
 
+@export var display_scroll_center : bool = true
 @export var display_scrolling : bool = false
 
 @export var display_scroll_limit : float = 5
+
+var limits : PackedFloat32Array = [64,4,128,8,256,16,512,32,1024,64,2048,128,4096,256]
+
+@export var display_active_back_color : Color :
+	set(v):
+		display_active_back_color = v
+		queue_redraw()
+@export var display_active_back_texture : Texture
 
 
 var splitter : Callable = func(text : String) :
@@ -557,14 +566,14 @@ func calculate_time_y_offset(time : float) -> float:
 					active_top = line.y
 				else:
 					var duration : float = line.end - line.start
-					var rate := (time - line.start) / duration 
+					var rate := (time - line.start) / duration if duration > 0 else 0.0
 					active_top = line.y + line.height * rate
 				break
 		for i in range(displayed_lines.size()-1,0,-1):
 			var line := displayed_lines[i] as DisplayedLine
 			if time >= line.start:
 				var duration : float = line.end - line.start
-				var rate := (time - line.start) / duration 
+				var rate := (time - line.start) / duration if duration > 0 else 1.0
 				active_bottom = line.y + line.height * rate
 				break
 	else:
@@ -573,7 +582,7 @@ func calculate_time_y_offset(time : float) -> float:
 			if time <= line.end:
 				var duration : float = min(line.end - line.start,display_fade_in_time)
 				if time > line.end - duration:
-					var rate := (time - (line.end - duration)) / duration 
+					var rate := (time - (line.end - duration)) / duration if duration > 0 else 0.0
 					active_top = line.y + line.height * rate
 				else:
 					active_top = line.y
@@ -584,7 +593,7 @@ func calculate_time_y_offset(time : float) -> float:
 			var duration : float = min(prev.end - prev.start,display_fade_in_time)
 			if time >= line.start - duration:
 				if time < line.start:
-					var rate := (time - (line.start - duration)) / duration 
+					var rate := (time - (line.start - duration)) / duration  if duration > 0 else 1.0
 					active_bottom = line.y + line.height * rate
 				else:
 					active_bottom = line.y + line.height
@@ -599,12 +608,30 @@ func _draw():
 	
 	var target_time_y_offset : float = calculate_time_y_offset(display_time)
 
-	if abs(target_time_y_offset - time_y_offset) > display_scroll_limit:
-		time_y_offset += sign(target_time_y_offset - time_y_offset) * display_scroll_limit
+	if display_scroll_center:
+		target_time_y_offset +=  size.y/2
+	else:
+		target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
+		target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
+		
+		target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
+
+	var distance = abs(target_time_y_offset - time_y_offset)
+	if distance > display_scroll_limit:
+		var move : float = 0.0
+		for i in limits.size() / 2:
+			if distance <= limits[i*2]:
+				move = limits[i*2+1]
+				break
+		if move == 0:
+			move = distance
+		time_y_offset += sign(target_time_y_offset - time_y_offset) * move
+#		time_y_offset += sign(target_time_y_offset - time_y_offset) * display_scroll_limit
 	else:
 		time_y_offset = target_time_y_offset
 
-	var y_offset : float = display_y_offset + time_y_offset + size.y/2
+	var y_offset : float = display_y_offset + time_y_offset
+
 	
 	var display_start_line : int = 0
 	var display_end_line : int = displayed_lines.size()
@@ -619,7 +646,6 @@ func _draw():
 		if l.y + y_offset < size.y:
 			display_end_line = i + 1
 			break
-	
 
 	var slides := PackedFloat32Array()
 	slides.resize(displayed_lines.size())
@@ -650,135 +676,228 @@ func _draw():
 					var width = right - left
 					var slide = (size.x + buffer_left_padding - buffer_right_padding - width) / 2 - buffer_left_padding
 					slides[i] = slide
+#
+#	if font_outline_width > 0:
+#		for i in range(display_start_line,display_end_line):
+#			var l := displayed_lines[i] as DisplayedLine
+#
+#			if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
+#				for c in l.base:
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_sleep_outline_color)
+#			elif display_time < l.start:
+#				var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
+#				var fade_color := font_standby_outline_color * rate + font_sleep_outline_color * (1 - rate)
+#				for c in l.base:
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fade_color)
+#			elif display_time > l.end:
+#				var rate := (display_time - l.end) / display_fade_out_time
+#				var fade_color := font_sleep_outline_color * rate + font_active_outline_color * (1 - rate)
+#				for c in l.base:
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fade_color)
+#			else:
+#				for c_ in l.base:
+#					var c := c_ as Unit
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					if display_time < c.start:
+#						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_standby_outline_color)
+#					elif display_time > c.end:
+#						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_active_outline_color)
+#					else:
+#						var rate := (display_time - c.start) / (c.end - c.start)
+#						var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
+#						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fadecolor)
+#
+#	if font_ruby_outline_width > 0:
+#		for i in range(display_start_line,display_end_line):
+#			var l := displayed_lines[i] as DisplayedLine
+#
+#			if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
+#				for c in l.ruby:
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_sleep_outline_color)
+#			elif display_time < l.start:
+#				var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
+#				var fade_color := font_standby_outline_color * rate + font_sleep_outline_color * (1 - rate)
+#				for c in l.ruby:
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_color)
+#			elif display_time > l.end:
+#				var rate := (display_time - l.end) / display_fade_out_time
+#				var fade_color := font_sleep_outline_color * rate + font_active_outline_color * (1 - rate)
+#				for c in l.ruby:
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_color)
+#			else:
+#				for c_ in l.ruby:
+#					var c := c_ as Unit
+#					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#					if display_time < c.start:
+#						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_standby_outline_color)
+#					elif display_time > c.end:
+#						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_active_outline_color)
+#					else:
+#						var rate := (display_time - c.start) / (c.end - c.start)
+#						var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
+#						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fadecolor)
+#
+#	for i in range(display_start_line,display_end_line):
+#		var l := displayed_lines[i] as DisplayedLine
+#
+#		if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
+#			for c in l.base:
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_sleep_color)
+#		elif display_time < l.start:
+#			var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
+#			var fade_color := font_standby_color * rate + font_sleep_color * (1 - rate)
+#			for c in l.base:
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fade_color)
+#		elif display_time > l.end:
+#			var rate := display_time - l.end / display_fade_out_time
+#			var fade_color := font_sleep_color * rate + font_active_color * (1 - rate)
+#			for c in l.base:
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fade_color)
+#		else:
+#			for c_ in l.base:
+#				var c := c_ as Unit
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				if display_time < c.start:
+#					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_standby_color)
+#				elif display_time > c.end:
+#					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_active_color)
+#				else:
+#					var rate := (display_time - c.start) / (c.end - c.start)
+#					var fadecolor := font_active_color * rate + font_standby_color * (1 - rate)
+#					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fadecolor)
+#
+#	for i in range(display_start_line,display_end_line):
+#		var l := displayed_lines[i] as DisplayedLine
+#
+#		if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
+#			for c in l.ruby:
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_sleep_color)
+#		elif display_time < l.start:
+#			var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
+#			var fade_color := font_standby_color * rate + font_sleep_color * (1 - rate)
+#			for c in l.ruby:
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fade_color)
+#		elif display_time > l.end:
+#			var rate := (display_time - l.end) / display_fade_out_time
+#			var fade_color := font_sleep_color * rate + font_active_color * (1 - rate)
+#			for c in l.ruby:
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fade_color)
+#		else:
+#			for c_ in l.ruby:
+#				var c := c_ as Unit
+#				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+#				if display_time < c.start:
+#					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_standby_color)
+#				elif display_time > c.end:
+#					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_active_color)
+#				else:
+#					var rate := (display_time - c.start) / (c.end - c.start)
+#					var fadecolor := font_active_color * rate + font_standby_color * (1 - rate)
+#					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fadecolor)
+#
 
-	if font_outline_width > 0:
-		for i in range(display_start_line,display_end_line):
-			var l := displayed_lines[i] as DisplayedLine
-			
-			if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
-				for c in l.base:
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+
+
+	for i in range(display_start_line,display_end_line):
+		var l := displayed_lines[i] as DisplayedLine
+
+		if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
+			for c in l.base:
+				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				if font_outline_width > 0:
 					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_sleep_outline_color)
-			elif display_time < l.start:
-				var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
-				var fade_color := font_standby_outline_color * rate + font_sleep_outline_color * (1 - rate)
-				for c in l.base:
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fade_color)
-			elif display_time > l.end:
-				var rate := (display_time - l.end) / display_fade_out_time
-				var fade_color := font_sleep_outline_color * rate + font_active_outline_color * (1 - rate)
-				for c in l.base:
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fade_color)
-			else:
-				for c_ in l.base:
-					var c := c_ as Unit
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
-					if display_time < c.start:
-						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_standby_outline_color)
-					elif display_time > c.end:
-						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_active_outline_color)
-					else:
-						var rate := (display_time - c.start) / (c.end - c.start)
-						var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
-						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fadecolor)
-
-	if font_ruby_outline_width > 0:
-		for i in range(display_start_line,display_end_line):
-			var l := displayed_lines[i] as DisplayedLine
-				
-			if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
-				for c in l.ruby:
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_sleep_outline_color)
-			elif display_time < l.start:
-				var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
-				var fade_color := font_standby_outline_color * rate + font_sleep_outline_color * (1 - rate)
-				for c in l.ruby:
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_color)
-			elif display_time > l.end:
-				var rate := (display_time - l.end) / display_fade_out_time
-				var fade_color := font_sleep_outline_color * rate + font_active_outline_color * (1 - rate)
-				for c in l.ruby:
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
-					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_color)
-			else:
-				for c_ in l.ruby:
-					var c := c_ as Unit
-					var pos = Vector2(c.x + slides[i],c.y + y_offset)
-					if display_time < c.start:
-						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_standby_outline_color)
-					elif display_time > c.end:
-						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_active_outline_color)
-					else:
-						var rate := (display_time - c.start) / (c.end - c.start)
-						var fadecolor := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
-						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fadecolor)
-
-	for i in range(display_start_line,display_end_line):
-		var l := displayed_lines[i] as DisplayedLine
-			
-		if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
-			for c in l.base:
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
 				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_sleep_color)
-		elif display_time < l.start:
-			var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
-			var fade_color := font_standby_color * rate + font_sleep_color * (1 - rate)
-			for c in l.base:
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
-				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fade_color)
-		elif display_time > l.end:
-			var rate := display_time - l.end / display_fade_out_time
-			var fade_color := font_sleep_color * rate + font_active_color * (1 - rate)
-			for c in l.base:
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
-				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fade_color)
-		else:
-			for c_ in l.base:
-				var c := c_ as Unit
-				var pos = Vector2(c.x + slides[i],c.y + y_offset)
-				if display_time < c.start:
-					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_standby_color)
-				elif display_time > c.end:
-					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_active_color)
-				else:
-					var rate := (display_time - c.start) / (c.end - c.start)
-					var fadecolor := font_active_color * rate + font_standby_color * (1 - rate)
-					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fadecolor)
-
-	for i in range(display_start_line,display_end_line):
-		var l := displayed_lines[i] as DisplayedLine
-
-		if display_time < l.start - display_fade_in_time or l.end + display_fade_out_time < display_time:
 			for c in l.ruby:
 				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				if font_ruby_outline_width > 0:
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_sleep_outline_color)
 				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_sleep_color)
 		elif display_time < l.start:
 			var rate := (display_time - (l.start - display_fade_in_time)) / display_fade_in_time
 			var fade_color := font_standby_color * rate + font_sleep_color * (1 - rate)
+			var fade_outline_color := font_standby_outline_color * rate + font_sleep_outline_color * (1 - rate)
+			var rect := Rect2(0,l.y + y_offset,size.x,l.height)
+#			draw_rect(rect,display_active_back_color * rate)
+			draw_texture_rect(display_active_back_texture,rect,false,display_active_back_color * rate)
+			for c in l.base:
+				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				if font_outline_width > 0:
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fade_outline_color)
+				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fade_color)
 			for c in l.ruby:
 				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				if font_ruby_outline_width > 0:
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_outline_color)
 				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fade_color)
 		elif display_time > l.end:
 			var rate := (display_time - l.end) / display_fade_out_time
 			var fade_color := font_sleep_color * rate + font_active_color * (1 - rate)
+			var fade_outline_color := font_sleep_outline_color * rate + font_active_outline_color * (1 - rate)
+			var rect := Rect2(0,l.y + y_offset,size.x,l.height)
+#			draw_rect(rect,display_active_back_color * (1 - rate))
+			draw_texture_rect(display_active_back_texture,rect,false,display_active_back_color * (1 - rate))
+			for c in l.base:
+				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				if font_outline_width > 0:
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fade_outline_color)
+				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fade_color)
 			for c in l.ruby:
 				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				if font_ruby_outline_width > 0:
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_outline_color)
 				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fade_color)
 		else:
+			var rect := Rect2(0,l.y + y_offset,size.x,l.height)
+#			draw_rect(rect,display_active_back_color)
+			draw_texture_rect(display_active_back_texture,rect,false,display_active_back_color)
+			
+			for c_ in l.base:
+				var c := c_ as Unit
+				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				if display_time < c.start:
+					if font_outline_width > 0:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_standby_outline_color)
+					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_standby_color)
+				elif display_time > c.end:
+					if font_outline_width > 0:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_active_outline_color)
+					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_active_color)
+				else:
+					var rate := (display_time - c.start) / (c.end - c.start)
+					var fade_color := font_active_color * rate + font_standby_color * (1 - rate)
+					var fade_outline_color := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
+					if font_outline_width > 0:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,fade_outline_color)
+					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,fade_color)
+
 			for c_ in l.ruby:
 				var c := c_ as Unit
 				var pos = Vector2(c.x + slides[i],c.y + y_offset)
 				if display_time < c.start:
+					if font_ruby_outline_width > 0:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_standby_outline_color)
 					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_standby_color)
 				elif display_time > c.end:
+					if font_ruby_outline_width > 0:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_active_outline_color)
 					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_active_color)
 				else:
 					var rate := (display_time - c.start) / (c.end - c.start)
-					var fadecolor := font_active_color * rate + font_standby_color * (1 - rate)
-					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fadecolor)
+					var fade_color := font_active_color * rate + font_standby_color * (1 - rate)
+					var fade_outline_color := font_active_outline_color * rate + font_standby_outline_color * (1 - rate)
+					if font_ruby_outline_width > 0:
+						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_outline_color)
+					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fade_color)
 
-			

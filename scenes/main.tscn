@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://c4vtedr1xfn8x"]
+[gd_scene load_steps=11 format=3 uid="uid://c4vtedr1xfn8x"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
@@ -8,6 +8,14 @@
 
 [sub_resource type="SystemFont" id="SystemFont_54pwe"]
 font_names = PackedStringArray("Shippori Antique")
+
+[sub_resource type="Gradient" id="Gradient_ln6se"]
+offsets = PackedFloat32Array(0, 0.1, 0.9, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.25098)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_60y71"]
+gradient = SubResource("Gradient_ln6se")
+fill_to = Vector2(0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_em36m"]
 bg_color = Color(0, 0, 0, 0)
@@ -103,8 +111,12 @@ font_standby_color = Color(0.890196, 0.890196, 0.890196, 1)
 buffer_left_padding = 12
 buffer_right_padding = 12
 adjust_ruby_distance = -10
+display_fade_out_time = 0.5
+display_scroll_center = null
 display_scrolling = true
 display_scroll_limit = 4.0
+display_active_back_color = Color(0, 0.333333, 0, 0.486275)
+display_active_back_texture = SubResource("GradientTexture2D_60y71")
 
 [node name="WindowUI" parent="." instance=ExtResource("4_tcylf")]
 layout_mode = 1
