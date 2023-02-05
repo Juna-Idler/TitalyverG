@@ -1,21 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://c4vtedr1xfn8x"]
+[gd_scene load_steps=8 format=3 uid="uid://c4vtedr1xfn8x"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
 [ext_resource type="Script" path="res://receiver/server.gd" id="4_cy7tu"]
 [ext_resource type="PackedScene" uid="uid://cfvium7sqii0l" path="res://scenes/window_ui.tscn" id="4_tcylf"]
-[ext_resource type="PackedScene" uid="uid://dmriqyur7nbu2" path="res://scenes/settings_window.tscn" id="5_7w6ah"]
-
-[sub_resource type="SystemFont" id="SystemFont_54pwe"]
-font_names = PackedStringArray("Shippori Antique")
-
-[sub_resource type="Gradient" id="Gradient_ln6se"]
-offsets = PackedFloat32Array(0, 0.1, 0.9, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.25098)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_60y71"]
-gradient = SubResource("Gradient_ln6se")
-fill_to = Vector2(0, 1)
+[ext_resource type="PackedScene" uid="uid://cluue5kyaytsq" path="res://settings/settings_window.tscn" id="5_8xix0"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_em36m"]
 bg_color = Color(0, 0, 0, 0)
@@ -103,31 +92,20 @@ color = Color(0, 0, 0, 0.74902)
 custom_minimum_size = Vector2(0, 400)
 layout_mode = 1
 size_flags_horizontal = 3
-font_font = SubResource("SystemFont_54pwe")
-font_outline_width = 2
-font_ruby_outline_width = 1
-font_sleep_color = Color(0.780392, 0.780392, 0.780392, 1)
-font_standby_color = Color(0.890196, 0.890196, 0.890196, 1)
-buffer_left_padding = 12
-buffer_right_padding = 12
-adjust_ruby_distance = -10
-display_fade_out_time = 0.5
-display_scroll_center = null
-display_scrolling = true
-display_scroll_limit = 4.0
-display_active_back_color = Color(0, 0.333333, 0, 0.486275)
-display_active_back_texture = SubResource("GradientTexture2D_60y71")
+font_outline_width = 0
+font_ruby_outline_width = 0
+font_sleep_color = Color(0.498039, 0.498039, 0.498039, 1)
+font_standby_color = Color(0.678431, 0.678431, 0.678431, 1)
+line_height = 0
+no_ruby_space = 4
+horizontal_alignment = 0
+fade_in_time = 0.5
+fade_out_time = 0.5
+scroll_center = false
+scrolling = true
 
 [node name="WindowUI" parent="." instance=ExtResource("4_tcylf")]
 layout_mode = 1
-
-[node name="PopupMenu" type="PopupMenu" parent="."]
-size = Vector2i(100, 62)
-item_count = 2
-item_0/text = "Settings"
-item_0/id = 0
-item_1/text = "test"
-item_1/id = 1
 
 [node name="Button" type="Button" parent="."]
 layout_mode = 1
@@ -146,24 +124,6 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_em36m")
 
 [node name="Node" type="Node" parent="."]
 script = ExtResource("4_cy7tu")
-
-[node name="Window" parent="." instance=ExtResource("5_7w6ah")]
-unique_name_in_owner = true
-visible = false
-
-[node name="HSlider" type="HSlider" parent="."]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = -24.0
-offset_right = -8.0
-offset_bottom = -8.0
-grow_horizontal = 2
-grow_vertical = 0
-step = 0.1
 
 [node name="LyricsCount" type="Label" parent="."]
 layout_mode = 1
@@ -208,14 +168,25 @@ mouse_default_cursor_shape = 2
 flat = true
 alignment = 0
 
+[node name="Window" parent="." instance=ExtResource("5_8xix0")]
+unique_name_in_owner = true
+visible = false
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+size = Vector2i(100, 62)
+item_count = 2
+item_0/text = "Settings"
+item_0/id = 0
+item_1/text = "test"
+item_1/id = 1
+
 [connection signal="resized" from="." to="." method="_on_resized"]
 [connection signal="middle_clicked" from="WindowUI" to="." method="_on_window_ui_middle_clicked"]
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
 [connection signal="wheel_moved" from="WindowUI" to="." method="_on_window_ui_wheel_moved"]
-[connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
 [connection signal="received" from="Node" to="." method="_on_node_received"]
-[connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]
 [connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]
+[connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]

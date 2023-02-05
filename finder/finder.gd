@@ -1,9 +1,12 @@
 
 class_name ILyricsFinder
 
-func _find(title : String,artists : PackedStringArray,album : String,
-		file_path : String,param : String) -> PackedStringArray:
+func _get_name() -> String:
+	return ""
 
-	var no_lyrics = title + "\n" + ",".join(artists) + "\n" + album + "\n" + file_path + "\n" + param;
+func _find(title : String,artists : PackedStringArray,album : String,
+		file_path : String,_meta : Dictionary) -> PackedStringArray:
+			
+	var no_lyrics = title + "\n" + ",".join(artists) + "\n" + album + "\n" + file_path;
 	return PackedStringArray([no_lyrics]);
 

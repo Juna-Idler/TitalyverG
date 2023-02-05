@@ -1,6 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://bj43idxrswfsp"]
+[gd_scene load_steps=5 format=3 uid="uid://bj43idxrswfsp"]
 
 [ext_resource type="Script" path="res://ruby_lyrics_view/ruby_lyrics_view.gd" id="1_g3lwn"]
+[ext_resource type="FontFile" uid="uid://deoykaw2557al" path="res://fonts/ShipporiAntique-Medium.otf" id="2_dc8f2"]
+
+[sub_resource type="Gradient" id="Gradient_cvyrj"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_mu5ao"]
+gradient = SubResource("Gradient_cvyrj")
+fill_to = Vector2(1, 1)
 
 [node name="RubyLyricsView" type="Control"]
 layout_mode = 3
@@ -10,10 +17,20 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_g3lwn")
+font = ExtResource("2_dc8f2")
 font_size = 32
 font_ruby_size = 16
-ruby_alignment_ruby = 0
-ruby_alignment_parent = 0
-display_horizontal_alignment = 0
-display_scroll_center = null
-display_active_back_color = null
+font_outline_width = 2
+font_ruby_outline_width = 1
+alignment_ruby = 0
+alignment_parent = 0
+left_padding = 8
+right_padding = 8
+line_height = null
+ruby_distance = -12
+active_back_color = Color(0, 0.243137, 0, 0.243137)
+active_back_texture = SubResource("GradientTexture2D_mu5ao")
+fade_in_time = null
+fade_out_time = null
+scroll_center = null
+scrolling = null

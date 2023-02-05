@@ -3,8 +3,11 @@ extends ILyricsFinder
 
 class_name LyricsFileFinder
 
+func _get_name() -> String:
+	return "Default File Finder"
+
 func _find(_title : String,_artists : PackedStringArray,_album : String,
-		file_path : String,_param : String) -> PackedStringArray:
+		file_path : String,_meta : Dictionary) -> PackedStringArray:
 	if not file_path.is_absolute_path():
 		return PackedStringArray()
 		
