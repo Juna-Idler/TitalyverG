@@ -66,9 +66,8 @@ func serialize() -> String:
 static func deserialize(json : String) -> PlaybackData:
 	var dic : Dictionary = JSON.parse_string(json)
 	if dic.has("path"):
-		var artist = dic["artists"] as String
 		return PlaybackData.new(false,dic["event"],dic["seek"],dic["time"],
-				dic["path"],dic["title"],[artist] if artist != null else dic["artists"],dic["album"],dic["duration"],dic["meta"])
+				dic["path"],dic["title"],dic["artists"],dic["album"],dic["duration"],dic["meta"])
 	else:
 		return PlaybackData.new(true,dic["event"],dic["seek"],dic["time"])
 		

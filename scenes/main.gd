@@ -4,6 +4,8 @@ extends Control
 @export_multiline var input : String
 
 
+var settings := Settings.new()
+
 
 @onready var ruby_lyrics_view : RubyLyricsView = $RubyLyricsView
 
@@ -26,11 +28,17 @@ func _ready():
 	get_viewport().gui_embed_subwindows = false
 	get_window().files_dropped.connect(on_files_dropped)
 #	OS.get_executable_path().get_base_dir()
+
+	settings.load_settings()
+	$ColorRect.color = settings.get_background_color()
+	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	
-	finders.plugins.append(LyricsFileFinder.new())
+	finders.plugins.append(LyricsFinders.Plugin.create("Default lyrics file finder"))
 	
 	source_texts = [input]
 	set_lyrics()
+
+	%SettingsWindow.initialize(settings,ruby_lyrics_view)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -68,9 +76,9 @@ func _on_window_ui_middle_clicked():
 func _on_popup_menu_id_pressed(id):
 	match id:
 		0: #Settings
-			%Window.hide()
-			var rect := Rect2i((size - Vector2(%Window.size))/2,%Window.size)
-			%Window.popup_on_parent(rect)
+			%SettingsWindow.hide()
+			var rect := Rect2i((size - Vector2(%SettingsWindow.size))/2,%SettingsWindow.size)
+			%SettingsWindow.popup_on_parent(rect)
 	pass # Replace with function body.
 
 
@@ -143,3 +151,7 @@ func set_lyrics():
 		$LyricsCount.show()
 		$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
+
+
+func _on_settings_display_background_color_changed(color):
+	$ColorRect.color = color

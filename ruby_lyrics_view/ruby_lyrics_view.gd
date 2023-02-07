@@ -552,6 +552,15 @@ func layout():
 
 	layout_height = (y - line_height) if line_height < 0 else y
 
+	time_y_offset = calculate_time_y_offset(time)
+	if scroll_center:
+		time_y_offset +=  size.y/2
+	else:
+		time_y_offset = min(time_y_offset + size.y / 2,0)
+		time_y_offset = max(time_y_offset,-(layout_height - size.y))
+		time_y_offset = (layout_height - size.y) * time_y_offset / (layout_height - size.y)
+	queue_redraw()
+
 
 func calculate_time_y_offset(c_time : float) -> float:
 	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:

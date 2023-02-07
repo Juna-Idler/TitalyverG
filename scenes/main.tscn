@@ -1,10 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://c4vtedr1xfn8x"]
+[gd_scene load_steps=9 format=3 uid="uid://c4vtedr1xfn8x"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
 [ext_resource type="Script" path="res://receiver/server.gd" id="4_cy7tu"]
 [ext_resource type="PackedScene" uid="uid://cfvium7sqii0l" path="res://scenes/window_ui.tscn" id="4_tcylf"]
 [ext_resource type="PackedScene" uid="uid://cluue5kyaytsq" path="res://settings/settings_window.tscn" id="5_8xix0"]
+
+[sub_resource type="SystemFont" id="SystemFont_ha14a"]
+font_names = PackedStringArray("Shippori Antique")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_em36m"]
 bg_color = Color(0, 0, 0, 0)
@@ -92,15 +95,12 @@ color = Color(0, 0, 0, 0.74902)
 custom_minimum_size = Vector2(0, 400)
 layout_mode = 1
 size_flags_horizontal = 3
+font = SubResource("SystemFont_ha14a")
 font_outline_width = 0
 font_ruby_outline_width = 0
 font_sleep_color = Color(0.498039, 0.498039, 0.498039, 1)
 font_standby_color = Color(0.678431, 0.678431, 0.678431, 1)
-line_height = 0
 no_ruby_space = 4
-horizontal_alignment = 0
-fade_in_time = 0.5
-fade_out_time = 0.5
 scroll_center = false
 scrolling = true
 
@@ -168,7 +168,7 @@ mouse_default_cursor_shape = 2
 flat = true
 alignment = 0
 
-[node name="Window" parent="." instance=ExtResource("5_8xix0")]
+[node name="SettingsWindow" parent="." instance=ExtResource("5_8xix0")]
 unique_name_in_owner = true
 visible = false
 
@@ -189,4 +189,7 @@ item_1/id = 1
 [connection signal="received" from="Node" to="." method="_on_node_received"]
 [connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]
+[connection signal="background_color_changed" from="SettingsWindow/MarginContainer/VBoxContainer/TabContainer/Display" to="." method="_on_settings_display_background_color_changed"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
+
+[editable path="SettingsWindow"]

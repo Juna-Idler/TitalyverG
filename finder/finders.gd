@@ -21,10 +21,10 @@ class Plugin:
 		var plugin_script := load(file_path_) as GDScript
 		if not plugin_script:
 			return null
-		var finder = plugin_script.new()
-		if not finder is ILyricsFinder:
+		var finder_ = plugin_script.new()
+		if not finder_ is ILyricsFinder:
 			return null
-		return Plugin.new(finder,file_path_)
+		return Plugin.new(finder_,file_path_)
 
 
 var plugins : Array = [] # of Plugin
