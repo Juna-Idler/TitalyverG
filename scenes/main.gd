@@ -12,7 +12,6 @@ var settings := Settings.new()
 var finders := LyricsFinders.new()
 
 
-
 var source_texts : PackedStringArray
 var source_text_index : int
 var lyrics : LyricsContainer
@@ -33,12 +32,14 @@ func _ready():
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	
-	finders.plugins.append(LyricsFinders.Plugin.create("Default lyrics file finder"))
+	finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.DEFAULT_LYRICS_FILE_FINDER))
+	finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.COMMAND_IF_NOT_EMPTY_END_FIND))
+	finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.DEFAULT_NOT_FOUND_FINDER))
 	
 	source_texts = [input]
 	set_lyrics()
 
-	%SettingsWindow.initialize(settings,ruby_lyrics_view)
+	%SettingsWindow.initialize(settings,ruby_lyrics_view,finders)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -8,9 +8,11 @@ func _ready():
 	%LineEditDirectory.text = OS.get_user_data_dir()
 	
 
-func initialize(settings_ : Settings,ruby_lyrics_view : RubyLyricsView):
+func initialize(settings_ : Settings,ruby_lyrics_view : RubyLyricsView,finders : LyricsFinders):
 	settings = settings_
 	%Display.initialize(settings,ruby_lyrics_view)
+	
+	%Finder.initialize(settings,finders)
 	
 
 

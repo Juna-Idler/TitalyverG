@@ -359,8 +359,9 @@ alignment = 1
 
 [node name="FileDialog" type="FileDialog" parent="."]
 title = "Open a File"
-position = Vector2i(0, 64)
-size = Vector2i(600, 400)
+size = Vector2i(600, 440)
+unresizable = true
+ok_button_text = "開く"
 file_mode = 0
 access = 2
 filters = PackedStringArray("*.ttf, *.ttc, *.otf, *.otc, *.woff, *.woff2 ; Font file")

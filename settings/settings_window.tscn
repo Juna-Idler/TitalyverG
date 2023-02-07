@@ -2,10 +2,11 @@
 
 [ext_resource type="Script" path="res://settings/settings_window.gd" id="1_ff5r0"]
 [ext_resource type="PackedScene" uid="uid://2eewjl0nd8t5" path="res://settings/display.tscn" id="2_ciu6t"]
-[ext_resource type="Script" path="res://settings/finder.gd" id="3_fw0md"]
+[ext_resource type="PackedScene" uid="uid://bojtoienwdl1s" path="res://settings/finder.tscn" id="3_5xy5c"]
 
 [node name="SettingsWindow" type="Window"]
 gui_embed_subwindows = true
+title = "Settings"
 size = Vector2i(640, 512)
 unresizable = true
 script = ExtResource("1_ff5r0")
@@ -34,61 +35,10 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Finder" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+[node name="Finder" parent="MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("3_5xy5c")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-script = ExtResource("3_fw0md")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Finder"]
-layout_mode = 2
-
-[node name="ItemList" type="ItemList" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer"]
-custom_minimum_size = Vector2(0, 200)
-layout_mode = 2
-item_count = 2
-item_0/text = "text"
-item_1/text = "test"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="MenuButton" type="MenuButton" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 4
-text = "Insert Built-in"
-flat = false
-switch_on_hover = true
-item_count = 2
-popup/item_0/text = "if not empty : End Find"
-popup/item_0/id = 0
-popup/item_1/text = "Default lyrics file finder"
-popup/item_1/id = 1
-
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 4
-text = "Delete"
-
-[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "up"
-
-[node name="Button2" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Finder/VBoxContainer/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-text = "down"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
