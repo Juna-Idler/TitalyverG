@@ -100,9 +100,14 @@ font_outline_width = 0
 font_ruby_outline_width = 0
 font_sleep_color = Color(0.498039, 0.498039, 0.498039, 1)
 font_standby_color = Color(0.678431, 0.678431, 0.678431, 1)
+font_unsync_color = null
+font_unsync_outline_color = null
+font_unsync_outline_enable = null
 no_ruby_space = 4
 scroll_center = false
 scrolling = true
+unsync_auto_scroll = null
+song_duration = 0.0
 
 [node name="WindowUI" parent="." instance=ExtResource("4_tcylf")]
 layout_mode = 1

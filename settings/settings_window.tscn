@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cluue5kyaytsq"]
+[gd_scene load_steps=5 format=3 uid="uid://cluue5kyaytsq"]
 
 [ext_resource type="Script" path="res://settings/settings_window.gd" id="1_ff5r0"]
 [ext_resource type="PackedScene" uid="uid://2eewjl0nd8t5" path="res://settings/display.tscn" id="2_ciu6t"]
 [ext_resource type="PackedScene" uid="uid://bojtoienwdl1s" path="res://settings/finder.tscn" id="3_5xy5c"]
+[ext_resource type="PackedScene" uid="uid://bybb8b0e1ppl8" path="res://settings/unsync.tscn" id="4_7rrpf"]
 
 [node name="SettingsWindow" type="Window"]
 gui_embed_subwindows = true
@@ -40,16 +41,20 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
+[node name="Unsync" parent="MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("4_7rrpf")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="LabelPath" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "Path"
-horizontal_alignment = 1
-vertical_alignment = 1
+flat = true
 
 [node name="LineEditDirectory" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
@@ -70,4 +75,5 @@ text = "Save
 [connection signal="about_to_popup" from="." to="." method="_on_about_to_popup"]
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="files_dropped" from="." to="." method="_on_files_dropped"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/LabelPath" to="." method="_on_label_path_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/ButtonSave" to="." method="_on_button_save_pressed"]

@@ -11,8 +11,8 @@ func _ready():
 func initialize(settings_ : Settings,ruby_lyrics_view : RubyLyricsView,finders : LyricsFinders):
 	settings = settings_
 	%Display.initialize(settings,ruby_lyrics_view)
-	
 	%Finder.initialize(settings,finders)
+	%Unsync.initialize(settings,ruby_lyrics_view)
 	
 
 
@@ -36,4 +36,8 @@ func _on_files_dropped(files):
 
 func _on_button_save_pressed():
 	settings.save_settings()
+
+
+func _on_label_path_pressed():
+	OS.shell_open(OS.get_user_data_dir())
 

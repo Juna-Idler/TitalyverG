@@ -25,6 +25,7 @@ func initialize(settings_ : Settings,finders_ : LyricsFinders):
 			item_list.add_item(builtin)
 			finders.plugins.append(LyricsFinders.Plugin.create(builtin))
 			item_list.select(item_list.item_count - 1)
+			settings.config.set_value("Finder","plug_in",finders.serialize())
 	)
 	
 	item_list.clear()
@@ -50,6 +51,7 @@ func on_files_dropped(files : PackedStringArray):
 			finders.plugins.append(plugin)
 			item_list.add_item(plugin.file_path.get_file())
 			item_list.select(item_list.item_count - 1)
+			settings.config.set_value("Finder","plug_in",finders.serialize())
 
 
 func _on_button_insert_plugin_pressed():
@@ -63,6 +65,7 @@ func _on_file_dialog_file_selected(path : String):
 		finders.plugins.append(plugin)
 		item_list.add_item(plugin.file_path.get_file())
 		item_list.select(item_list.item_count - 1)
+		settings.config.set_value("Finder","plug_in",finders.serialize())
 
 
 func _on_button_delete_pressed():
@@ -70,6 +73,7 @@ func _on_button_delete_pressed():
 	if selected.size() == 1:
 		var index : int = selected[0]
 		item_list.remove_item(index)
+		settings.config.set_value("Finder","plug_in",finders.serialize())
 
 func _on_button_up_pressed():
 	var selected : PackedInt32Array = item_list.get_selected_items()
@@ -80,6 +84,7 @@ func _on_button_up_pressed():
 			var tmp = finders.plugins[index]
 			finders.plugins[index] = finders.plugins[index-1]
 			finders.plugins[index-1] = tmp
+			settings.config.set_value("Finder","plug_in",finders.serialize())
 
 
 func _on_button_down_pressed():
@@ -91,4 +96,5 @@ func _on_button_down_pressed():
 			var tmp = finders.plugins[index]
 			finders.plugins[index] = finders.plugins[index+1]
 			finders.plugins[index+1] = tmp
+			settings.config.set_value("Finder","plug_in",finders.serialize())
 

@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=3 uid="uid://bybb8b0e1ppl8"]
+
+[ext_resource type="Script" path="res://settings/unsync.gd" id="1_igb42"]
+
+[node name="Unsync" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("1_igb42")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Outline"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheckButtonVisble" type="CheckButton" parent="VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Visble"
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="Label" type="Control" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Fill"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Stroke"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label4" type="Label" parent="VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Color"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ColorPickerUnsyncFill" type="ColorPickerButton" parent="VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerUnsyncStroke" type="ColorPickerButton" parent="VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Scroll"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheckButtonAutoScroll" type="CheckButton" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Auto Scroll"
+
+[connection signal="toggled" from="VBoxContainer/HBoxContainer2/CheckButtonVisble" to="." method="_on_check_button_visble_toggled"]
+[connection signal="color_changed" from="VBoxContainer/GridContainer/ColorPickerUnsyncFill" to="." method="_on_color_picker_unsync_fill_color_changed"]
+[connection signal="color_changed" from="VBoxContainer/GridContainer/ColorPickerUnsyncStroke" to="." method="_on_color_picker_unsync_stroke_color_changed"]
+[connection signal="toggled" from="VBoxContainer/HBoxContainer/CheckButtonAutoScroll" to="." method="_on_check_button_auto_scroll_toggled"]

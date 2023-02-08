@@ -54,6 +54,22 @@ class_name RubyLyricsView
 		font_standby_outline_color = v
 		queue_redraw()
 
+@export var font_unsync_color : Color = Color.WHITE :
+	set(v):
+		font_unsync_color = v
+		if lyrics and lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+			queue_redraw()
+@export var font_unsync_outline_color : Color = Color.BLACK :
+	set(v):
+		font_unsync_outline_color = v
+		if lyrics and lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+			queue_redraw()
+
+@export var font_unsync_outline_enable : bool = false:
+	set(v):
+		font_unsync_outline_enable = v
+		if lyrics and lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+			queue_redraw()
 
 
 @export_group("Adjust")
@@ -117,15 +133,65 @@ enum HorizontalAlignment {LEFT,CENTER,RIGHT}
 @export var scroll_center : bool = true
 @export var scrolling : bool = false
 
-var scroll_limit : float = 5
+@export var unsync_auto_scroll : bool = true
+@export var song_duration : float = 0
+
+var scroll_limit : float = 2
 var limits : PackedFloat32Array = [32,2,64,4,128,8,256,16,512,32,1024,64,2048,128,4096,256]
 
-var user_y_offset : int :
+@export var user_y_offset : int :
 	set(v):
 		user_y_offset = v
 		queue_redraw()
 		
 var time : float = 0
+
+func set_time_and_target_y(time_ : float):
+	if time == time_:
+		return
+	time = time_
+	if not lyrics:
+		return
+
+	var target_time_y_offset : float
+	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+		if unsync_auto_scroll and song_duration > 0 and layout_height > size.y:
+			target_time_y_offset = -(layout_height) * (time) / song_duration 
+			target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
+			target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
+			target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
+			if target_time_y_offset == time_y_offset:
+				return
+		else:
+			if time_y_offset == 0:
+				return
+			target_time_y_offset = 0
+	else:
+		target_time_y_offset = calculate_time_y_offset(time)
+		if scroll_center:
+			target_time_y_offset +=  size.y/2
+		else:
+			if layout_height > size.y:
+				target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
+				target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
+				
+				target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
+			else:
+				target_time_y_offset = 0
+
+	var distance = abs(target_time_y_offset - time_y_offset)
+	if distance > scroll_limit:
+		var move : float = 0.0
+		for i in limits.size() / 2:
+			if distance <= limits[i*2]:
+				move = limits[i*2+1]
+				break
+		if move == 0:
+			move = distance
+		time_y_offset += sign(target_time_y_offset - time_y_offset) * move
+	else:
+		time_y_offset = target_time_y_offset
+	queue_redraw()
 
 
 var splitter : Callable = func(text : String) :
@@ -616,35 +682,7 @@ func _draw():
 	if not font or not lyrics:
 		return
 	
-	var target_time_y_offset : float = calculate_time_y_offset(time)
-
-	if scroll_center:
-		target_time_y_offset +=  size.y/2
-	else:
-		if layout_height > size.y:
-			target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
-			target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
-			
-			target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
-		else:
-			target_time_y_offset = 0
-
-	var distance = abs(target_time_y_offset - time_y_offset)
-	if distance > scroll_limit:
-		var move : float = 0.0
-		for i in limits.size() / 2:
-			if distance <= limits[i*2]:
-				move = limits[i*2+1]
-				break
-		if move == 0:
-			move = distance
-		time_y_offset += sign(target_time_y_offset - time_y_offset) * move
-#		time_y_offset += sign(target_time_y_offset - time_y_offset) * display_scroll_limit
-	else:
-		time_y_offset = target_time_y_offset
-
 	var y_offset : float = user_y_offset + time_y_offset
-
 	
 	var display_start_line : int = 0
 	var display_end_line : int = displayed_lines.size()
@@ -690,6 +728,30 @@ func _draw():
 					var slide = (size.x + left_padding - right_padding - width) / 2 - left_padding
 					slides[i] = slide
 
+	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+		if font_outline_width > 0 and font_unsync_outline_enable:
+			for i in range(display_start_line,display_end_line):
+				var l := displayed_lines[i] as DisplayedLine
+				for c in l.base:
+					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_outline_width,font_unsync_outline_color)
+		if font_outline_width > 0 and font_unsync_outline_enable:
+			for i in range(display_start_line,display_end_line):
+				var l := displayed_lines[i] as DisplayedLine
+				for c in l.ruby:
+					var pos = Vector2(c.x + slides[i],c.y + y_offset)
+					font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,font_unsync_outline_color)
+		for i in range(display_start_line,display_end_line):
+			var l := displayed_lines[i] as DisplayedLine
+			for c in l.base:
+				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,font_unsync_color)
+		for i in range(display_start_line,display_end_line):
+			var l := displayed_lines[i] as DisplayedLine
+			for c in l.ruby:
+				var pos = Vector2(c.x + slides[i],c.y + y_offset)
+				font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_unsync_color)
+		return
 
 	for i in range(display_start_line,display_end_line):
 		var l := displayed_lines[i] as DisplayedLine

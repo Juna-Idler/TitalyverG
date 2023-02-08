@@ -31,10 +31,7 @@ func _ready():
 	settings.load_settings()
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
-	
-	finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.DEFAULT_LYRICS_FILE_FINDER))
-	finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.COMMAND_IF_NOT_EMPTY_END_FIND))
-	finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.DEFAULT_NOT_FOUND_FINDER))
+	settings.initialize_finders_settings(finders)
 	
 	source_texts = [input]
 	set_lyrics()
@@ -45,8 +42,7 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if playing:
-		ruby_lyrics_view.time += delta
-		ruby_lyrics_view.queue_redraw()
+		ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time + delta)
 
 
 func _on_button_pressed():
@@ -83,18 +79,12 @@ func _on_popup_menu_id_pressed(id):
 	pass # Replace with function body.
 
 
-func _on_h_slider_value_changed(value):
-	ruby_lyrics_view.time = value
-	pass # Replace with function body.
-
-
 func _on_resized():
 	pass
 
 
-
 func _on_node_received(data : PlaybackData):
-	ruby_lyrics_view.time = data.seek_time
+	ruby_lyrics_view.set_time_and_target_y(data.seek_time)
 	if data.playback_event & PlaybackData.PlaybackEvent.PLAY_FLAG:
 		playing = true
 	else:
@@ -103,7 +93,9 @@ func _on_node_received(data : PlaybackData):
 #			playing = false
 	if data.playback_only or playback_data.same_song(data):
 		return
-
+	playback_data = data
+	
+	ruby_lyrics_view.song_duration = data.duration
 	source_texts = finders.find(data.title,data.artists,data.album,data.file_path,data.meta_data)
 	set_lyrics()
 
@@ -116,6 +108,7 @@ func _on_button_prev_pressed():
 		source_text_index = source_texts.size() - 1
 	lyrics = LyricsContainer.new(source_texts[source_text_index])
 	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.user_y_offset = 0
 	ruby_lyrics_view.build()
 	$LyricsCount/ButtonPrev.release_focus()
 	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
@@ -128,12 +121,14 @@ func _on_button_next_pressed():
 		source_text_index = 0
 	lyrics = LyricsContainer.new(source_texts[source_text_index])
 	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.user_y_offset = 0
 	ruby_lyrics_view.build()
 	$LyricsCount/ButtonNext.release_focus()
 	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 
 func set_lyrics():
+	ruby_lyrics_view.user_y_offset = 0
 	if not source_texts.is_empty():
 		source_text_index = 0
 		lyrics = LyricsContainer.new(source_texts[0])

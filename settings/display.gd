@@ -15,14 +15,15 @@ func initialize(settings_ : Settings,rlv : RubyLyricsView):
 	settings = settings_
 	ruby_lyrics_view = rlv
 	
-	if settings.config.get_value("Font","is_system",false):
-		%CheckBoxSysFont.button_pressed = true
-	else:
-		%CheckBoxFontFile.button_pressed = true
 	%ButtonSysFont.text = settings.config.get_value("Font","system_font","sans-serif")
 	var font_file : String = settings.config.get_value("Font","font_file","")
 	%ButtonFontFile.text = font_file.get_file()
 	%ButtonFontFile.tooltip_text = font_file
+
+	if settings.config.get_value("Font","is_system",false):
+		%CheckBoxSysFont.button_pressed = true
+	else:
+		%CheckBoxFontFile.button_pressed = true
 	
 	%SpinBoxRubySize.value = rlv.font_ruby_size
 	%SpinBoxRubyOutline.value = rlv.font_ruby_outline_width

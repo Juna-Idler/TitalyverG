@@ -34,6 +34,7 @@ func initialize_ruby_lyrics_view_settings(rlv : RubyLyricsView):
 	rlv.font_standby_color = config.get_value("Font","standby_color",Color.LIGHT_GRAY)
 	rlv.font_standby_outline_color = config.get_value("Font","standby_outline_color",Color.BLUE)
 	
+
 	rlv.alignment_ruby = config.get_value("Adjust","alignment_ruby",0)
 	rlv.alignment_parent = config.get_value("Adjust","alignment_parent",0)
 	rlv.left_padding = config.get_value("Adjust","left_padding",16)
@@ -50,6 +51,20 @@ func initialize_ruby_lyrics_view_settings(rlv : RubyLyricsView):
 	rlv.scroll_center = config.get_value("Scroll","scroll_center",true)
 	rlv.scrolling = config.get_value("Scroll","scrolling",false)
 	
+	rlv.font_unsync_color = config.get_value("Unsync","font_color",Color.WHITE)
+	rlv.font_unsync_outline_color = config.get_value("Unsync","outline_color",Color.BLACK)
+	rlv.font_unsync_outline_enable = config.get_value("Unsync","outline_enable",false)
+	rlv.unsync_auto_scroll = config.get_value("Unsync","auto_scroll",true)
+	
+func initialize_finders_settings(finders : LyricsFinders):
+	var plugins = config.get_value("Finder","plug_in",[])
+	if plugins.is_empty():
+		finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.DEFAULT_LYRICS_FILE_FINDER))
+		finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.COMMAND_IF_NOT_EMPTY_END_FIND))
+		finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.DEFAULT_NOT_FOUND_FINDER))
+	else:
+		finders.deserialize(plugins)
+
 
 func get_background_color() -> Color:
 	return config.get_value("Window","background_color",Color(0,0,0,0.8))
