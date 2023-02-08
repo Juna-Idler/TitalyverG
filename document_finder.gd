@@ -2,16 +2,15 @@
 extends ILyricsFinder
 
 
-const DIRECTORY = "D:/Documents/Lyrics/"
-
 func _get_name() -> String:
-	return "directory finder"
+	return "Lyrics directory finder"
 
 
 func _find(title : String,artists : PackedStringArray,album : String,
 		_file_path : String,_meta : Dictionary) -> PackedStringArray:
 
-	var path := DIRECTORY + ",".join(artists) + "/" + album + "-" + title
+	var path := (OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS) + "/Lyrics/" +
+			",".join(artists) + "/" + album + "-" + title)
 	var r = PackedStringArray()
 	var kra_path = path.get_basename() + ".kra"
 	if FileAccess.file_exists(kra_path):

@@ -31,10 +31,8 @@ func initialize(settings_ : Settings,finders_ : LyricsFinders):
 	item_list.clear()
 	for p in finders.plugins:
 		var plugin := p as LyricsFinders.Plugin
-		if plugin.file_path.is_absolute_path():
-			item_list.add_item(plugin.file_path.get_file())
-		else:
-			item_list.add_item(plugin.file_path)
+		item_list.add_item(plugin.finder._get_name())
+#		item_list.set_item_tooltip()
 			
 
 
@@ -73,6 +71,7 @@ func _on_button_delete_pressed():
 	if selected.size() == 1:
 		var index : int = selected[0]
 		item_list.remove_item(index)
+		finders.plugins.remove_at(index)
 		settings.config.set_value("Finder","plug_in",finders.serialize())
 
 func _on_button_up_pressed():

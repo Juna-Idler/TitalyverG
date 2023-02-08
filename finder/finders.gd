@@ -15,14 +15,16 @@ class Plugin:
 		
 	static func create(file_path_ : String) -> Plugin:
 		if file_path_ == COMMAND_IF_NOT_EMPTY_END_FIND:
-			return Plugin.new(null,file_path_)
+			return Plugin.new(IfNotEmptyEndFind.new(),file_path_)
 		elif file_path_ == DEFAULT_LYRICS_FILE_FINDER:
 			return Plugin.new(DefaultFileFinder.new(),file_path_)
 		elif file_path_ == DEFAULT_NOT_FOUND_FINDER:
 			return Plugin.new(DefaultNotFoundFinder.new(),file_path_)
-			
-		var plugin_script := load(file_path_) as GDScript
-		if not plugin_script:
+		
+		if not FileAccess.file_exists(file_path_):
+			return null
+		var plugin_script := load(file_path_)
+		if not plugin_script is GDScript:
 			return null
 		var finder_ = plugin_script.new()
 		if not finder_ is ILyricsFinder:
@@ -67,10 +69,16 @@ func find(title : String,artists : PackedStringArray,album : String,
 	return result
 
 
-
+class IfNotEmptyEndFind extends  ILyricsFinder:
+	func _get_name() -> String:
+		return COMMAND_IF_NOT_EMPTY_END_FIND
+	func _find(_title : String,_artists : PackedStringArray,_album : String,
+			_file_path : String,_meta : Dictionary) -> PackedStringArray:
+		return []
+		
 class DefaultFileFinder extends ILyricsFinder:
 	func _get_name() -> String:
-		return "Default File Finder"
+		return DEFAULT_LYRICS_FILE_FINDER + "(filename + .kra;.lrc:.txt)"
 
 	func _find(_title : String,_artists : PackedStringArray,_album : String,
 			file_path : String,_meta : Dictionary) -> PackedStringArray:
@@ -102,7 +110,7 @@ class DefaultFileFinder extends ILyricsFinder:
 
 class DefaultNotFoundFinder extends ILyricsFinder:
 	func _get_name() -> String:
-		return "Default Not Found Finder"
+		return DEFAULT_NOT_FOUND_FINDER
 
 	func _find(title : String,artists : PackedStringArray,album : String,
 			file_path : String,_meta : Dictionary) -> PackedStringArray:

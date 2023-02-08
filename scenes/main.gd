@@ -10,7 +10,7 @@ var settings := Settings.new()
 @onready var ruby_lyrics_view : RubyLyricsView = $RubyLyricsView
 
 var finders := LyricsFinders.new()
-
+var savers := LyricsSavers.new()
 
 var source_texts : PackedStringArray
 var source_text_index : int
@@ -26,17 +26,22 @@ func _ready():
 	get_viewport().transparent_bg = true
 	get_viewport().gui_embed_subwindows = false
 	get_window().files_dropped.connect(on_files_dropped)
-#	OS.get_executable_path().get_base_dir()
+
+	$PopupMenu.set_item_submenu(2,"PopupMenuSave")
+
 
 	settings.load_settings()
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	settings.initialize_finders_settings(finders)
+	settings.initialize_saver_settings(savers,$PopupMenu/PopupMenuSave)
+	if $PopupMenu/PopupMenuSave.item_count == 0:
+		$PopupMenu.set_item_disabled(2,true)
 	
 	source_texts = [input]
 	set_lyrics()
 
-	%SettingsWindow.initialize(settings,ruby_lyrics_view,finders)
+	%SettingsWindow.initialize(settings,ruby_lyrics_view,finders,savers,$PopupMenu/PopupMenuSave)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -77,6 +82,12 @@ func _on_popup_menu_id_pressed(id):
 			var rect := Rect2i((size - Vector2(%SettingsWindow.size))/2,%SettingsWindow.size)
 			%SettingsWindow.popup_on_parent(rect)
 	pass # Replace with function body.
+
+
+func _on_popup_menu_save_index_pressed(index):
+	savers.plugins[index].saver._save(playback_data.title,playback_data.artists,
+			playback_data.album,playback_data.file_path,playback_data.meta_data,
+			source_texts,source_text_index)
 
 
 func _on_resized():
@@ -151,3 +162,4 @@ func set_lyrics():
 
 func _on_settings_display_background_color_changed(color):
 	$ColorRect.color = color
+

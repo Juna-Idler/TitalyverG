@@ -402,13 +402,13 @@ func build():
 				var unit := u as LyricsContainer.LyricsLine.Unit
 				var bases : Array = []
 				for t in unit.base:
-					var clusters := splitter.call(t.text)
+					var clusters : PackedStringArray = splitter.call(t.text)
 					for c in clusters:
 						var w := font.get_string_size(c,0,-1,font_size).x
 						bases.append(Unit.new(w,c))
 				var rubys : Array = []
 				for t in unit.ruby:
-					var clusters := splitter.call(t.text)
+					var clusters : PackedStringArray = splitter.call(t.text)
 					for c in clusters:
 						var w := font.get_string_size(c,0,-1,font_ruby_size).x
 						rubys.append(Unit.new(w,c))
@@ -429,7 +429,7 @@ func build():
 				var bases : Array = [] # of Unit
 				for t in unit.base:
 					var tt := t as LyricsContainer.TimeTag
-					var clusters := splitter.call(tt.text)
+					var clusters : PackedStringArray = splitter.call(tt.text)
 					var index = bases.size()
 					for c in clusters:
 						var w := font.get_string_size(c,0,-1,font_size).x
@@ -440,7 +440,7 @@ func build():
 				var rubys : Array = [] # of Unit
 				for t in unit.ruby:
 					var tt := t as LyricsContainer.TimeTag
-					var clusters := splitter.call(tt.text)
+					var clusters : PackedStringArray = splitter.call(tt.text)
 					var index = rubys.size()
 					for c in clusters:
 						var w := font.get_string_size(c,0,-1,font_ruby_size).x

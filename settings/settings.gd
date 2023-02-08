@@ -64,8 +64,20 @@ func initialize_finders_settings(finders : LyricsFinders):
 		finders.plugins.append(LyricsFinders.Plugin.create(LyricsFinders.DEFAULT_NOT_FOUND_FINDER))
 	else:
 		finders.deserialize(plugins)
+		#正常に読めたもののみ書き戻す
+		config.set_value("Finder","plug_in",finders.serialize())
 
-
+func initialize_saver_settings(saver : LyricsSavers,menu : PopupMenu):
+	var plugins = config.get_value("Saver","plug_in",[])
+	if plugins.is_empty():
+		saver.plugins.append(LyricsSavers.Plugin.create(LyricsSavers.DEFAULT_LYRICS_FILE_SAVER))
+	else:
+		saver.deserialize(plugins)
+		config.set_value("Saver","plug_in",saver.serialize())
+		
+	for p in saver.plugins:
+		menu.add_item(p.saver._get_name())
+	
 func get_background_color() -> Color:
 	return config.get_value("Window","background_color",Color(0,0,0,0.8))
 
