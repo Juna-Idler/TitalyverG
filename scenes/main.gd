@@ -95,20 +95,24 @@ func _on_resized():
 
 
 func _on_node_received(data : PlaybackData):
-	ruby_lyrics_view.set_time_and_target_y(data.seek_time)
 	if data.playback_event & PlaybackData.PlaybackEvent.PLAY_FLAG:
 		playing = true
 	else:
 		playing = false;
-#		if data.playback_event & PlaybackData.PlaybackEvent.STOP_FLAG:
-#			playing = false
+
 	if data.playback_only or playback_data.same_song(data):
+		var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
+		var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
+		ruby_lyrics_view.set_time_and_target_y(time)
 		return
 	playback_data = data
 	
 	ruby_lyrics_view.song_duration = data.duration
 	source_texts = finders.find(data.title,data.artists,data.album,data.file_path,data.meta_data)
 	set_lyrics()
+	var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
+	var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
+	ruby_lyrics_view.set_time_and_target_y(time)
 
 
 func _on_button_prev_pressed():

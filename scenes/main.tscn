@@ -172,12 +172,6 @@ alignment = 0
 unique_name_in_owner = true
 visible = false
 
-[node name="Display" parent="SettingsWindow/MarginContainer/VBoxContainer/TabContainer" index="1"]
-visible = true
-
-[node name="Unsync" parent="SettingsWindow/MarginContainer/VBoxContainer/TabContainer" index="3"]
-visible = false
-
 [node name="PopupMenu" type="PopupMenu" parent="."]
 size = Vector2i(100, 62)
 item_count = 3

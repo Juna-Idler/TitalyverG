@@ -22,8 +22,9 @@ func initialize(settings_ : Settings,finders_ : LyricsFinders):
 	insert_b_popup.add_item(LyricsFinders.DEFAULT_NOT_FOUND_FINDER)
 	insert_b_popup.index_pressed.connect(func (index : int):
 			var builtin := insert_b_popup.get_item_text(index)
-			item_list.add_item(builtin)
-			finders.plugins.append(LyricsFinders.Plugin.create(builtin))
+			var plugin := LyricsFinders.Plugin.create(builtin)
+			item_list.add_item(plugin.finder._get_name())
+			finders.plugins.append(plugin)
 			item_list.select(item_list.item_count - 1)
 			settings.config.set_value("Finder","plug_in",finders.serialize())
 	)
@@ -47,7 +48,7 @@ func on_files_dropped(files : PackedStringArray):
 		var plugin = LyricsFinders.Plugin.create(file_path)
 		if plugin:
 			finders.plugins.append(plugin)
-			item_list.add_item(plugin.file_path.get_file())
+			item_list.add_item(plugin.finder._get_name())
 			item_list.select(item_list.item_count - 1)
 			settings.config.set_value("Finder","plug_in",finders.serialize())
 
@@ -61,7 +62,7 @@ func _on_file_dialog_file_selected(path : String):
 	var plugin = LyricsFinders.Plugin.create(path)
 	if plugin:
 		finders.plugins.append(plugin)
-		item_list.add_item(plugin.file_path.get_file())
+		item_list.add_item(plugin.finder._get_name())
 		item_list.select(item_list.item_count - 1)
 		settings.config.set_value("Finder","plug_in",finders.serialize())
 
