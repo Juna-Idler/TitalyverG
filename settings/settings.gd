@@ -70,7 +70,9 @@ func initialize_finders_settings(finders : LyricsFinders):
 func initialize_saver_settings(saver : LyricsSavers,menu : PopupMenu):
 	var plugins = config.get_value("Saver","plug_in",[])
 	if plugins.is_empty():
-		saver.plugins.append(LyricsSavers.Plugin.create(LyricsSavers.DEFAULT_LYRICS_FILE_SAVER))
+		saver.plugins.append(LyricsSavers.Plugin.create(LyricsSavers.BUILTIN_LYRICS_FILE_SAVER))
+		saver.plugins.append(LyricsSavers.Plugin.create(LyricsSavers.BUILTIN_LYRICS_FILE_SAVER_OVERWRITE))
+		saver.plugins.append(LyricsSavers.Plugin.create(LyricsSavers.BUILTIN_LYRICS_TEXT_SHELL_OPENER))
 	else:
 		saver.deserialize(plugins)
 		config.set_value("Saver","plug_in",saver.serialize())

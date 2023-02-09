@@ -29,7 +29,6 @@ func _ready():
 
 	$PopupMenu.set_item_submenu(2,"PopupMenuSave")
 
-
 	settings.load_settings()
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
@@ -44,10 +43,8 @@ func _ready():
 	%SettingsWindow.initialize(settings,ruby_lyrics_view,finders,savers,$PopupMenu/PopupMenuSave)
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if playing:
-		ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time + delta)
+	ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time + (delta if playing else 0))
 
 
 func _on_button_pressed():
@@ -85,9 +82,13 @@ func _on_popup_menu_id_pressed(id):
 
 
 func _on_popup_menu_save_index_pressed(index):
-	savers.plugins[index].saver._save(playback_data.title,playback_data.artists,
+	var msg :String= savers.plugins[index].saver._save(playback_data.title,playback_data.artists,
 			playback_data.album,playback_data.file_path,playback_data.meta_data,
 			source_texts,source_text_index)
+	
+	if not msg.is_empty():
+		%AcceptDialog.dialog_text = msg
+		%AcceptDialog.popup_centered()
 
 
 func _on_resized():

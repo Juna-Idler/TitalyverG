@@ -31,3 +31,5 @@ ruby_distance = -12
 horizontal_alignment = 0
 active_back_color = Color(0, 0.25, 0, 0.25)
 active_back_texture = SubResource("GradientTexture2D_mu5ao")
+
+[connection signal="resized" from="." to="." method="_on_resized"]

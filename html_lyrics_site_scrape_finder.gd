@@ -70,14 +70,18 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 #	}
 
 	
-	
 	var lists := get_list(param,title," ".join(artists))
 	var lyricss : PackedStringArray = []
 	for l in lists:
 		var list  := l as ListData
 		var lyrics := get_lyrics(list.url,param)
 		if not lyrics.is_empty():
-			lyricss.append(lyrics)
+			var header : String = (
+				param["host"] + list.url + "\n" +
+				"Title:" + list.title + "\n" +
+				"Artist:" + list.artist + "\n\n"
+			)
+			lyricss.append(header + lyrics)
 	return lyricss
 
 

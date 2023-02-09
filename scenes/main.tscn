@@ -92,7 +92,6 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.74902)
 
 [node name="RubyLyricsView" parent="." instance=ExtResource("4_c1jr5")]
-custom_minimum_size = Vector2(0, 400)
 layout_mode = 1
 size_flags_horizontal = 3
 font = SubResource("SystemFont_ha14a")
@@ -185,7 +184,14 @@ item_2/id = 2
 
 [node name="PopupMenuSave" type="PopupMenu" parent="PopupMenu"]
 
-[connection signal="resized" from="." to="." method="_on_resized"]
+[node name="AcceptDialog" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+title = "Save Result"
+size = Vector2i(240, 100)
+unresizable = true
+popup_window = true
+dialog_text = "Success"
+
 [connection signal="middle_clicked" from="WindowUI" to="." method="_on_window_ui_middle_clicked"]
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]

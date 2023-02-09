@@ -1,9 +1,9 @@
 
 class_name LyricsFinders
 
-const COMMAND_IF_NOT_EMPTY_END_FIND := "if not empty : End Find"
-const DEFAULT_LYRICS_FILE_FINDER := "Default lyrics file finder"
-const DEFAULT_NOT_FOUND_FINDER := "Default not found finder"
+const COMMAND_IF_NOT_EMPTY_END_FIND := "[Command] ==== if not empty : End Find ===="
+const DEFAULT_LYRICS_FILE_FINDER := "[Built-in] lyrics file finder"
+const DEFAULT_NOT_FOUND_FINDER := "[Built-in] not found finder"
 
 class Plugin:
 	var finder : ILyricsFinder

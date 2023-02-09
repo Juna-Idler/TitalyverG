@@ -147,38 +147,15 @@ var limits : PackedFloat32Array = [32,2,64,4,128,8,256,16,512,32,1024,64,2048,12
 var time : float = 0
 
 func set_time_and_target_y(time_ : float):
-	if time == time_:
-		return
+	var last_time := time
 	time = time_
 	if not lyrics:
 		return
 
-	var target_time_y_offset : float
-	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
-		if unsync_auto_scroll and song_duration > 0 and layout_height > size.y:
-			target_time_y_offset = -(layout_height) * (time) / song_duration 
-			target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
-			target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
-			target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
-			if target_time_y_offset == time_y_offset:
-				return
-		else:
-			if time_y_offset == 0:
-				return
-			target_time_y_offset = 0
-	else:
-		target_time_y_offset = calculate_time_y_offset(time)
-		if scroll_center:
-			target_time_y_offset +=  size.y/2
-		else:
-			if layout_height > size.y:
-				target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
-				target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
-				
-				target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
-			else:
-				target_time_y_offset = 0
-
+	var target_time_y_offset = get_target_y_offset()
+	if target_time_y_offset == time_y_offset and time == last_time:
+		return
+		
 	var distance = abs(target_time_y_offset - time_y_offset)
 	if distance > scroll_limit:
 		var move : float = 0.0
@@ -628,7 +605,7 @@ func layout():
 	queue_redraw()
 
 
-func calculate_time_y_offset(c_time : float) -> float:
+func _calculate_time_y_offset(c_time : float) -> float:
 	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
 		return 0
 	var active_top : float = 0
@@ -674,6 +651,34 @@ func calculate_time_y_offset(c_time : float) -> float:
 					active_bottom = line.y + line.height
 				break
 	return -(active_top + active_bottom) / 2
+
+
+func get_target_y_offset() -> float:
+	var target_time_y_offset : float
+	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+		if unsync_auto_scroll and song_duration > 0 and layout_height > size.y:
+			target_time_y_offset = -(layout_height) * (time) / song_duration 
+			target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
+			target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
+			target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
+			if target_time_y_offset == time_y_offset:
+				return time_y_offset
+		else:
+			if time_y_offset == 0:
+				return time_y_offset
+			target_time_y_offset = 0
+	else:
+		target_time_y_offset = _calculate_time_y_offset(time)
+		if scroll_center:
+			target_time_y_offset +=  size.y/2
+		else:
+			if layout_height > size.y:
+				target_time_y_offset = min(target_time_y_offset + size.y / 2,0)
+				target_time_y_offset = max(target_time_y_offset,-(layout_height - size.y))
+				target_time_y_offset = (layout_height - size.y) * target_time_y_offset / (layout_height - size.y)
+			else:
+				target_time_y_offset = 0
+	return target_time_y_offset
 
 
 func _draw():
@@ -991,3 +996,7 @@ func _draw():
 #						font.draw_string_outline(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,font_ruby_outline_width,fade_outline_color)
 #					font.draw_string(get_canvas_item(),pos,c.cluster,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size,fade_color)
 
+
+func _on_resized():
+	if font and lyrics:
+		time_y_offset = get_target_y_offset()
