@@ -21,6 +21,7 @@ func initialize(settings_ : Settings,savers_ : LyricsSavers,menu_ : PopupMenu):
 	insert_b_popup.add_item(LyricsSavers.BUILTIN_LYRICS_FILE_SAVER)
 	insert_b_popup.add_item(LyricsSavers.BUILTIN_LYRICS_FILE_SAVER_OVERWRITE)
 	insert_b_popup.add_item(LyricsSavers.BUILTIN_LYRICS_TEXT_SHELL_OPENER)
+	insert_b_popup.add_item(LyricsSavers.DEBUG_NOEFFECT_SAVER)
 	insert_b_popup.index_pressed.connect(func (index : int):
 			var builtin := insert_b_popup.get_item_text(index)
 			var plugin := LyricsSavers.Plugin.create(builtin)

@@ -113,7 +113,13 @@ class DefaultNotFoundFinder extends ILyricsFinder:
 		return DEFAULT_NOT_FOUND_FINDER
 
 	func _find(title : String,artists : PackedStringArray,album : String,
-			file_path : String,_meta : Dictionary) -> PackedStringArray:
+			file_path : String,meta : Dictionary) -> PackedStringArray:
 		var info := ("title:%s" % title + "\nartists:%s" % ",".join(artists) +
 				"\nalbum:%s" % album + "\nfile_path:%s" % file_path)
-		return [info]
+		if meta.is_empty():
+			return [info]
+			
+		var meta_info : String = ""
+		for key in meta:
+			meta_info += str(key) + ":" + str(meta[key]) + "\n"
+		return [info,meta_info]

@@ -9,6 +9,12 @@ var settings := Settings.new()
 
 @onready var ruby_lyrics_view : RubyLyricsView = $RubyLyricsView
 
+@onready var popup_menu = $PopupMenu
+const MENU_ID_SETTINGS := 0
+const MENU_ID_ALWAYS_ON_TOP := 1
+const MENU_ID_SAVE := 2
+
+
 var finders := LyricsFinders.new()
 var savers := LyricsSavers.new()
 
@@ -27,15 +33,18 @@ func _ready():
 	get_viewport().gui_embed_subwindows = false
 	get_window().files_dropped.connect(on_files_dropped)
 
-	$PopupMenu.set_item_submenu(2,"PopupMenuSave")
+	popup_menu.add_item("Settings",MENU_ID_SETTINGS)
+	popup_menu.add_separator("",100)
+	popup_menu.add_check_item("Always on Top",MENU_ID_ALWAYS_ON_TOP)
+	popup_menu.add_separator("",101)
+	popup_menu.add_item("Save",MENU_ID_SAVE)
+	popup_menu.set_item_submenu(popup_menu.get_item_index(MENU_ID_SAVE),"PopupMenuSave")
 
 	settings.load_settings()
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	settings.initialize_finders_settings(finders)
 	settings.initialize_saver_settings(savers,$PopupMenu/PopupMenuSave)
-	if $PopupMenu/PopupMenuSave.item_count == 0:
-		$PopupMenu.set_item_disabled(2,true)
 	
 	source_texts = [input]
 	set_lyrics()
@@ -52,9 +61,14 @@ func _on_button_pressed():
 
 
 func on_files_dropped(files : PackedStringArray):
-	var file_path = files[0]
-	source_texts = finders._find("",[""],"",file_path,{})
-	set_lyrics()
+	var source_texts_count := source_texts.size()
+	for f in files:
+		var file := FileAccess.open(f,FileAccess.READ)
+		if file:
+			source_texts.append(file.get_as_text())
+	if source_texts_count < source_texts.size():
+		source_text_index = source_texts_count
+		set_lyrics()
 
 func _on_window_ui_right_clicked(position_):
 	var popup = $PopupMenu
@@ -74,21 +88,27 @@ func _on_window_ui_middle_clicked():
 
 func _on_popup_menu_id_pressed(id):
 	match id:
-		0: #Settings
+		MENU_ID_SETTINGS: #Settings
 			%SettingsWindow.hide()
 			var rect := Rect2i((size - Vector2(%SettingsWindow.size))/2,%SettingsWindow.size)
 			%SettingsWindow.popup_on_parent(rect)
-	pass # Replace with function body.
+		MENU_ID_ALWAYS_ON_TOP:
+			var always = not get_window().always_on_top
+			get_window().always_on_top = always
+			var idx = popup_menu.get_item_index(MENU_ID_ALWAYS_ON_TOP)
+			popup_menu.set_item_checked(idx,always)
+			popup_menu.always_on_top = always
+			%SettingsWindow.always_on_top = always
+#			$PopupMenu/PopupMenuSave.always_on_top = always
 
 
 func _on_popup_menu_save_index_pressed(index):
 	var msg :String= savers.plugins[index].saver._save(playback_data.title,playback_data.artists,
 			playback_data.album,playback_data.file_path,playback_data.meta_data,
 			source_texts,source_text_index)
-	
 	if not msg.is_empty():
-		%AcceptDialog.dialog_text = msg
-		%AcceptDialog.popup_centered()
+		$Notice.text = "Save result\n" + msg
+		$Notice.show()
 
 
 func _on_resized():
@@ -168,3 +188,9 @@ func set_lyrics():
 func _on_settings_display_background_color_changed(color):
 	$ColorRect.color = color
 
+
+
+func _on_notice_gui_input(event):
+	if (event is InputEventMouseButton and not event.pressed):
+		$Notice.hide()
+		

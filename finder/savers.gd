@@ -1,6 +1,8 @@
 
 class_name LyricsSavers
 
+const DEBUG_NOEFFECT_SAVER := "[Debug] No Effect"
+
 const BUILTIN_LYRICS_FILE_SAVER := "[Built-in] lyrics file saver"
 const BUILTIN_LYRICS_FILE_SAVER_OVERWRITE := "[Built-in] lyrics file saver [Overwrite]"
 const BUILTIN_LYRICS_TEXT_SHELL_OPENER := "[Built-in] lyrics text shell opener"
@@ -14,6 +16,8 @@ class Plugin:
 		file_path = fp
 		
 	static func create(file_path_ : String) -> Plugin:
+		if file_path_ == DEBUG_NOEFFECT_SAVER:
+			return Plugin.new(DebugNoEffectSaver.new(),file_path_)
 		if file_path_ == BUILTIN_LYRICS_FILE_SAVER:
 			return Plugin.new(DefaultFileSaver.new(),file_path_)
 		if file_path_ == BUILTIN_LYRICS_FILE_SAVER_OVERWRITE:
@@ -49,6 +53,14 @@ func deserialize(strings : PackedStringArray):
 		if p:
 			plugins.append(p)
 
+
+class DebugNoEffectSaver extends  ILyricsSaver:
+	func _get_name() -> String:
+		return DEBUG_NOEFFECT_SAVER
+	func _save(_title : String,_artists : PackedStringArray,_album : String,
+			_file_path : String,_meta : Dictionary,
+			_lyrics : PackedStringArray,_index : int) -> String:
+		return "no effect save"
 
 
 class DefaultFileSaver extends ILyricsSaver:
