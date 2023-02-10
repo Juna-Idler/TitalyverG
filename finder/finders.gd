@@ -52,7 +52,7 @@ func deserialize(strings : PackedStringArray):
 			plugins.append(p)
 
 
-func find(title : String,artists : PackedStringArray,album : String,
+func find_all(title : String,artists : PackedStringArray,album : String,
 		file_path : String,meta : Dictionary) -> PackedStringArray:
 	var result : PackedStringArray = []
 	for p in plugins:
@@ -67,6 +67,43 @@ func find(title : String,artists : PackedStringArray,album : String,
 		result.append_array(plugin.finder._find(title,artists,album,file_path,meta))
 		
 	return result
+
+
+class Iterator:
+	var finders : LyricsFinders
+	var index : int
+	var iterator_result : PackedStringArray
+	
+	func _init(f):
+		finders = f
+		index = -1 if finders.plugins.is_empty() else 0
+		iterator_result = []
+	
+	func is_end() -> bool:
+		return index < 0
+	
+	func find(title : String,artists : PackedStringArray,album : String,
+			file_path : String,meta : Dictionary) -> PackedStringArray:
+		var result : PackedStringArray = finders.plugins[index].finder._find(title,artists,album,file_path,meta)
+		iterator_result.append_array(result)
+		
+		index += 1
+		while index < finders.plugins.size():
+			if finders.plugins[index].file_path == COMMAND_IF_NOT_EMPTY_END_FIND:
+				if not iterator_result.is_empty():
+					index = -1
+					return result
+				else:
+					index += 1
+					continue
+			else:
+				return result
+		index = -1
+		return result
+
+
+func get_iterator() -> Iterator:
+	return Iterator.new(self)
 
 
 class IfNotEmptyEndFind extends  ILyricsFinder:

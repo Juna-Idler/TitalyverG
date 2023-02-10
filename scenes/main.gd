@@ -20,7 +20,7 @@ var savers := LyricsSavers.new()
 
 var source_texts : PackedStringArray
 var source_text_index : int
-var lyrics : LyricsContainer
+var lyrics := LyricsContainer.new("")
 
 var playback_data : PlaybackData = PlaybackData.new(false,0,0,0,"","",[],"",0,{})
 
@@ -46,8 +46,7 @@ func _ready():
 	settings.initialize_finders_settings(finders)
 	settings.initialize_saver_settings(savers,$PopupMenu/PopupMenuSave)
 	
-	source_texts = [input]
-	set_lyrics()
+	reset_lyrics([input],0)
 
 	%SettingsWindow.initialize(settings,ruby_lyrics_view,finders,savers,$PopupMenu/PopupMenuSave)
 
@@ -61,14 +60,16 @@ func _on_button_pressed():
 
 
 func on_files_dropped(files : PackedStringArray):
-	var source_texts_count := source_texts.size()
+	var drop_texts : PackedStringArray = []
 	for f in files:
 		var file := FileAccess.open(f,FileAccess.READ)
 		if file:
-			source_texts.append(file.get_as_text())
-	if source_texts_count < source_texts.size():
-		source_text_index = source_texts_count
-		set_lyrics()
+			drop_texts.append(file.get_as_text())
+	if not drop_texts.is_empty():
+		var index = source_texts.size()
+		add_lyrics(drop_texts)
+		change_lyrics_source(index)
+		
 
 func _on_window_ui_right_clicked(position_):
 	var popup = $PopupMenu
@@ -115,7 +116,7 @@ func _on_resized():
 	pass
 
 
-func _on_node_received(data : PlaybackData):
+func _on_receiver_received(data : PlaybackData):
 	if data.playback_event & PlaybackData.PlaybackEvent.PLAY_FLAG:
 		playing = true
 	else:
@@ -124,73 +125,88 @@ func _on_node_received(data : PlaybackData):
 	if data.playback_only or playback_data.same_song(data):
 		var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
 		var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
-		ruby_lyrics_view.set_time_and_target_y(time)
+		ruby_lyrics_view.set_time_and_target_y(time - lyrics.at_tag_container.offset)
 		return
 	playback_data = data
 	
 	ruby_lyrics_view.song_duration = data.duration
-	source_texts = finders.find(data.title,data.artists,data.album,data.file_path,data.meta_data)
-	set_lyrics()
-	var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
-	var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
-	ruby_lyrics_view.set_time_and_target_y(time)
+
+	var first := true
+	var it := finders.get_iterator()
+	while not it.is_end():
+		var find := Callable(it.find).bind(data.title,data.artists,data.album,data.file_path,data.meta_data)
+		var thread := Thread.new()
+		thread.start(find)
+		while thread.is_alive():
+			await get_tree().create_timer(0.5).timeout
+		var result : PackedStringArray = thread.wait_to_finish()
+#		var result := it.find(data.title,data.artists,data.album,data.file_path,data.meta_data)
+		if not result.is_empty():
+			if first:
+				var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
+				var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0
+				reset_lyrics(result,time)
+				first = false
+			else:
+				add_lyrics(result)
 
 
 func _on_button_prev_pressed():
-	if source_texts.size() <= 1:
-		return
-	source_text_index -= 1
-	if source_text_index < 0:
-		source_text_index = source_texts.size() - 1
-	lyrics = LyricsContainer.new(source_texts[source_text_index])
-	ruby_lyrics_view.lyrics = lyrics
-	ruby_lyrics_view.user_y_offset = 0
-	ruby_lyrics_view.build()
+	var index = source_text_index - 1
+	if index < 0:
+		index = source_texts.size() - 1
+	change_lyrics_source(index)
 	$LyricsCount/ButtonPrev.release_focus()
-	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 func _on_button_next_pressed():
-	if source_texts.size() <= 1:
-		return
-	source_text_index += 1
-	if source_text_index >= source_texts.size():
-		source_text_index = 0
-	lyrics = LyricsContainer.new(source_texts[source_text_index])
-	ruby_lyrics_view.lyrics = lyrics
-	ruby_lyrics_view.user_y_offset = 0
-	ruby_lyrics_view.build()
+	var index = source_text_index + 1
+	if index >= source_texts.size():
+		index = 0
+	change_lyrics_source(index)
 	$LyricsCount/ButtonNext.release_focus()
-	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 
-func set_lyrics():
+func reset_lyrics(lyrics_source : PackedStringArray,time_ : float):
 	ruby_lyrics_view.user_y_offset = 0
-	if not source_texts.is_empty():
-		source_text_index = 0
-		lyrics = LyricsContainer.new(source_texts[0])
-		ruby_lyrics_view.lyrics = lyrics
-		ruby_lyrics_view.build()
-	else:
-		var text := "no data"
-		source_texts = [text]
-		source_text_index = 0
-		lyrics = LyricsContainer.new(text)
-		ruby_lyrics_view.lyrics = lyrics
-		ruby_lyrics_view.build()
+	source_texts = lyrics_source.duplicate()
+	source_text_index = 0
+	lyrics = LyricsContainer.new(source_texts[0])
+	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.build()
+	ruby_lyrics_view.set_time_and_target_y(time_ + lyrics.at_tag_container.offset)
 	if source_texts.size() <= 1:
 		$LyricsCount.hide()
 	else:
 		$LyricsCount.show()
 		$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
+func add_lyrics(lyrics_source : PackedStringArray):
+	source_texts.append_array(lyrics_source)
+	if source_texts.size() <= 1:
+		$LyricsCount.hide()
+	else:
+		$LyricsCount.show()
+		$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
+
+func change_lyrics_source(index : int):
+	if source_texts.size() <= 1:
+		return
+	var old_offset := lyrics.at_tag_container.offset
+	source_text_index = index
+	lyrics = LyricsContainer.new(source_texts[source_text_index])
+	ruby_lyrics_view.lyrics = lyrics
+	ruby_lyrics_view.user_y_offset = 0
+	ruby_lyrics_view.build()
+	ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time - old_offset + lyrics.at_tag_container.offset)
+	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 
 func _on_settings_display_background_color_changed(color):
 	$ColorRect.color = color
 
 
-
 func _on_notice_gui_input(event):
 	if (event is InputEventMouseButton and not event.pressed):
 		$Notice.hide()
 		
+

@@ -133,7 +133,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_6vx0g")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_6vx0g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_em36m")
 
-[node name="Node" type="Node" parent="."]
+[node name="Receiver" type="Node" parent="."]
 script = ExtResource("4_cy7tu")
 
 [node name="LyricsCount" type="Label" parent="."]
@@ -208,7 +208,7 @@ autowrap_mode = 2
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
 [connection signal="wheel_moved" from="WindowUI" to="." method="_on_window_ui_wheel_moved"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
-[connection signal="received" from="Node" to="." method="_on_node_received"]
+[connection signal="received" from="Receiver" to="." method="_on_receiver_received"]
 [connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
