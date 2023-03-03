@@ -245,10 +245,16 @@ class AtTagContainer:
 	
 	var other_lines : PackedStringArray
 
+	var _rubying_regex : RegEx
+	var _ruby_pattern_regex : RegEx
+
 	func _init(lyrics : String):
 		var tt_regex := RegEx.create_from_string(TimeTag.LINE_PATTERN)
 		var at_regex := RegEx.create_from_string("^@([^=]+)=(.*)")
 		var tag_regex := RegEx.create_from_string("^\\[([^:]+):([^\\]]*)\\]$")
+		_rubying_regex = RegEx.create_from_string("^\\[([^\\]]+)\\]((\\d+),(\\d+))?\\[([^\\]]+)\\]$");
+
+		
 		var lines := lyrics.replace("\r\n","\n").replace("\r","\n").split("\n")
 		for i in lines.size():
 			var line := lines[i] as String
@@ -295,36 +301,92 @@ class AtTagContainer:
 						offset = int(value) / 1000.0
 				continue
 			other_lines.append(line)
+		
+		if not (ruby_parent.is_empty() || ruby_begin.is_empty() || ruby_end.is_empty()):
+			var ep := AtTagContainer.escape_regex(ruby_parent)
+			var eb := AtTagContainer.escape_regex(ruby_begin)
+			var ee := AtTagContainer.escape_regex(ruby_end)
+			_ruby_pattern_regex = RegEx.create_from_string(ep + "(.+?)" + eb + "(.+?)" +ee)
+		else:
+			_ruby_pattern_regex = null
 		return
 
 	func translate(text : String) -> Array:
-		
-		if ruby_parent.is_empty() || ruby_begin.is_empty() || ruby_end.is_empty():
-			return [RubyUnit.new(text)]
-		
-		var ruby_pattern = AtTagContainer.escape_regex(ruby_parent) + "(.+?)" +\
-				AtTagContainer.escape_regex(ruby_begin) + "(.+?)" +\
-				AtTagContainer.escape_regex(ruby_end)
-		var r = RegEx.create_from_string(ruby_pattern)
-
-		var target := text
+		var target_text := text
 		var result : Array = []
-		while true:
-			var ruby = r.search(target)
-			if ruby:
-				if ruby.get_start() > 0:
-					result.append(RubyUnit.new(target.substr(0,ruby.get_start())))
-				result.append(RubyUnit.new(ruby.get_string(1),ruby.get_string(2)))
-				if ruby.get_end() == target.length():
+		if _ruby_pattern_regex:
+			while true:
+				var ruby = _ruby_pattern_regex.search(target_text)
+				if ruby:
+					if ruby.get_start() > 0:
+						result.append(RubyUnit.new(target_text.substr(0,ruby.get_start())))
+					result.append(RubyUnit.new(ruby.get_string(1),ruby.get_string(2)))
+					if ruby.get_end() == target_text.length():
+						break
+					target_text = target_text.substr(ruby.get_end())
+				else:
+					result.append(RubyUnit.new(target_text))
 					break
-				target = target.substr(ruby.get_end())
-			else:
-				result.append(RubyUnit.new(target))
-				break
+		else:
+			result.append(RubyUnit.new(text))
+
+		if not rubying.is_empty():
+			var result_base : String = ""
+			for i in result:
+				result_base += i.base_text
+			for r in rubying:
+				var m = _rubying_regex.search(r)
+				if not m:
+					continue
+				var parent_target := m.get_string(1)
+				var ruby = m.get_string(5)
+				var parent_offset := int(m.get_string(3)) if m.get_start(3) >= 0 else 0
+				var parent_length := int(m.get_string(4)) if m.get_start(4) >= 0 else parent_target.length() - parent_offset
+				var next := 0
+				while true:
+					var index := result_base.find(parent_target,next)
+					if index < 0:
+						break
+					next = index + 1
+					
+					var count := 0
+					index += parent_offset
+					for i in result.size():
+						if count > index:
+							break
+						if count + result[i].base_text.length() <= index:
+							count += result[i].base_text.length()
+							continue
+						if result[i].has_ruby():
+							break
+						if index + parent_length > count + result[i].base_text.length():
+							break
+						
+						var div1 := index - count
+						var div2 := index - count + parent_length
+						var target : String = result[i].base_text
+						if div1 > 0 and div2 < target.length():
+							result.remove_at(i)
+							result.insert(i,RubyUnit.new(target.substr(0,div1)))
+							result.insert(i + 1,RubyUnit.new(target.substr(div1,div2-div1),ruby))
+							result.insert(i + 2,RubyUnit.new(target.substr(div2)))
+						elif div1 == 0 and div2 < target.length():
+							result.remove_at(i)
+							result.insert(i,RubyUnit.new(target.substr(0,div2),ruby))
+							result.insert(i + 1,RubyUnit.new(target.substr(div2)))
+						elif div1 > 0 and div2 == target.length():
+							result.remove_at(i)
+							result.insert(i,RubyUnit.new(target.substr(0,div1)))
+							result.insert(i + 1,RubyUnit.new(target.substr(div1,div2-div1),ruby))
+						elif div1 == 0 and div2 == target.length():
+							result[i] = RubyUnit.new(target,ruby)
+						break
+					
 		return result
+		
 
 	static func escape_regex(text : String) -> String:
 		for c in ["\\","*","+","?","|","{","}","[","]","(",")","^","$",".","#"]:
 			text = text.replace(c,"\\"+c)
 		return text
-			
+	

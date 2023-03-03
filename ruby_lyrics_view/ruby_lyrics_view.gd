@@ -112,7 +112,7 @@ enum ParentAlignment {NOTHING,CENTER,SPACE121,SPACE010}
 @export_group("Display")
 
 enum HorizontalAlignment {LEFT,CENTER,RIGHT}
-@export var horizontal_alignment : HorizontalAlignment :
+@export var horizontal_alignment : RubyLyricsView.HorizontalAlignment :
 	set(v):
 		horizontal_alignment = v
 		queue_redraw()
@@ -159,7 +159,7 @@ func set_time_and_target_y(time_ : float):
 	var distance = abs(target_time_y_offset - time_y_offset)
 	if distance > scroll_limit:
 		var move : float = 0.0
-		for i in limits.size() / 2:
+		for i in limits.size() / 2.0:
 			if distance <= limits[i*2]:
 				move = limits[i*2+1]
 				break
@@ -381,13 +381,13 @@ func build():
 				for t in unit.base:
 					var clusters : PackedStringArray = splitter.call(t.text)
 					for c in clusters:
-						var w := font.get_string_size(c,0,-1,font_size).x
+						var w := font.get_string_size(c,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x
 						bases.append(Unit.new(w,c))
 				var rubys : Array = []
 				for t in unit.ruby:
 					var clusters : PackedStringArray = splitter.call(t.text)
 					for c in clusters:
-						var w := font.get_string_size(c,0,-1,font_ruby_size).x
+						var w := font.get_string_size(c,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size).x
 						rubys.append(Unit.new(w,c))
 				parts.append(BuiltLine.Part.new(bases,rubys,-1,-1))
 			built_lines.append(BuiltLine.new(parts,-1,-1))
@@ -409,7 +409,7 @@ func build():
 					var clusters : PackedStringArray = splitter.call(tt.text)
 					var index = bases.size()
 					for c in clusters:
-						var w := font.get_string_size(c,0,-1,font_size).x
+						var w := font.get_string_size(c,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x
 						bases.append(Unit.new(w,c))
 					bases[index].start = tt.start_time
 					if index - 1 >= 0 and bases[index - 1].end < 0:
@@ -420,7 +420,7 @@ func build():
 					var clusters : PackedStringArray = splitter.call(tt.text)
 					var index = rubys.size()
 					for c in clusters:
-						var w := font.get_string_size(c,0,-1,font_ruby_size).x
+						var w := font.get_string_size(c,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size).x
 						rubys.append(Unit.new(w,c))
 					rubys[index].start = tt.start_time
 					if index - 1 >= 0 and rubys[index - 1].end < 0:

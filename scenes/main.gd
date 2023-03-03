@@ -72,9 +72,8 @@ func on_files_dropped(files : PackedStringArray):
 		
 
 func _on_window_ui_right_clicked(position_):
-	var popup = $PopupMenu
 	var pos := Vector2(DisplayServer.window_get_position())
-	popup.popup(Rect2(pos + position_,Vector2.ZERO))
+	popup_menu.popup(Rect2(pos + position_,Vector2.ZERO))
 
 
 func _on_window_ui_wheel_moved(delta):
