@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c4vtedr1xfn8x"]
+[gd_scene load_steps=23 format=3 uid="uid://c4vtedr1xfn8x"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
@@ -14,6 +14,61 @@ bg_color = Color(0, 0, 0, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6vx0g"]
 bg_color = Color(1, 0, 0, 0.501961)
+
+[sub_resource type="Gradient" id="Gradient_nv83v"]
+offsets = PackedFloat32Array(0, 0.485437, 1)
+colors = PackedColorArray(1, 1, 1, 0.25098, 1, 1, 1, 1, 1, 1, 1, 0.25098)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_0tavi"]
+gradient = SubResource("Gradient_nv83v")
+width = 5
+height = 16
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_3bms8"]
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1t5v7"]
+gradient = SubResource("Gradient_3bms8")
+width = 1
+height = 16
+fill_to = Vector2(0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2x4w0"]
+content_margin_top = 16.0
+draw_center = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_28yeb"]
+draw_center = false
+expand_margin_top = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_peum0"]
+draw_center = false
+expand_margin_top = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m8e0o"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p4sfb"]
+bg_color = Color(0, 0, 1, 0.501961)
+
+[sub_resource type="Gradient" id="Gradient_hpd67"]
+offsets = PackedFloat32Array(0, 0.5)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_70m70"]
+gradient = SubResource("Gradient_hpd67")
+width = 32
+height = 32
+fill_from = Vector2(0, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qbt7j"]
+texture = SubResource("GradientTexture2D_70m70")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g3n4e"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ou42v"]
 bg_color = Color(0, 0, 0, 0.75)
@@ -61,7 +116,7 @@ scrolling = true
 [node name="WindowUI" parent="." instance=ExtResource("4_tcylf")]
 layout_mode = 1
 
-[node name="Button" type="Button" parent="."]
+[node name="ButtonClose" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -75,6 +130,48 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_em36m")
 theme_override_styles/hover = SubResource("StyleBoxFlat_6vx0g")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_6vx0g")
 theme_override_styles/focus = SubResource("StyleBoxFlat_em36m")
+
+[node name="HSlider" type="HSlider" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = -20.0
+offset_right = -72.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_icons/grabber = SubResource("GradientTexture2D_0tavi")
+theme_override_icons/grabber_highlight = SubResource("GradientTexture2D_0tavi")
+theme_override_icons/tick = SubResource("GradientTexture2D_1t5v7")
+theme_override_styles/slider = SubResource("StyleBoxFlat_2x4w0")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_28yeb")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_peum0")
+min_value = -300.0
+max_value = 300.0
+allow_greater = true
+allow_lesser = true
+tick_count = 7
+ticks_on_borders = true
+
+[node name="ButtonOffset" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -36.0
+offset_right = 36.0
+offset_bottom = -4.0
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_m8e0o")
+theme_override_styles/hover = SubResource("StyleBoxFlat_p4sfb")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_qbt7j")
+theme_override_styles/focus = SubResource("StyleBoxFlat_g3n4e")
+toggle_mode = true
 
 [node name="Receiver" type="Node" parent="."]
 script = ExtResource("4_cy7tu")
@@ -150,7 +247,10 @@ autowrap_mode = 2
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
 [connection signal="wheel_moved" from="WindowUI" to="." method="_on_window_ui_wheel_moved"]
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="ButtonClose" to="." method="_on_button_pressed"]
+[connection signal="gui_input" from="HSlider" to="." method="_on_h_slider_gui_input"]
+[connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]
+[connection signal="toggled" from="ButtonOffset" to="." method="_on_button_offset_toggled"]
 [connection signal="received" from="Receiver" to="." method="_on_receiver_received"]
 [connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]

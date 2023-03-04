@@ -26,6 +26,8 @@ var playback_data : PlaybackData = PlaybackData.new(false,0,0,0,"","",[],"",0,{}
 
 var playing : bool = false
 
+var time_offset : float = 0
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -48,11 +50,13 @@ func _ready():
 	
 	reset_lyrics([input],0)
 
-	%SettingsWindow.initialize(settings,ruby_lyrics_view,finders,savers,$PopupMenu/PopupMenuSave)
+	%SettingsWindow.initialize(
+			settings,ruby_lyrics_view,finders,savers,$PopupMenu/PopupMenuSave)
 
 
 func _process(delta):
-	ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time + (delta if playing else 0))
+	ruby_lyrics_view.set_time_and_target_y(
+			ruby_lyrics_view.time + (delta if playing else 0))
 
 
 func _on_button_pressed():
@@ -124,7 +128,7 @@ func _on_receiver_received(data : PlaybackData):
 	if data.playback_only or playback_data.same_song(data):
 		var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
 		var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
-		ruby_lyrics_view.set_time_and_target_y(time - lyrics.at_tag_container.offset)
+		ruby_lyrics_view.set_time_and_target_y(time + time_offset - lyrics.at_tag_container.offset)
 		return
 	playback_data = data
 	
@@ -172,7 +176,7 @@ func reset_lyrics(lyrics_source : PackedStringArray,time_ : float):
 	lyrics = LyricsContainer.new(source_texts[0])
 	ruby_lyrics_view.lyrics = lyrics
 	ruby_lyrics_view.build()
-	ruby_lyrics_view.set_time_and_target_y(time_ + lyrics.at_tag_container.offset)
+	ruby_lyrics_view.set_time_and_target_y(time_ + time_offset + lyrics.at_tag_container.offset)
 	if source_texts.size() <= 1:
 		$LyricsCount.hide()
 	else:
@@ -196,7 +200,8 @@ func change_lyrics_source(index : int):
 	ruby_lyrics_view.lyrics = lyrics
 	ruby_lyrics_view.user_y_offset = 0
 	ruby_lyrics_view.build()
-	ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time - old_offset + lyrics.at_tag_container.offset)
+	ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time
+			- old_offset + lyrics.at_tag_container.offset)
 	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 
@@ -207,5 +212,21 @@ func _on_settings_display_background_color_changed(color):
 func _on_notice_gui_input(event):
 	if (event is InputEventMouseButton and not event.pressed):
 		$Notice.hide()
-		
 
+
+func _on_button_offset_toggled(button_pressed):
+	$HSlider.visible = button_pressed
+
+func _on_h_slider_value_changed(value):
+	ruby_lyrics_view.time -= time_offset
+	time_offset = value / 100.0
+	ruby_lyrics_view.time += time_offset
+
+func _on_h_slider_gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_MIDDLE:
+			if event.pressed:
+				$HSlider.value = 0
+#				ruby_lyrics_view.time -= time_offset
+#				time_offset = 0
+				accept_event()
