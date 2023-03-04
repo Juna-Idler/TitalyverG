@@ -555,10 +555,20 @@ func layout():
 			u.x += x
 			displayed_ruby.append(u)
 		x += line.unbreakables[0].width
+		var ruby_padding : float = line.unbreakables[0].get_right_ruby_buffer()
 
 		for i in range(1,line.unbreakables.size()):
 			var unbreakable := line.unbreakables[i] as LinebreakLine.Unbreakable
-			if x + unbreakable.width > size.x - right_padding:
+			if unbreakable.ruby.is_empty():
+				ruby_padding += unbreakable.get_left_ruby_buffer()
+			else:
+				var padding = ruby_padding + unbreakable.get_left_ruby_buffer()
+				if padding < 0:
+					x -= padding
+				ruby_padding = unbreakable.get_right_ruby_buffer()
+			var right := x + unbreakable.width
+			if right > size.x - right_padding or (not unbreakable.ruby.is_empty()
+					and right - unbreakable.get_right_ruby_buffer() > size.x):
 				var base_y_distance = float(no_ruby_space) if displayed_ruby.is_empty() else ruby_height
 				var by = y + base_y_distance + font.get_ascent(font_size)
 				var ry = y + font.get_ascent(font_ruby_size)
