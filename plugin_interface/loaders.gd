@@ -10,7 +10,7 @@ class Plugin:
 	func _init(l,fp):
 		loader = l
 		file_path = fp
-		loader._initialize(file_path.get_base_dir())
+		loader._initialize(file_path)
 		
 	static func create(file_path_ : String) -> Plugin:
 			

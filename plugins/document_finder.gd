@@ -1,18 +1,26 @@
 
 extends ILyricsFinder
 
-func _initialize(_script_dir_path : String):
+func _initialize(_script_path : String):
 	pass
 	
 func _get_name() -> String:
 	return "Lyrics directory finder"
 
+const FROM := ["\"","<",">","|",":","*","?","\\","/"]
+const TO := ["”","＜","＞","｜","：","＊","？","￥","／"]
+
+func filename_replace(text : String) -> String:
+	for i in FROM.size():
+		text = text.replace(FROM[i],TO[i])
+	return text
 
 func _find(title : String,artists : PackedStringArray,album : String,
 		_file_path : String,_meta : Dictionary) -> PackedStringArray:
 
 	var path := (OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS) + "/Lyrics/" +
-			",".join(artists) + "/" + album + "-" + title)
+			filename_replace(",".join(artists)) + "/" + filename_replace(album + "-" + title))
+			
 	var r = PackedStringArray()
 	var kra_path = path.get_basename() + ".kra"
 	if FileAccess.file_exists(kra_path):

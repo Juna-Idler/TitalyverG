@@ -4,8 +4,8 @@ extends ILyricsFinder
 var MyHttpRequest : GDScript
 var http # : MyHttpRequest
 
-func _initialize(script_dir_path : String):
-	MyHttpRequest = load(script_dir_path + "/http_request.gd")
+func _initialize(script_path : String):
+	MyHttpRequest = load(script_path.get_base_dir() + "/http_request.gd")
 	http = MyHttpRequest.new()
 	
 func _get_name() -> String:
@@ -78,6 +78,12 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 
 	
 	var lists := get_list(param,title," ".join(artists))
+	if lists.is_empty():
+		title = title.uri_encode()
+		var artist = " ".join(artists).uri_encode()
+		var url = param["param_format"].replace("{title}",title).replace("{artist}",artist)
+		OS.shell_open(param["host"] + url)
+		return []
 	var lyricss : PackedStringArray = []
 	for l in lists:
 		var list  := l as ListData
@@ -89,6 +95,7 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 				"Artist:" + list.artist + "\n\n"
 			)
 			lyricss.append(header + lyrics)
+			OS.shell_open(param["host"] + list.url)
 	return lyricss
 
 

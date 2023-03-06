@@ -1,7 +1,7 @@
 
 class_name ILyricsSaver
 
-func _initialize(_script_dir_path : String):
+func _initialize(_script_path : String):
 	pass
 
 func _get_name() -> String:

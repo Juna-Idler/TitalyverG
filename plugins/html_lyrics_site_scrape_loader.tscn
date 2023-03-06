@@ -1,0 +1,68 @@
+[gd_scene load_steps=2 format=3 uid="uid://doke2osnwldot"]
+
+[ext_resource type="Script" path="res://plugins/html_lyrics_site_scrape_loader.gd" id="1_28et6"]
+
+[node name="html_lyrics_site_scrape_loader" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_28et6")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 24.0
+offset_top = -56.0
+offset_right = 64.0
+offset_bottom = -24.0
+grow_vertical = 2
+text = "URL"
+vertical_alignment = 2
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = -16.0
+offset_right = -16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -184.0
+offset_top = 32.0
+offset_right = -16.0
+offset_bottom = 64.0
+grow_horizontal = 0
+grow_vertical = 2
+text = "OK"
+
+[node name="ButtonBrower" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = 32.0
+offset_right = 184.0
+offset_bottom = 64.0
+grow_vertical = 2
+text = "Browser"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="ButtonBrower" to="." method="_on_button_brower_pressed"]

@@ -14,7 +14,7 @@ class Plugin:
 	func _init(s,fp):
 		saver = s
 		file_path = fp
-		saver._initialize(file_path.get_base_dir())
+		saver._initialize(file_path)
 		
 	static func create(file_path_ : String) -> Plugin:
 		if file_path_ == DEBUG_NOEFFECT_SAVER:
