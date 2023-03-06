@@ -12,6 +12,7 @@ class Plugin:
 	func _init(f,fp):
 		finder = f
 		file_path = fp
+		finder._initialize(file_path.get_base_dir())
 		
 	static func create(file_path_ : String) -> Plugin:
 		if file_path_ == COMMAND_IF_NOT_EMPTY_END_FIND:

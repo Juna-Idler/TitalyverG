@@ -1,7 +1,9 @@
 
 extends ILyricsFinder
 
-
+func _initialize(_script_dir_path : String):
+	pass
+	
 func _get_name() -> String:
 	return "Lyrics directory finder"
 

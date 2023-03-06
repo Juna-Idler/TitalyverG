@@ -3,8 +3,10 @@ extends ILyricsFinder
 
 var finder : ILyricsFinder
 
-func _init():
-	finder = load("html_lyrics_site_scrape_finder.gd").new()
+
+func _initialize(script_dir_path : String):
+	finder = load(script_dir_path + "/html_lyrics_site_scrape_finder.gd").new()
+	finder._initialize(script_dir_path)
 
 func _get_name() -> String:
 	return "html_lyrics_site_scrape_save_finder"

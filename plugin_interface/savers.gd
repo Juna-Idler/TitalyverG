@@ -14,6 +14,7 @@ class Plugin:
 	func _init(s,fp):
 		saver = s
 		file_path = fp
+		saver._initialize(file_path.get_base_dir())
 		
 	static func create(file_path_ : String) -> Plugin:
 		if file_path_ == DEBUG_NOEFFECT_SAVER:
@@ -25,8 +26,10 @@ class Plugin:
 		if file_path_ == BUILTIN_LYRICS_TEXT_SHELL_OPENER:
 			return Plugin.new(DefaultLyricsShellOpener.new(),file_path_)
 			
-		var plugin_script := load(file_path_) as GDScript
-		if not plugin_script:
+		if not FileAccess.file_exists(file_path_):
+			return null
+		var plugin_script = load(file_path_)
+		if not plugin_script is GDScript:
 			return null
 		var saver_ = plugin_script.new()
 		if not saver_ is ILyricsSaver:

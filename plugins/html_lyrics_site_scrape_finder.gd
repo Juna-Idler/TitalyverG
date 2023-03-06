@@ -1,6 +1,13 @@
 
 extends ILyricsFinder
 
+var MyHttpRequest : GDScript
+var http # : MyHttpRequest
+
+func _initialize(script_dir_path : String):
+	MyHttpRequest = load(script_dir_path + "/http_request.gd")
+	http = MyHttpRequest.new()
+	
 func _get_name() -> String:
 	return "http_lyrics_site_finder"
 
@@ -86,7 +93,6 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 
 
 
-const MyHttpRequest = preload("./http_request.gd")
 
 
 class ListData:
@@ -102,7 +108,6 @@ class ListData:
 
 const POLLING_WAIT_TIME_MS = 500
 
-var http := MyHttpRequest.new()
 
 
 func get_list(site_param : Dictionary,title : String,artist : String) -> Array:
@@ -114,7 +119,7 @@ func get_list(site_param : Dictionary,title : String,artist : String) -> Array:
 	if not http.connect_to_host(site_param["host"]):
 		return []
 		
-	var response := http.get_response(url_param)
+	var response = http.get_response(url_param)
 	if response.is_empty():
 		return []
 		
@@ -153,7 +158,7 @@ func get_lyrics(url : String,param : Dictionary) -> String:
 	if not http.connect_to_host(param["host"]):
 		return ""
 	
-	var response := http.get_response(url)
+	var response = http.get_response(url)
 	if response.is_empty():
 		return ""
 	
