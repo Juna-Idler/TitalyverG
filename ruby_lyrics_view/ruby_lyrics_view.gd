@@ -337,9 +337,9 @@ class LinebreakLine:
 			ruby = r
 			width = w
 		func get_left_ruby_buffer() -> float:
-			return width if ruby.is_empty() else ruby[0].x
+			return width if ruby.is_empty() else ruby[0].x - base[0].x
 		func get_right_ruby_buffer() -> float:
-			return width - (0.0 if ruby.is_empty() else ruby.back().x + ruby.back().width)
+			return width - (0.0 if ruby.is_empty() else ruby.back().x - base[0].x + ruby.back().width)
 	
 	var unbreakables : Array
 	var start : float
@@ -547,6 +547,7 @@ func layout():
 		var displayed_base : Array = []
 		var displayed_ruby : Array = []
 
+		var ruby_padding : float = line.unbreakables[0].get_right_ruby_buffer()
 		var x : float = left_padding
 		for u in line.unbreakables[0].base:
 			u.x += x
@@ -555,7 +556,6 @@ func layout():
 			u.x += x
 			displayed_ruby.append(u)
 		x += line.unbreakables[0].width
-		var ruby_padding : float = line.unbreakables[0].get_right_ruby_buffer()
 
 		for i in range(1,line.unbreakables.size()):
 			var unbreakable := line.unbreakables[i] as LinebreakLine.Unbreakable
