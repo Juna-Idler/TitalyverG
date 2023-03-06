@@ -79,6 +79,19 @@ func initialize_saver_settings(saver : LyricsSavers,menu : PopupMenu):
 		
 	for p in saver.plugins:
 		menu.add_item(p.saver._get_name())
+
+func initialize_loader_settings(loader : LyricsLoaders,menu : PopupMenu):
+	var plugins = config.get_value("Loader","plug_in",[])
+	if plugins.is_empty():
+#		loader.plugins.append()
+		pass
+	else:
+		loader.deserialize(plugins)
+		config.set_value("Loader","plug_in",loader.serialize())
+	
+	for p in loader.plugins:
+		menu.add_item(p.loader._get_name())
+	
 	
 func get_background_color() -> Color:
 	return config.get_value("Window","background_color",Color(0,0,0,0.8))

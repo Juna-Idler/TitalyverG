@@ -13,10 +13,12 @@ var settings := Settings.new()
 const MENU_ID_SETTINGS := 0
 const MENU_ID_ALWAYS_ON_TOP := 1
 const MENU_ID_SAVE := 2
+const MENU_ID_LOAD := 3
 
 
 var finders := LyricsFinders.new()
 var savers := LyricsSavers.new()
+var loaders := LyricsLoaders.new()
 
 var source_texts : PackedStringArray
 var source_text_index : int
@@ -41,17 +43,23 @@ func _ready():
 	popup_menu.add_separator("",101)
 	popup_menu.add_item("Save",MENU_ID_SAVE)
 	popup_menu.set_item_submenu(popup_menu.get_item_index(MENU_ID_SAVE),"PopupMenuSave")
+	popup_menu.add_item("Load",MENU_ID_LOAD)
+	popup_menu.set_item_submenu(popup_menu.get_item_index(MENU_ID_LOAD),"PopupMenuLoad")
+	
 
 	settings.load_settings()
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	settings.initialize_finders_settings(finders)
 	settings.initialize_saver_settings(savers,$PopupMenu/PopupMenuSave)
+	settings.initialize_loader_settings(loaders,$PopupMenu/PopupMenuLoad)
 	
 	reset_lyrics([input],0)
 
 	%SettingsWindow.initialize(
-			settings,ruby_lyrics_view,finders,savers,$PopupMenu/PopupMenuSave)
+			settings,ruby_lyrics_view,finders,
+			savers,$PopupMenu/PopupMenuSave,
+			loaders,$PopupMenu/PopupMenuLoad)
 
 
 func _process(delta):
@@ -114,10 +122,38 @@ func _on_popup_menu_save_index_pressed(index):
 		$Notice.text = "Save result\n" + msg
 		$Notice.show()
 
+func _on_popup_menu_load_index_pressed(index):
+	var loader : ILyricsLoader = loaders.plugins[index].loader
+	
+	var window := $LoaderWindow
+	if not loader.loaded.is_connected(_on_loader_loaded):
+		loader.loaded.connect(_on_loader_loaded)
+	
+	if loader._open(playback_data.title,playback_data.artists,
+			playback_data.album,playback_data.file_path,playback_data.meta_data):
+		for c in window.get_children():
+			window.remove_child(c)
+		window.add_child(loader)
+		window.title = loader._get_name()
+		var rect := Rect2i((size - Vector2(loader.size))/2,loader.size)
+		window.popup_on_parent(rect)
+
+func _on_loader_loaded(lyrics_ : PackedStringArray,msg : String):
+	if not lyrics_.is_empty():
+		add_lyrics(lyrics_,true)
+	if not msg.is_empty():
+		$Notice.text = "Load result\n" + msg
+		$Notice.show()
+	$LoaderWindow.hide()
+
+func _on_loader_window_close_requested():
+	$LoaderWindow.hide()
+	var loader = $LoaderWindow.get_child(0)
+	loader._close()
+
 
 func _on_resized():
 	pass
-
 
 func _on_receiver_received(data : PlaybackData):
 	if data.playback_event & PlaybackData.PlaybackEvent.PLAY_FLAG:
@@ -183,12 +219,15 @@ func reset_lyrics(lyrics_source : PackedStringArray,time_ : float):
 		$LyricsCount.show()
 		$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
-func add_lyrics(lyrics_source : PackedStringArray):
+func add_lyrics(lyrics_source : PackedStringArray,change : bool = false):
+	if lyrics_source.is_empty():
+		return
+	var index := source_texts.size()
 	source_texts.append_array(lyrics_source)
-	if source_texts.size() <= 1:
-		$LyricsCount.hide()
+	$LyricsCount.show()
+	if change:
+		change_lyrics_source(index)
 	else:
-		$LyricsCount.show()
 		$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 func change_lyrics_source(index : int):
@@ -230,3 +269,4 @@ func _on_h_slider_gui_input(event):
 #				ruby_lyrics_view.time -= time_offset
 #				time_offset = 0
 				accept_event()
+

@@ -228,6 +228,8 @@ size = Vector2i(100, 62)
 
 [node name="PopupMenuSave" type="PopupMenu" parent="PopupMenu"]
 
+[node name="PopupMenuLoad" type="PopupMenu" parent="PopupMenu"]
+
 [node name="Notice" type="Label" parent="."]
 visible = false
 layout_mode = 1
@@ -243,6 +245,10 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
+[node name="LoaderWindow" type="Window" parent="."]
+visible = false
+exclusive = true
+
 [connection signal="middle_clicked" from="WindowUI" to="." method="_on_window_ui_middle_clicked"]
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
@@ -256,4 +262,6 @@ autowrap_mode = 2
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
 [connection signal="index_pressed" from="PopupMenu/PopupMenuSave" to="." method="_on_popup_menu_save_index_pressed"]
+[connection signal="index_pressed" from="PopupMenu/PopupMenuLoad" to="." method="_on_popup_menu_load_index_pressed"]
 [connection signal="gui_input" from="Notice" to="." method="_on_notice_gui_input"]
+[connection signal="close_requested" from="LoaderWindow" to="." method="_on_loader_window_close_requested"]

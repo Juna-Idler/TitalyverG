@@ -1,20 +1,23 @@
+extends ILyricsLoader
 
-extends Control
-class_name ILyricsLoader
-
-signal loaded(lyrics : PackedStringArray,msg : String)
 
 
 func _initialize(_script_dir_path : String):
 	pass
 	
 func _get_name() -> String:
-	return ""
+	return "Textbox Loader"
 
 
 func _open(_title : String, _artists : PackedStringArray, _album : String,
 		_file_path : String,_meta : Dictionary) -> bool:
-	return false
+	return true
 
 func _close():
-	pass
+	$TextEdit.text = ""
+
+
+func _on_button_pressed():
+	loaded.emit([$TextEdit.text],"")
+	$TextEdit.text = ""
+

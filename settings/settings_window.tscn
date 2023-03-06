@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://cluue5kyaytsq"]
+[gd_scene load_steps=7 format=3 uid="uid://cluue5kyaytsq"]
 
 [ext_resource type="Script" path="res://settings/settings_window.gd" id="1_ff5r0"]
 [ext_resource type="PackedScene" uid="uid://2eewjl0nd8t5" path="res://settings/display.tscn" id="2_ciu6t"]
 [ext_resource type="PackedScene" uid="uid://bojtoienwdl1s" path="res://settings/finder.tscn" id="3_5xy5c"]
 [ext_resource type="PackedScene" uid="uid://bybb8b0e1ppl8" path="res://settings/unsync.tscn" id="4_7rrpf"]
 [ext_resource type="PackedScene" uid="uid://1mp0cqt0r6a0" path="res://settings/saver.tscn" id="5_j1oqk"]
+[ext_resource type="PackedScene" uid="uid://mq3q3i6815ts" path="res://settings/loader.tscn" id="6_yy3mp"]
 
 [node name="SettingsWindow" type="Window"]
 gui_embed_subwindows = true
@@ -48,6 +49,11 @@ visible = false
 layout_mode = 2
 
 [node name="Saver" parent="MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("5_j1oqk")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Loader" parent="MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("6_yy3mp")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
