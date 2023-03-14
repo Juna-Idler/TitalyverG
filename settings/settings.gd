@@ -14,6 +14,15 @@ func load_settings() -> bool:
 func save_settings():
 	config.save(CONFIG_FILE_PATH)
 	
+func initialize_receiver_settings(setter : Callable):
+	var receiver : String = config.get_value("Receiver","receiver","Spotify")
+	match receiver:
+		"WebSocket":
+			setter.call(load("res://receiver/websocket_receiver.tscn").instantiate())
+		"Spotify":
+			setter.call(load("res://receiver/spotify_receiver.tscn").instantiate())
+			
+	
 func initialize_ruby_lyrics_view_settings(rlv : RubyLyricsView):
 	if config.get_value("Font","is_system",true):
 		var font := SystemFont.new()

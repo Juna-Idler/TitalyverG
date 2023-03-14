@@ -25,19 +25,15 @@ func _ready():
 	pass # Replace with function body.
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
-	pass
 
-
-func login():
+func login(token : SpotifyAuth.PKCETokenResponse = null):
 	retry = Callable()
 	$Auth.process_mode = Node.PROCESS_MODE_ALWAYS
-	$Auth.authenticate()
+	$Auth.authenticate(token)
 
 
 func get_currently_playing_track():
-	if access_token.is_empty():
+	if access_token == null:
 		return
 	if requesting:
 		return
@@ -68,7 +64,7 @@ func _on_request_complited_get_currently_playing_track(
 			received_response.emit({})
 		401: #need refresh
 			retry = get_currently_playing_track
-			$Auth.request_refresh_access_token()
+			$Auth.request_refresh_access_token(access_token.refresh_token)
 		403:
 			received_response.emit(JSON.parse_string(body.get_string_from_utf8()))
 		429:
@@ -86,5 +82,8 @@ func _on_auth_got_token(token : SpotifyAuth.PKCETokenResponse):
 		$Auth.process_mode = Node.PROCESS_MODE_DISABLED
 
 func _on_auth_failed(_err : String):
+	if access_token != null:
+		access_token = null
+		changed_token.emit(null)
 	finished_login.emit(false)
 	$Auth.process_mode = Node.PROCESS_MODE_DISABLED

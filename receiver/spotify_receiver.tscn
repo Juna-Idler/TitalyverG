@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://dk76bbijhrxeh"]
+
+[ext_resource type="Script" path="res://receiver/spotify_receiver.gd" id="1_844hu"]
+[ext_resource type="PackedScene" uid="uid://btfpi0208nkvw" path="res://receiver/spotify/spotify.tscn" id="2_fhx3t"]
+
+[node name="SpotifyReceiver" type="Node"]
+script = ExtResource("1_844hu")
+
+[node name="Spotify" parent="." instance=ExtResource("2_fhx3t")]
+
+[node name="Auth" parent="Spotify" index="1"]
+client_id = "5a2454d5df544fed9e1438fb3a909faa"
+
+[connection signal="changed_token" from="Spotify" to="." method="_on_spotify_changed_token"]
+[connection signal="finished_login" from="Spotify" to="." method="_on_spotify_finished_login"]
+[connection signal="received_response" from="Spotify" to="." method="_on_spotify_received_response"]
+
+[editable path="Spotify"]

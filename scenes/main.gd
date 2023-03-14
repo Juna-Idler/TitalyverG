@@ -15,6 +15,14 @@ const MENU_ID_ALWAYS_ON_TOP := 1
 const MENU_ID_SAVE := 2
 const MENU_ID_LOAD := 3
 
+var receiver : I_Receiver
+func set_receiver(r : I_Receiver):
+	if receiver:
+		remove_child(receiver)
+		receiver.queue_free()
+	receiver = r
+	add_child(receiver)
+	receiver.received.connect(_on_receiver_received)
 
 var finders := LyricsFinders.new()
 var savers := LyricsSavers.new()
@@ -46,8 +54,10 @@ func _ready():
 	popup_menu.add_item("Load",MENU_ID_LOAD)
 	popup_menu.set_item_submenu(popup_menu.get_item_index(MENU_ID_LOAD),"PopupMenuLoad")
 	
-
 	settings.load_settings()
+	
+	settings.initialize_receiver_settings(set_receiver)
+	
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	settings.initialize_finders_settings(finders)

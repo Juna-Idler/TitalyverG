@@ -1,8 +1,7 @@
-[gd_scene load_steps=23 format=3 uid="uid://ccl30cbnidoqs"]
+[gd_scene load_steps=22 format=3 uid="uid://bq3mop0sgipn"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
-[ext_resource type="Script" path="res://receiver/websocket_server.gd" id="4_nvc5e"]
 [ext_resource type="PackedScene" uid="uid://cfvium7sqii0l" path="res://scenes/window_ui.tscn" id="4_tcylf"]
 [ext_resource type="PackedScene" uid="uid://cluue5kyaytsq" path="res://settings/settings_window.tscn" id="5_8xix0"]
 
@@ -173,9 +172,6 @@ theme_override_styles/pressed = SubResource("StyleBoxTexture_qbt7j")
 theme_override_styles/focus = SubResource("StyleBoxFlat_g3n4e")
 toggle_mode = true
 
-[node name="Receiver" type="Node" parent="."]
-script = ExtResource("4_nvc5e")
-
 [node name="LyricsCount" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 3
@@ -257,7 +253,6 @@ exclusive = true
 [connection signal="gui_input" from="HSlider" to="." method="_on_h_slider_gui_input"]
 [connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]
 [connection signal="toggled" from="ButtonOffset" to="." method="_on_button_offset_toggled"]
-[connection signal="received" from="Receiver" to="." method="_on_receiver_received"]
 [connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]

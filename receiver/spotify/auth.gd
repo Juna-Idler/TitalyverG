@@ -200,7 +200,7 @@ func _generate_challenge(v : String) -> String:
 func request_refresh_access_token(refresh_token : String) -> bool:
 	token = null
 	var params : PackedStringArray = [
-		"client_id=" + $Auth.client_id,
+		"client_id=" + client_id,
 		"grant_type=" + "refresh_token",
 		"refresh_token=" + refresh_token,
 	]

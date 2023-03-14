@@ -1,13 +1,16 @@
 [gd_scene load_steps=3 format=3 uid="uid://btfpi0208nkvw"]
 
-[ext_resource type="Script" path="res://spotify.gd" id="1_o4yrv"]
-[ext_resource type="Script" path="res://auth.gd" id="2_td3l5"]
+[ext_resource type="Script" path="res://receiver/spotify/spotify.gd" id="1_pyg3v"]
+[ext_resource type="Script" path="res://receiver/spotify/auth.gd" id="2_allhq"]
 
 [node name="Spotify" type="Node"]
-script = ExtResource("1_o4yrv")
+script = ExtResource("1_pyg3v")
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
 [node name="Auth" type="Node" parent="."]
 process_mode = 4
-script = ExtResource("2_td3l5")
+script = ExtResource("2_allhq")
+
+[connection signal="failed" from="Auth" to="." method="_on_auth_failed"]
+[connection signal="got_token" from="Auth" to="." method="_on_auth_got_token"]
