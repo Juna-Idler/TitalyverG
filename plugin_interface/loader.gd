@@ -1,5 +1,4 @@
 
-extends Control
 class_name ILyricsLoader
 
 signal loaded(lyrics : PackedStringArray,msg : String)
@@ -13,8 +12,8 @@ func _get_name() -> String:
 
 
 func _open(_title : String, _artists : PackedStringArray, _album : String,
-		_file_path : String,_meta : Dictionary) -> bool:
-	return false
+		_file_path : String,_meta : Dictionary) -> Control:
+	return null
 
 func _close():
 	pass

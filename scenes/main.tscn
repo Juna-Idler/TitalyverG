@@ -1,8 +1,8 @@
-[gd_scene load_steps=23 format=3 uid="uid://c4vtedr1xfn8x"]
+[gd_scene load_steps=23 format=3 uid="uid://ccl30cbnidoqs"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
-[ext_resource type="Script" path="res://receiver/server.gd" id="4_cy7tu"]
+[ext_resource type="Script" path="res://receiver/websocket_server.gd" id="4_nvc5e"]
 [ext_resource type="PackedScene" uid="uid://cfvium7sqii0l" path="res://scenes/window_ui.tscn" id="4_tcylf"]
 [ext_resource type="PackedScene" uid="uid://cluue5kyaytsq" path="res://settings/settings_window.tscn" id="5_8xix0"]
 
@@ -174,7 +174,7 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_g3n4e")
 toggle_mode = true
 
 [node name="Receiver" type="Node" parent="."]
-script = ExtResource("4_cy7tu")
+script = ExtResource("4_nvc5e")
 
 [node name="LyricsCount" type="Label" parent="."]
 layout_mode = 1

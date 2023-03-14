@@ -38,7 +38,7 @@ func initialize(settings_ : Settings,loaders_ : LyricsLoaders,menu_ : PopupMenu)
 
 func on_files_dropped(files : PackedStringArray):
 	var file_path = files[0]
-	if file_path.get_extension() == "tscn":
+	if file_path.get_extension() == "gd":
 		var plugin := LyricsLoaders.Plugin.create(file_path)
 		if plugin:
 			loaders.plugins.append(plugin)

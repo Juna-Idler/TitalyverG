@@ -16,6 +16,9 @@ func _get_name() -> String:
 func _find(title : String,artists : PackedStringArray,_album : String,
 		_file_path : String,_meta : Dictionary) -> PackedStringArray:
 	
+	if title.is_empty() or artists.is_empty():
+		return []
+	
 	var param : Dictionary = {
 		"host" : "https://utaten.com",
 		"param_format" : "/search?sort=popular_sort%3Aasc&artist_name={artist}&title={title}&beginning=&body=&lyricist=&composer=&sub_title=&tag=&form_open=1&show_artists=1",
@@ -76,12 +79,13 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 #		]
 #	}
 
-	
-	var lists := get_list(param,title," ".join(artists))
+	var search_artist = artists[0]
+#	var search_artist = " ".join(artists)
+	var lists := get_list(param,title,search_artist)
 	if lists.is_empty():
 		title = title.uri_encode()
-		var artist = " ".join(artists).uri_encode()
-		var url = param["param_format"].replace("{title}",title).replace("{artist}",artist)
+		search_artist = search_artist.uri_encode()
+		var url = param["param_format"].replace("{title}",title).replace("{artist}",search_artist)
 		OS.shell_open(param["host"] + url)
 		return []
 	var lyricss : PackedStringArray = []

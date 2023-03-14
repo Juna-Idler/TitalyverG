@@ -1,7 +1,7 @@
 
 class_name ILyricsFinder
 
-func _initialize(script_path : String):
+func _initialize(_script_path : String):
 	pass
 
 func _get_name() -> String:

@@ -1,6 +1,6 @@
-extends Node
+extends I_Receiver
 
-signal received(data : PlaybackData)
+#signal received(data : PlaybackData)
 
 @export var port_number = 14738
 

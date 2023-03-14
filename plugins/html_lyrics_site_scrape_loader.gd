@@ -1,6 +1,11 @@
 extends ILyricsLoader
 
 
+var scene
+var line_edit : LineEdit
+var button : Button
+var browser : Button
+
 var MyHttpRequest : GDScript
 var http # : MyHttpRequest
 
@@ -51,6 +56,13 @@ var param : Dictionary = {
 func _initialize(script_path : String):
 	MyHttpRequest = load(script_path.get_base_dir() + "/http_request.gd")
 	http = MyHttpRequest.new()
+	var Scene : PackedScene = load(script_path.get_base_dir() + "/html_lyrics_site_scrape_loader.tscn")
+	scene = Scene.instantiate()
+	line_edit = scene.get_node("LineEdit")
+	button = scene.get_node("Button")
+	browser = scene.get_node("ButtonBrowser")
+	button.pressed.connect(_on_button_pressed)
+	browser.pressed.connect(_on_button_brower_pressed)
 	
 
 func _get_name() -> String:
@@ -58,25 +70,25 @@ func _get_name() -> String:
 
 
 func _open(_title : String, _artists : PackedStringArray, _album : String,
-		_file_path : String,_meta : Dictionary) -> bool:
-	return true
+		_file_path : String,_meta : Dictionary) -> Control:
+	return scene
 
 func _close():
 	pass
 
 
 func _on_button_pressed():
-	var url : String = $LineEdit.text
+	var url : String = line_edit.text
 	if not url.begins_with(param["host"]):
 		return
 	url = url.substr(param["host"].length())
-	var lyrics := get_lyrics(url,param)
+	var lyrics := get_lyrics(url)
 	if not lyrics.is_empty():
 		var header : String = param["host"] + url + "\n\n"
 		loaded.emit([header + lyrics],"")
 
 
-func get_lyrics(url : String,param : Dictionary) -> String:
+func get_lyrics(url : String) -> String:
 	if not http.connect_to_host(param["host"]):
 		return ""
 	
@@ -96,7 +108,7 @@ func get_lyrics(url : String,param : Dictionary) -> String:
 
 
 func _on_button_brower_pressed():
-	OS.shell_open($LineEdit.text)
+	OS.shell_open(line_edit.text)
 
 
 

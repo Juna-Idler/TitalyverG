@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://btfpi0208nkvw"]
+
+[ext_resource type="Script" path="res://spotify.gd" id="1_o4yrv"]
+[ext_resource type="Script" path="res://auth.gd" id="2_td3l5"]
+
+[node name="Spotify" type="Node"]
+script = ExtResource("1_o4yrv")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="Auth" type="Node" parent="."]
+process_mode = 4
+script = ExtResource("2_td3l5")

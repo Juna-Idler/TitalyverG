@@ -122,6 +122,7 @@ func _on_popup_menu_save_index_pressed(index):
 		$Notice.text = "Save result\n" + msg
 		$Notice.show()
 
+var display_loader : ILyricsLoader
 func _on_popup_menu_load_index_pressed(index):
 	var loader : ILyricsLoader = loaders.plugins[index].loader
 	
@@ -129,14 +130,18 @@ func _on_popup_menu_load_index_pressed(index):
 	if not loader.loaded.is_connected(_on_loader_loaded):
 		loader.loaded.connect(_on_loader_loaded)
 	
-	if loader._open(playback_data.title,playback_data.artists,
-			playback_data.album,playback_data.file_path,playback_data.meta_data):
+	var control = loader._open(playback_data.title,playback_data.artists,
+			playback_data.album,playback_data.file_path,playback_data.meta_data)
+	if control:
 		for c in window.get_children():
 			window.remove_child(c)
-		window.add_child(loader)
+		window.add_child(control)
 		window.title = loader._get_name()
-		var rect := Rect2i((size - Vector2(loader.size))/2,loader.size)
+		var rect := Rect2i((size - Vector2(control.size))/2,control.size)
 		window.popup_on_parent(rect)
+		display_loader = loader
+	else:
+		display_loader = null
 
 func _on_loader_loaded(lyrics_ : PackedStringArray,msg : String):
 	if not lyrics_.is_empty():
@@ -145,11 +150,13 @@ func _on_loader_loaded(lyrics_ : PackedStringArray,msg : String):
 		$Notice.text = "Load result\n" + msg
 		$Notice.show()
 	$LoaderWindow.hide()
+	display_loader = null
 
 func _on_loader_window_close_requested():
 	$LoaderWindow.hide()
-	var loader = $LoaderWindow.get_child(0)
-	loader._close()
+	if display_loader:
+		display_loader._close()
+		display_loader = null
 
 
 func _on_resized():

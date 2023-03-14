@@ -17,9 +17,9 @@ class Plugin:
 		if not FileAccess.file_exists(file_path_):
 			return null
 		var plugin_scene = load(file_path_)
-		if not plugin_scene is PackedScene:
+		if not plugin_scene is GDScript:
 			return null
-		var loader_ = plugin_scene.instantiate()
+		var loader_ = plugin_scene.new()
 		if not loader_ is ILyricsLoader:
 			return null
 		return Plugin.new(loader_,file_path_)

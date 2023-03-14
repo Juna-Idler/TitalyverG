@@ -83,7 +83,7 @@ ok_button_text = "開く"
 mode_overrides_title = false
 file_mode = 0
 access = 2
-filters = PackedStringArray("*.tscn ; Godot Scene")
+filters = PackedStringArray("*.gd ;GDScript")
 
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/VBoxContainer/ButtonUp" to="." method="_on_button_up_pressed" flags=18]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/VBoxContainer/ButtonDown" to="." method="_on_button_down_pressed" flags=18]
