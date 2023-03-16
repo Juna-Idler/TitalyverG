@@ -2,6 +2,9 @@
 
 TimeTagedLyricsViewer Godot Version
 
+動画
+https://twitter.com/Juna_idler/status/1623803736752812032?s=20
+
 ## 概要
 Godotの機能を見てたらなんか移植できそうだったのでhttps://github.com/Juna-Idler/Titalyver2
 
