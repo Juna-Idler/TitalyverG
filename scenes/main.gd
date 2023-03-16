@@ -15,14 +15,7 @@ const MENU_ID_ALWAYS_ON_TOP := 1
 const MENU_ID_SAVE := 2
 const MENU_ID_LOAD := 3
 
-var receiver : I_Receiver
-func set_receiver(r : I_Receiver):
-	if receiver:
-		remove_child(receiver)
-		receiver.queue_free()
-	receiver = r
-	add_child(receiver)
-	receiver.received.connect(_on_receiver_received)
+@onready var receiver : ReceiverManager = $receiver_manager
 
 var finders := LyricsFinders.new()
 var savers := LyricsSavers.new()
@@ -56,7 +49,7 @@ func _ready():
 	
 	settings.load_settings()
 	
-	settings.initialize_receiver_settings(set_receiver)
+	settings.initialize_receiver_settings(receiver)
 	
 	$ColorRect.color = settings.get_background_color()
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
@@ -69,7 +62,8 @@ func _ready():
 	%SettingsWindow.initialize(
 			settings,ruby_lyrics_view,finders,
 			savers,$PopupMenu/PopupMenuSave,
-			loaders,$PopupMenu/PopupMenuLoad)
+			loaders,$PopupMenu/PopupMenuLoad,
+			receiver)
 
 
 func _process(delta):
@@ -179,9 +173,10 @@ func _on_receiver_received(data : PlaybackData):
 		playing = false;
 
 	if data.playback_only or playback_data.same_song(data):
-		var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
-		var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
-		ruby_lyrics_view.set_time_and_target_y(time + time_offset - lyrics.at_tag_container.offset)
+		if data.playback_event & PlaybackData.PlaybackEvent.SEEK_FLAG:
+			var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
+			var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
+			ruby_lyrics_view.set_time_and_target_y(time + time_offset - lyrics.at_tag_container.offset)
 		return
 	playback_data = data
 	

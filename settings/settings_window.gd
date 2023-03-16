@@ -11,13 +11,16 @@ func _ready():
 func initialize(settings_ : Settings,ruby_lyrics_view : RubyLyricsView,
 		finders : LyricsFinders,
 		savers : LyricsSavers,save_menu : PopupMenu,
-		loaders : LyricsLoaders,load_menu : PopupMenu):
+		loaders : LyricsLoaders,load_menu : PopupMenu,
+		receiver : ReceiverManager):
 	settings = settings_
 	%Display.initialize(settings,ruby_lyrics_view)
 	%Finder.initialize(settings,finders)
 	%Unsync.initialize(settings,ruby_lyrics_view)
 	%Saver.initialize(settings,savers,save_menu)
 	%Loader.initialize(settings,loaders,load_menu)
+	
+	%Receiver.initialize(settings,receiver)
 
 
 

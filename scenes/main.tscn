@@ -1,9 +1,10 @@
-[gd_scene load_steps=22 format=3 uid="uid://bq3mop0sgipn"]
+[gd_scene load_steps=23 format=3 uid="uid://bq3mop0sgipn"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
 [ext_resource type="PackedScene" uid="uid://cfvium7sqii0l" path="res://scenes/window_ui.tscn" id="4_tcylf"]
 [ext_resource type="PackedScene" uid="uid://cluue5kyaytsq" path="res://settings/settings_window.tscn" id="5_8xix0"]
+[ext_resource type="PackedScene" uid="uid://ofewmns37338" path="res://receiver/receiver_manager.tscn" id="5_mkear"]
 
 [sub_resource type="SystemFont" id="SystemFont_ha14a"]
 font_names = PackedStringArray("Shippori Antique")
@@ -108,7 +109,10 @@ font_outline_width = 0
 font_ruby_outline_width = 0
 font_sleep_color = Color(0.498039, 0.498039, 0.498039, 1)
 font_standby_color = Color(0.678431, 0.678431, 0.678431, 1)
+alignment_ruby = 0
+alignment_parent = 0
 no_ruby_space = 4
+horizontal_alignment = 0
 scroll_center = false
 scrolling = true
 
@@ -245,6 +249,8 @@ autowrap_mode = 2
 visible = false
 exclusive = true
 
+[node name="receiver_manager" parent="." instance=ExtResource("5_mkear")]
+
 [connection signal="middle_clicked" from="WindowUI" to="." method="_on_window_ui_middle_clicked"]
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
@@ -260,3 +266,4 @@ exclusive = true
 [connection signal="index_pressed" from="PopupMenu/PopupMenuLoad" to="." method="_on_popup_menu_load_index_pressed"]
 [connection signal="gui_input" from="Notice" to="." method="_on_notice_gui_input"]
 [connection signal="close_requested" from="LoaderWindow" to="." method="_on_loader_window_close_requested"]
+[connection signal="received" from="receiver_manager" to="." method="_on_receiver_received"]

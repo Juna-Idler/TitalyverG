@@ -39,11 +39,16 @@ func _on_spotify_finished_login(success):
 	pass # Replace with function body.
 
 
+var last_timestamp : int
+
 func _on_spotify_received_response(json : Dictionary):
 
 	if not json.is_empty():
 		
  # timestampが「最後に操作をした時間」を表すみたい？
+		var timestamp := int(json["timestamp"])
+		var seeked = timestamp != last_timestamp
+		last_timestamp = timestamp
 #		var tod := int(json["timestamp"]) % (24*60*60*1000)
 		var tod := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
 		
@@ -57,8 +62,10 @@ func _on_spotify_received_response(json : Dictionary):
 				var progress : float = json["progress_ms"] / 1000.0
 				
 				var duration : float = json["item"]["duration_ms"] / 1000.0
+				var event : PlaybackData.PlaybackEvent = (PlaybackData.PlaybackEvent.SEEK_FLAG if seeked else PlaybackData.PlaybackEvent.NULL) |\
+						PlaybackData.PlaybackEvent.PLAY_FLAG if is_playing else PlaybackData.PlaybackEvent.STOP_FLAG
 				var data := PlaybackData.new(false,
-						PlaybackData.PlaybackEvent.SEEK_PLAY if is_playing else PlaybackData.PlaybackEvent.SEEK_STOP,
+						event,
 						progress,tod,"",title,artists,album,duration,json)
 				received.emit(data)
 				

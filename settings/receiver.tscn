@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://gl52qxyhtn07"]
+[gd_scene load_steps=2 format=3 uid="uid://gl52qxyhtn07"]
+
+[ext_resource type="Script" path="res://settings/receiver.gd" id="1_7c0k3"]
 
 [node name="Receiver" type="MarginContainer"]
 anchors_preset = 15
@@ -10,7 +12,60 @@ theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
+script = ExtResource("1_7c0k3")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Selected Receiver"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemList" type="ItemList" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonChange" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+text = "Change"
+
+[node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+tabs_visible = false
+
+[node name="WebSocketReceiver" type="PanelContainer" parent="VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/TabContainer/WebSocketReceiver"]
+layout_mode = 2
+text = "no settings"
+
+[node name="SpotifyReceiver" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/SpotifyReceiver"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/TabContainer/SpotifyReceiver/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "get currently "
+
+[node name="Button" type="Button" parent="VBoxContainer/TabContainer/SpotifyReceiver/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "get currently playback data"
+
+[connection signal="item_selected" from="VBoxContainer/HBoxContainer/ItemList" to="." method="_on_item_list_item_selected"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ButtonChange" to="." method="_on_button_change_pressed"]

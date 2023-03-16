@@ -32,7 +32,7 @@ var duration : float
 
 var meta_data : Dictionary
 
-func _init(po,pe,st,tod,fp = "",t = "",ar = [""],al = "",d = 0,md = {}):
+func _init(po,pe,st,tod,fp = "",t = "",ar = [""],al = "",d = 0.0,md = {}):
 	playback_only = po
 	playback_event = pe
 	seek_time = st
