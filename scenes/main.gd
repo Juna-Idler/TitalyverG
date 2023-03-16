@@ -72,6 +72,7 @@ func _process(delta):
 
 
 func _on_button_pressed():
+	get_tree().get_root().propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST)
 	get_tree().quit()
 
 

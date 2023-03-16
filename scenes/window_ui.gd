@@ -6,8 +6,28 @@ signal wheel_moved(delta : int)
 signal scroll_pad_dragging(delta : int)
 signal middle_clicked()
 
+const POS_SIZE_SAVE_FILE_PATH := "user://pos_size.cfg"
+
+var config : ConfigFile = ConfigFile.new()
+
+
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		var win_pos := DisplayServer.window_get_position()
+		var win_size := DisplayServer.window_get_size()
+		config.set_value("Window","Pos",win_pos)
+		config.set_value("Window","Size",win_size)
+		config.save(POS_SIZE_SAVE_FILE_PATH)
+
 func _ready():
-	pass # Replace with function body.
+	config.load(POS_SIZE_SAVE_FILE_PATH)
+	var wint_pos = config.get_value("Window","Pos",null)
+	if wint_pos and wint_pos is Vector2i:
+		DisplayServer.window_set_position(wint_pos)
+	var win_size = config.get_value("Window","Size",null)
+	if win_size and win_size is Vector2i:
+		DisplayServer.window_set_size(win_size)
+
 
 enum SizingDirection {NONE,TOP_LEFT,TOP,TOP_RIGHT,LEFT,RIGHT,BOTTOM_LEFT,BOTTOM,BOTTOM_RIGHT}
 
@@ -25,7 +45,7 @@ func _on_gui_input(event : InputEvent):
 			var r := Vector2i(event.global_position) + pos - pointer_position
 			pointer_position = Vector2i(event.global_position) + pos
 			pos += r
-			DisplayServer.window_set_position(pos)	
+			DisplayServer.window_set_position(pos)
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			if event.pressed:

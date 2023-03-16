@@ -62,8 +62,10 @@ func _on_spotify_received_response(json : Dictionary):
 				var progress : float = json["progress_ms"] / 1000.0
 				
 				var duration : float = json["item"]["duration_ms"] / 1000.0
-				var event : PlaybackData.PlaybackEvent = (PlaybackData.PlaybackEvent.SEEK_FLAG if seeked else PlaybackData.PlaybackEvent.NULL) |\
-						PlaybackData.PlaybackEvent.PLAY_FLAG if is_playing else PlaybackData.PlaybackEvent.STOP_FLAG
+				var event := (
+						(PlaybackData.PlaybackEvent.SEEK_FLAG if seeked else PlaybackData.PlaybackEvent.NULL) |
+						(PlaybackData.PlaybackEvent.PLAY_FLAG if is_playing else PlaybackData.PlaybackEvent.STOP_FLAG)
+				) as PlaybackData.PlaybackEvent
 				var data := PlaybackData.new(false,
 						event,
 						progress,tod,"",title,artists,album,duration,json)
