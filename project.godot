@@ -26,6 +26,10 @@ window/size/transparent=true
 window/per_pixel_transparency/allowed=true
 window/stretch/aspect="ignore"
 
+[editor]
+
+run/main_run_args="--verbose"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/ruby_label/plugin.cfg")

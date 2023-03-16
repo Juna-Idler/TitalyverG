@@ -51,7 +51,11 @@ var param : Dictionary = {
 		]
 	]
 }
-		
+
+func _notification(what):
+	if what == NOTIFICATION_PREDELETE:
+		if scene:
+			scene.free()
 
 func _initialize(script_path : String):
 	MyHttpRequest = load(script_path.get_base_dir() + "/http_request.gd")

@@ -4,6 +4,11 @@ var scene : Control
 var text_edit : TextEdit
 var button : Button
 
+func _notification(what):
+	if what == NOTIFICATION_PREDELETE:
+		if scene:
+			scene.free()
+
 func _initialize(script_path : String):
 	var Scene : PackedScene = load(script_path.get_base_dir() + "/textbox_loader.tscn")
 	scene = Scene.instantiate()
