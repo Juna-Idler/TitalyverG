@@ -6,9 +6,22 @@ const CREDENTIALS_FILE_PATH := "user://credentials.json"
 
 @onready var spotify : Spotify = $Spotify
 
-const POLLING_SEC := 30
+@onready var timer = $Timer
+
+@export var polling_sec : float = 30
+@export var ad_polling_sec : float = 5
+
+
+const Controler := preload("res://receiver/spotify/controler.tscn")
+const Settings := preload("res://receiver/spotify/settings.tscn")
+
+var controler : Control
+var settings : Control
+var config : ConfigFile
 
 func _ready():
+	timer.timeout.connect(spotify.get_currently_playing_track)
+	
 	var token : SpotifyAuth.PKCETokenResponse = null
 	if FileAccess.file_exists(CREDENTIALS_FILE_PATH):
 		var file = FileAccess.open(CREDENTIALS_FILE_PATH,FileAccess.READ)
@@ -17,6 +30,17 @@ func _ready():
 			token = SpotifyAuth.PKCETokenResponse.deserialize(json)
 	$Spotify.login(token)
 
+	controler = Controler.instantiate()
+	controler.get_node("%Button").pressed.connect(_on_controler_button_pressed)
+	controler.timer = timer
+	
+	settings = Settings.instantiate()
+	settings.get_node("%LineEditAcceptLanguage")\
+			.text_changed.connect(_on_settings_line_edit_accept_language_text_changed)
+	settings.get_node("%SpinBoxPollingSec")\
+			.value_changed.connect(_on_settings_spin_box_polling_sec)
+	settings.get_node("%SpinBoxAdPollingSec")\
+			.value_changed.connect(_on_settings_spin_box_ad_polling_sec)
 
 
 func _on_spotify_changed_token(token : SpotifyAuth.PKCETokenResponse):
@@ -70,12 +94,12 @@ func _on_spotify_received_response(json : Dictionary):
 						event,
 						progress,tod,"",title,artists,album,duration,json)
 				received.emit(data)
+				set_controler_text(str(json))
 				
 				var remain := duration - progress
-				if remain > POLLING_SEC:
-					remain = POLLING_SEC
-				get_tree().create_timer(remain)\
-						.timeout.connect(spotify.get_currently_playing_track)
+				if remain > polling_sec:
+					remain = polling_sec
+				timer.start(remain)
 				return
 			"episode":
 				pass
@@ -84,8 +108,8 @@ func _on_spotify_received_response(json : Dictionary):
 						PlaybackData.PlaybackEvent.SEEK_STOP,
 						0,tod,"","ad",["Spotify"],"",0,json)
 				received.emit(data)
-				get_tree().create_timer(5)\
-						.timeout.connect(spotify.get_currently_playing_track)
+				set_controler_text(str(json))
+				timer.start(ad_polling_sec)
 				return
 			"unknown":
 				pass
@@ -93,6 +117,43 @@ func _on_spotify_received_response(json : Dictionary):
 				PlaybackData.PlaybackEvent.SEEK_STOP,
 				0,tod,"",json["currently_playing_type"],["Spotify"],"",0,json)
 		received.emit(data)
-	get_tree().create_timer(POLLING_SEC)\
-			.timeout.connect(spotify.get_currently_playing_track)
+		set_controler_text(str(json))
+	timer.start(polling_sec)
 
+
+
+func _get_controler() -> Control:
+	return controler
+
+func set_controler_text(text):
+	controler.get_node("%TextEdit").text = text
+	pass
+
+func _on_controler_button_pressed():
+	spotify.get_currently_playing_track()
+	timer.stop()
+
+
+func _get_settings(config_ : ConfigFile) -> Control:
+	config = config_
+	
+	spotify.accept_language = config.get_value("Spotify","accept_language","ja")
+	settings.get_node("%LineEditAcceptLanguage").text = spotify.accept_language
+	polling_sec = config.get_value("Spotify","polling",30)
+	settings.get_node("%SpinBoxPollingSec").value = polling_sec
+	ad_polling_sec = config.get_value("Spotify","ad_polling",5)
+	settings.get_node("%SpinBoxAdPollingSec").value = ad_polling_sec
+	
+	return settings
+
+func _on_settings_line_edit_accept_language_text_changed(new_text: String):
+	spotify.accept_language = new_text
+	config.set_value("Spotify","accept_language",new_text)
+
+func _on_settings_spin_box_polling_sec(value: float):
+	polling_sec = value
+	config.set_value("Spotify","polling",value)
+	
+func _on_settings_spin_box_ad_polling_sec(value: float):
+	ad_polling_sec = value
+	config.set_value("Spotify","ad_polling",value)

@@ -1,6 +1,5 @@
 extends I_Receiver
 
-#signal received(data : PlaybackData)
 
 @export var port_number = 14738
 
@@ -46,3 +45,10 @@ func _process(_delta):
 # WebSocket接続を確立させたら止めてもいいらしい（そもそも二つ以上は困る）
 		server.stop()
 	
+
+
+func _get_settings(_config : ConfigFile) -> Control:
+	return null
+
+func _get_controler() -> Control:
+	return null

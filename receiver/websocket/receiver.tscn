@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8fet8uv0ku0j"]
+
+[ext_resource type="Script" path="res://receiver/websocket/receiver.gd" id="1_3sbuv"]
+
+[node name="WebSocketReceiver" type="Node"]
+script = ExtResource("1_3sbuv")

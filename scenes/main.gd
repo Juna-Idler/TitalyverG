@@ -14,6 +14,7 @@ const MENU_ID_SETTINGS := 0
 const MENU_ID_ALWAYS_ON_TOP := 1
 const MENU_ID_SAVE := 2
 const MENU_ID_LOAD := 3
+const MENU_ID_RECEIVER := 4
 
 @onready var receiver : ReceiverManager = $receiver_manager
 
@@ -46,6 +47,8 @@ func _ready():
 	popup_menu.set_item_submenu(popup_menu.get_item_index(MENU_ID_SAVE),"PopupMenuSave")
 	popup_menu.add_item("Load",MENU_ID_LOAD)
 	popup_menu.set_item_submenu(popup_menu.get_item_index(MENU_ID_LOAD),"PopupMenuLoad")
+	popup_menu.add_separator("",102)
+	popup_menu.add_item("Receiver",MENU_ID_RECEIVER)
 	
 	settings.load_settings()
 	
@@ -114,10 +117,14 @@ func _on_popup_menu_id_pressed(id):
 			get_window().always_on_top = always
 			var idx = popup_menu.get_item_index(MENU_ID_ALWAYS_ON_TOP)
 			popup_menu.set_item_checked(idx,always)
-			popup_menu.always_on_top = always
+#			popup_menu.always_on_top = always
 			%SettingsWindow.always_on_top = always
 #			$PopupMenu/PopupMenuSave.always_on_top = always
-
+		MENU_ID_RECEIVER:
+			if %ReceiverWindow.get_child_count() == 1:
+				%ReceiverWindow.hide()
+				var rect := Rect2i((size - Vector2(%ReceiverWindow.size))/2,%ReceiverWindow.size)
+				%ReceiverWindow.popup_on_parent(rect)
 
 func _on_popup_menu_save_index_pressed(index):
 	var msg :String= savers.plugins[index].saver._save(playback_data.title,playback_data.artists,
@@ -155,7 +162,9 @@ func _on_loader_loaded(lyrics_ : PackedStringArray,msg : String):
 		$Notice.text = "Load result\n" + msg
 		$Notice.show()
 	$LoaderWindow.hide()
-	display_loader = null
+	if display_loader:
+		display_loader._close()
+		display_loader = null
 
 func _on_loader_window_close_requested():
 	$LoaderWindow.hide()
@@ -283,3 +292,6 @@ func _on_h_slider_gui_input(event):
 #				time_offset = 0
 				accept_event()
 
+
+func _on_receiver_window_close_requested():
+	$ReceiverWindow.hide()

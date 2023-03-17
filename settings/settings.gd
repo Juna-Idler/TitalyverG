@@ -15,7 +15,7 @@ func save_settings():
 	config.save(CONFIG_FILE_PATH)
 	
 func initialize_receiver_settings(receiver : ReceiverManager):
-	var receiver_name : String = config.get_value("Receiver","receiver","Spotify")
+	var receiver_name : String = config.get_value("Receiver","receiver",ReceiverManager.RECEIVERS.keys()[0])
 	receiver.change_receiver(receiver_name)
 
 

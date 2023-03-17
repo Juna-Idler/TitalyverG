@@ -1,0 +1,63 @@
+[gd_scene load_steps=2 format=3 uid="uid://shfub48uix8u"]
+
+[ext_resource type="Script" path="res://receiver/spotify/settings.gd" id="1_7acvg"]
+
+[node name="settings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7acvg")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/CenterContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="LabelAcceptLanguage" type="Label" parent="VBoxContainer/CenterContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "accept language"
+
+[node name="LineEditAcceptLanguage" type="LineEdit" parent="VBoxContainer/CenterContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+text = "ja"
+
+[node name="LabelPollingSec" type="Label" parent="VBoxContainer/CenterContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "polling sec"
+
+[node name="SpinBoxPollingSec" type="SpinBox" parent="VBoxContainer/CenterContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+min_value = 5.0
+max_value = 60.0
+value = 30.0
+
+[node name="LabelAdPollingSec" type="Label" parent="VBoxContainer/CenterContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "ad polling sec"
+
+[node name="SpinBoxAdPollingSec" type="SpinBox" parent="VBoxContainer/CenterContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 5.0
+max_value = 60.0
+value = 5.0

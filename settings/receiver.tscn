@@ -38,34 +38,9 @@ size_flags_horizontal = 8
 size_flags_vertical = 4
 text = "Change"
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
+[node name="SettingContainer" type="MarginContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-tabs_visible = false
 
-[node name="WebSocketReceiver" type="PanelContainer" parent="VBoxContainer/TabContainer"]
-visible = false
-layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/TabContainer/WebSocketReceiver"]
-layout_mode = 2
-text = "no settings"
-
-[node name="SpotifyReceiver" type="VBoxContainer" parent="VBoxContainer/TabContainer"]
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TabContainer/SpotifyReceiver"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="VBoxContainer/TabContainer/SpotifyReceiver/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 2
-text = "get currently "
-
-[node name="Button" type="Button" parent="VBoxContainer/TabContainer/SpotifyReceiver/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 10
-text = "get currently playback data"
-
-[connection signal="item_selected" from="VBoxContainer/HBoxContainer/ItemList" to="." method="_on_item_list_item_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ButtonChange" to="." method="_on_button_change_pressed"]
