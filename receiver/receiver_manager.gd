@@ -17,6 +17,7 @@ var _receiver_name : String
 
 @onready var receiver_window = $"../ReceiverWindow"
 
+var receiver_menu_disabled_setter : Callable
 
 func get_receiver() -> I_Receiver:
 	return _receiver
@@ -43,8 +44,10 @@ func change_receiver(receiver_name : String) -> bool:
 	var controler := _receiver._get_controler()
 	if controler:
 		receiver_window.add_child(controler)
+		receiver_menu_disabled_setter.call(false)
 	else:
 		receiver_window.hide()
+		receiver_menu_disabled_setter.call(true)
 	return true
 
 func _on_receiver_received(data : PlaybackData):
