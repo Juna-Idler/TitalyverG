@@ -121,25 +121,23 @@ func get_list_response(result : int,response_code : int,
 	var response := body.get_string_from_utf8()
 	list = []
 	var m := block_regex.search(response)
-	if not m:
-		finished.emit()
-		return
-	var items := item_regex.search_all(m.get_string(1))
-	for i in items:
-		var item = (i as RegExMatch).get_string(1)
-		m = url_regex.search(item)
-		if not m:
-			continue
-		var item_url := m.get_string(1)
-		m = title_regex.search(item)
-		if not m:
-			continue
-		var item_title := m.get_string(1)
-		m = artist_regex.search(item)
-		if not m:
-			continue
-		var item_artist := m.get_string(1)
-		list.append(ListData.new(item_url,item_title,item_artist))
+	if  m:
+		var items := item_regex.search_all(m.get_string(1))
+		for i in items:
+			var item = (i as RegExMatch).get_string(1)
+			m = url_regex.search(item)
+			if not m:
+				continue
+			var item_url := m.get_string(1)
+			m = title_regex.search(item)
+			if not m:
+				continue
+			var item_title := m.get_string(1)
+			m = artist_regex.search(item)
+			if not m:
+				continue
+			var item_artist := m.get_string(1)
+			list.append(ListData.new(item_url,item_title,item_artist))
 	
 	if list.is_empty():
 		var url = site_param["param_format"].replace("{title}",search_title).replace("{artist}",search_artist)

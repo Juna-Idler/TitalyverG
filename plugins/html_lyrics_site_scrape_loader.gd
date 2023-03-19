@@ -5,11 +5,9 @@ var scene : Node
 var line_edit : LineEdit
 var button : Button
 var browser : Button
+var http : HTTPRequest
 
-var MyHttpRequest : GDScript
-var http # : MyHttpRequest
-
-var param : Dictionary = {
+var site_param : Dictionary = {
 	"host" : "https://utaten.com",
 	"param_format" : "/search?sort=popular_sort%3Aasc&artist_name={artist}&title={title}&beginning=&body=&lyricist=&composer=&sub_title=&tag=&form_open=1&show_artists=1",
 	
@@ -52,6 +50,8 @@ var param : Dictionary = {
 	]
 }
 
+var block_regex : RegEx
+
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
 		if scene:
@@ -59,16 +59,19 @@ func _notification(what):
 				scene.free()
 
 func _initialize(script_path : String):
-	MyHttpRequest = load(script_path.get_base_dir() + "/http_request.gd")
-	http = MyHttpRequest.new()
 	var Scene : PackedScene = load(script_path.get_base_dir() + "/html_lyrics_site_scrape_loader.tscn")
 	scene = Scene.instantiate()
 	line_edit = scene.get_node("LineEdit")
 	button = scene.get_node("Button")
 	browser = scene.get_node("ButtonBrowser")
+	http = scene.get_node("HTTPRequest")
+	
 	button.pressed.connect(_on_button_pressed)
 	browser.pressed.connect(_on_button_brower_pressed)
+	http.set_tls_options(TLSOptions.client())
 	
+	block_regex = RegEx.create_from_string(site_param["lyrics_block_regex"])
+
 
 func _get_name() -> String:
 	return "http_lyrics_site_loader"
@@ -80,37 +83,42 @@ func _open(_title : String, _artists : PackedStringArray, _album : String,
 	return scene
 
 func _close():
+	http.cancel_request()
 	pass
 
 
 func _on_button_pressed():
 	var url : String = line_edit.text
-	if not url.begins_with(param["host"]):
+	if not url.begins_with(site_param["host"]):
 		return
-	url = url.substr(param["host"].length())
-	var lyrics := get_lyrics(url)
-	if not lyrics.is_empty():
-		var header : String = param["host"] + url + "\n\n"
-		loaded.emit([header + lyrics],"")
+	get_lyrics(url)
 
 
-func get_lyrics(url : String) -> String:
-	if not http.connect_to_host(param["host"]):
-		return ""
-	
-	var response = http.get_response(url)
+func get_lyrics(url : String):
+	var headers := PackedStringArray([])
+	http.request_completed.connect(_on_http_request_completed,CONNECT_ONE_SHOT)
+	if http.request(url,headers,HTTPClient.METHOD_GET) != OK:
+		http.request_completed.disconnect(_on_http_request_completed)
+
+func _on_http_request_completed(result : int,response_code : int,
+		_headers : PackedStringArray,body : PackedByteArray):
+	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
+		loaded.emit([""],"result error code=%s" % response_code)
+		return
+	var response := body.get_string_from_utf8()
 	if response.is_empty():
-		return ""
-	
-	var block_regex := RegEx.create_from_string(param["lyrics_block_regex"])
+		loaded.emit([""],"response no body")
+		return
+
 	var m := block_regex.search(response)
 	if not m:
-		return ""
+		loaded.emit([""],"no match")
+		return
 	var lyrics := m.get_string(1)
-	for r in param["lyrics_replacers"]:
+	for r in site_param["lyrics_replacers"]:
 		var replace_regex = RegEx.create_from_string(r[0])
 		lyrics = replace_regex.sub(lyrics,r[1],true)
-	return lyrics
+	loaded.emit([line_edit.text + "\n\n" + lyrics],"")
 
 
 func _on_button_brower_pressed():

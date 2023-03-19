@@ -249,6 +249,7 @@ exclusive = true
 
 [node name="ReceiverWindow" type="Window" parent="."]
 unique_name_in_owner = true
+title = "Receiver"
 size = Vector2i(320, 300)
 visible = false
 

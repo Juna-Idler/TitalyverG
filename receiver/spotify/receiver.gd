@@ -94,7 +94,7 @@ func _on_spotify_received_response(json : Dictionary):
 						event,
 						progress,tod,"",title,artists,album,duration,json)
 				received.emit(data)
-				set_controler_text(str(json))
+				set_controler_text(json)
 				
 				var remain := duration - progress
 				if remain > polling_sec:
@@ -108,7 +108,7 @@ func _on_spotify_received_response(json : Dictionary):
 						PlaybackData.PlaybackEvent.SEEK_STOP,
 						0,tod,"","ad",["Spotify"],"",0,json)
 				received.emit(data)
-				set_controler_text(str(json))
+				set_controler_text(json)
 				timer.start(ad_polling_sec)
 				return
 			"unknown":
@@ -117,7 +117,7 @@ func _on_spotify_received_response(json : Dictionary):
 				PlaybackData.PlaybackEvent.SEEK_STOP,
 				0,tod,"",json["currently_playing_type"],["Spotify"],"",0,json)
 		received.emit(data)
-		set_controler_text(str(json))
+		set_controler_text(json)
 	timer.start(polling_sec)
 
 
@@ -125,8 +125,8 @@ func _on_spotify_received_response(json : Dictionary):
 func _get_controler() -> Control:
 	return controler
 
-func set_controler_text(text):
-	controler.get_node("%TextEdit").text = text
+func set_controler_text(json : Dictionary):
+	controler.get_node("%TextEdit").text = JSON.stringify(json," ",false)
 	pass
 
 func _on_controler_button_pressed():
