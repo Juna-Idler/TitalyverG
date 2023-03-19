@@ -32,27 +32,32 @@ func login(token : SpotifyAuth.PKCETokenResponse = null):
 	$Auth.authenticate(token)
 
 
-func get_currently_playing_track():
+func get_currently_playing_track() -> bool:
 	if access_token == null:
-		return
+		return false
 	if requesting:
-		return
+		return false
 	requesting = true
 	var headers := PackedStringArray([
 		"Authorization: Bearer " + access_token.access_token,
 		"Content-Type:application/json",
 		"Accept-Language:" + accept_language,
 	])
-	$HTTPRequest.request_completed.connect(_on_request_complited_get_currently_playing_track)
+	$HTTPRequest.request_completed.connect(
+			_on_request_complited_get_currently_playing_track,CONNECT_ONE_SHOT)
 	
-	$HTTPRequest.request("https://api.spotify.com/v1/me/player/currently-playing",
-			headers,HTTPClient.METHOD_GET)
-	
+	if $HTTPRequest.request(
+			"https://api.spotify.com/v1/me/player/currently-playing",
+			headers,HTTPClient.METHOD_GET
+			) != OK:
+		$HTTPRequest.request_completed.disconnect(
+				_on_request_complited_get_currently_playing_track)
+		return false
+	return true
 
 func _on_request_complited_get_currently_playing_track(
 		_result : int,response_code : int,
 		_headers : PackedStringArray,body : PackedByteArray):
-	$HTTPRequest.request_completed.disconnect(_on_request_complited_get_currently_playing_track)
 	requesting = false
 
 	match response_code:

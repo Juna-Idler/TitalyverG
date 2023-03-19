@@ -196,15 +196,9 @@ func _on_receiver_received(data : PlaybackData):
 	ruby_lyrics_view.song_duration = data.duration
 
 	var first := true
-	var it := finders.get_iterator()
+	var it := finders.get_iterator(self)
 	while not it.is_end():
-		var find := Callable(it.find).bind(data.title,data.artists,data.album,data.file_path,data.meta_data)
-		var thread := Thread.new()
-		thread.start(find)
-		while thread.is_alive():
-			await get_tree().create_timer(0.5).timeout
-		var result : PackedStringArray = thread.wait_to_finish()
-#		var result := it.find(data.title,data.artists,data.album,data.file_path,data.meta_data)
+		var result := await it.find_async(data.title,data.artists,data.album,data.file_path,data.meta_data)
 		if not result.is_empty():
 			if first:
 				var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)

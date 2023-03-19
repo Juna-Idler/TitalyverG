@@ -156,7 +156,7 @@ func _request_token(code: String) -> bool:
 	var headers : PackedStringArray = [
 		"Content-Type:application/x-www-form-urlencoded"
 	]
-	http.request_completed.connect(_on_request_completed)
+	http.request_completed.connect(_on_request_completed,CONNECT_ONE_SHOT)
 	var err = http.request("https://accounts.spotify.com/api/token",
 			headers,HTTPClient.METHOD_POST,"&".join(params))
 	if err != OK:
@@ -168,8 +168,6 @@ func _request_token(code: String) -> bool:
 
 func _on_request_completed(_result : int,response_code : int,
 		_headers : PackedStringArray,body :  PackedByteArray):
-	http.request_completed.disconnect(_on_request_completed)
-	
 	if response_code != 200:
 		failed.emit("error")
 		return
@@ -207,7 +205,7 @@ func request_refresh_access_token(refresh_token : String) -> bool:
 	var headers : PackedStringArray = [
 		"Content-Type:application/x-www-form-urlencoded"
 	]
-	http.request_completed.connect(_on_request_refresh_completed)
+	http.request_completed.connect(_on_request_refresh_completed,CONNECT_ONE_SHOT)
 	var err = http.request("https://accounts.spotify.com/api/token",
 			headers,HTTPClient.METHOD_POST,"&".join(params))
 	if err != OK:
@@ -219,8 +217,6 @@ func request_refresh_access_token(refresh_token : String) -> bool:
 
 func _on_request_refresh_completed(_result : int,response_code : int,
 		_headers : PackedStringArray,body :  PackedByteArray):
-	http.request_completed.disconnect(_on_request_refresh_completed)
-	
 	if response_code != 200:
 		failed.emit("error refresh")
 		return

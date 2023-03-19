@@ -12,7 +12,6 @@ class Plugin:
 	func _init(f,fp):
 		finder = f
 		file_path = fp
-		finder._initialize(file_path)
 		
 	static func create(file_path_ : String) -> Plugin:
 		if file_path_ == COMMAND_IF_NOT_EMPTY_END_FIND:
@@ -29,6 +28,8 @@ class Plugin:
 			return null
 		var finder_ = plugin_script.new()
 		if not finder_ is ILyricsFinder:
+			return null
+		if not (finder_ as ILyricsFinder)._initialize(file_path_):
 			return null
 		return Plugin.new(finder_,file_path_)
 
@@ -53,75 +54,68 @@ func deserialize(strings : PackedStringArray):
 			plugins.append(p)
 
 
-func find_all(title : String,artists : PackedStringArray,album : String,
-		file_path : String,meta : Dictionary) -> PackedStringArray:
-	var result : PackedStringArray = []
-	for p in plugins:
-		var plugin := p as Plugin
-		match plugin.file_path:
-			COMMAND_IF_NOT_EMPTY_END_FIND:
-				if not result.is_empty():
-					return result
-				else:
-					continue
-		
-		result.append_array(plugin.finder._find(title,artists,album,file_path,meta))
-		
-	return result
-
 
 class Iterator:
 	var finders : LyricsFinders
+	var parent_node : Node
 	var index : int
 	var iterator_result : PackedStringArray
 	
-	func _init(f):
+	func _init(f : LyricsFinders,node : Node):
 		finders = f
+		parent_node = node
 		index = -1 if finders.plugins.is_empty() else 0
 		iterator_result = []
 	
 	func is_end() -> bool:
 		return index < 0
 	
-	func find(title : String,artists : PackedStringArray,album : String,
+	func find_async(title : String,artists : PackedStringArray,album : String,
 			file_path : String,meta : Dictionary) -> PackedStringArray:
-		var result : PackedStringArray = finders.plugins[index].finder._find(title,artists,album,file_path,meta)
-		iterator_result.append_array(result)
+		var plugin : Plugin = finders.plugins[index]
 		
-		index += 1
-		while index < finders.plugins.size():
-			if finders.plugins[index].file_path == COMMAND_IF_NOT_EMPTY_END_FIND:
-				if not iterator_result.is_empty():
-					index = -1
-					return result
-				else:
-					index += 1
-					continue
+		if plugin.file_path == COMMAND_IF_NOT_EMPTY_END_FIND:
+			if iterator_result.is_empty():
+				index += 1
 			else:
-				return result
-		index = -1
+				index = -1
+			return PackedStringArray()
+		
+		var node := plugin.finder._find(title,artists,album,file_path,meta)
+		if node:
+			parent_node.add_child(node)
+			await plugin.finder.finished
+			parent_node.remove_child(node)
+		var result := plugin.finder._get_result()
+		iterator_result.append_array(result)
+		index += 1
+		if index >= finders.plugins.size():
+			index = -1
 		return result
 
 
-func get_iterator() -> Iterator:
-	return Iterator.new(self)
+func get_iterator(parent_node : Node) -> Iterator:
+	return Iterator.new(self,parent_node)
 
 
 class IfNotEmptyEndFind extends  ILyricsFinder:
 	func _get_name() -> String:
 		return COMMAND_IF_NOT_EMPTY_END_FIND
-	func _find(_title : String,_artists : PackedStringArray,_album : String,
-			_file_path : String,_meta : Dictionary) -> PackedStringArray:
-		return []
-		
+
+
 class DefaultFileFinder extends ILyricsFinder:
+	var result := PackedStringArray()
+	func _get_result() -> PackedStringArray:
+		return result
+	
 	func _get_name() -> String:
 		return DEFAULT_LYRICS_FILE_FINDER + "(filename + .kra;.lrc:.txt)"
 
 	func _find(_title : String,_artists : PackedStringArray,_album : String,
-			file_path : String,_meta : Dictionary) -> PackedStringArray:
+			file_path : String,_meta : Dictionary) -> Node:
+		result = PackedStringArray()
 		if not file_path.is_absolute_path():
-			return PackedStringArray()
+			return null
 			
 		if file_path.begins_with("file://"):
 			var scheme = RegEx.create_from_string("file://+")
@@ -129,36 +123,37 @@ class DefaultFileFinder extends ILyricsFinder:
 			file_path = file_path.substr(m.get_end())
 		var base_name := file_path.get_basename()
 
-		var r = PackedStringArray()
 		var kra_path = base_name + ".kra"
 		if FileAccess.file_exists(kra_path):
 			var file = FileAccess.open(kra_path,FileAccess.READ)
 			if file:
-				r.append(file.get_as_text())
+				result.append(file.get_as_text())
 		var lrc_path = base_name + ".lrc"
 		if FileAccess.file_exists(lrc_path):
 			var file = FileAccess.open(lrc_path,FileAccess.READ)
 			if file:
-				r.append(file.get_as_text())	
+				result.append(file.get_as_text())
 		var txt_path = base_name + ".txt"
 		if FileAccess.file_exists(txt_path):
 			var file = FileAccess.open(txt_path,FileAccess.READ)
 			if file:
-				r.append(file.get_as_text())	
-		return r;
+				result.append(file.get_as_text())
+		return null
 
 class DefaultNotFoundFinder extends ILyricsFinder:
+	var result := PackedStringArray()
+	func _get_result() -> PackedStringArray:
+		return result
+
 	func _get_name() -> String:
 		return DEFAULT_NOT_FOUND_FINDER
 
 	func _find(title : String,artists : PackedStringArray,album : String,
-			file_path : String,meta : Dictionary) -> PackedStringArray:
+			file_path : String,meta : Dictionary) -> Node:
 		var info := ("title:%s" % title + "\nartists:%s" % ",".join(artists) +
 				"\nalbum:%s" % album + "\nfile_path:%s" % file_path)
 		if meta.is_empty():
-			return [info]
-			
-		var meta_info : String = ""
-		for key in meta:
-			meta_info += str(key) + ":" + str(meta[key]) + "\n"
-		return [info,meta_info]
+			result = [info]
+		else:
+			result = [info,JSON.stringify(meta," ",false)]
+		return null
