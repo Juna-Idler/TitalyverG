@@ -10,6 +10,16 @@ var site_param : Dictionary = {
 	"item_url_regex" : "<a href=\"(.+?)\">",
 	"item_title_regex" : "<a href=\"/lyric/[^>]*>\\s*(.+?)\\s*</a>",
 	"item_artist_regex" : "<a href=\"/artist/[^>]*>\\s*(.+?)\\s*</a>",
+
+	"lyrics_title_regex": [
+		"""<h2 class="newLyricTitle__main">\\s*(\\S+.*?)\\s*<span class="newLyricTitle_afterTxt">""",
+		"""<span class="newLyricTitle__subTitle">\\s*(\\S+.*?)\\s*</span>""",
+		],
+	"lyrics_artist_regex" : """<dt class="newLyricWork__name">\\s*<h3>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
+	
+	"lyrics_lyricist_regex" : """<dt class="newLyricWork__title">作詞</dt>\\s*<dd[^>]+>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
+	"lyrics_composer_regex" : """<dt class="newLyricWork__title">作曲</dt>\\s*<dd[^>]+>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
+	"lyrics_arranger_regex" : """<dt class="newLyricWork__title">編曲</dt>\\s*<dd[^>]+>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
 	
 	"lyrics_block_regex" :  """<div class="hiragana" >([\\s\\S]+?)<\\/div>""",
 	"lyrics_replacers" : [
@@ -38,7 +48,7 @@ var site_param : Dictionary = {
 			"\n"
 		],
 		[
-			"<[^>]*>",
+			"<[^ ][^<>]*>",
 			""
 		]
 	]
@@ -49,10 +59,13 @@ var http : HTTPRequest
 
 var finder_result := PackedStringArray()
 
+var NCR : GDScript
+
 func _get_result() -> PackedStringArray:
 	return finder_result
 
-func _initialize(_script_path : String) -> bool:
+func _initialize(script_path : String) -> bool:
+	NCR = load(script_path.get_base_dir() + "/named_character_references.gd")
 	http = HTTPRequest.new()
 	http.set_tls_options(TLSOptions.client())
 	return true
@@ -76,6 +89,13 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 	search_title = title.uri_encode()
 	search_artist = artists[0].uri_encode()
 	lyrics_block_regex = RegEx.create_from_string(site_param["lyrics_block_regex"])
+	lyrics_title_regexes = []
+	for r in site_param["lyrics_title_regex"]:
+		lyrics_title_regexes.append(RegEx.create_from_string(r))
+	lyrics_artist_regex = RegEx.create_from_string(site_param["lyrics_artist_regex"])
+	lyrics_lyricist_regex = RegEx.create_from_string(site_param["lyrics_lyricist_regex"])
+	lyrics_composer_regex = RegEx.create_from_string(site_param["lyrics_composer_regex"])
+	lyrics_arranger_regex = RegEx.create_from_string(site_param["lyrics_arranger_regex"])	
 	
 	http.tree_entered.connect(start_finding,CONNECT_ONE_SHOT)
 	return http
@@ -84,6 +104,13 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 var lyrics_block_regex : RegEx
 var search_title : String
 var search_artist : String
+
+var lyrics_title_regexes : Array
+var lyrics_artist_regex : RegEx
+var lyrics_lyricist_regex : RegEx
+var lyrics_composer_regex : RegEx
+var lyrics_arranger_regex : RegEx
+
 
 class ListData:
 	var url : String
@@ -97,6 +124,8 @@ class ListData:
 
 var list : Array # of ListData
 var index : int = 0
+
+
 
 func start_finding():
 	var url_param = site_param["param_format"].replace("{title}",search_title).replace("{artist}",search_artist)
@@ -165,25 +194,62 @@ func get_lyrics_response(result : int,response_code : int,
 		_headers : PackedStringArray,body : PackedByteArray):
 	http.request_completed.disconnect(get_lyrics_response)
 	var url : String = site_param["host"] + list[index].url
-	var info : String = (
-		url + "\n" +
-		"Title:" + list[index].title + "\n" +
-		"Artist:" + list[index].artist + "\n\n"
-	)
+
 	index += 1
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
 		get_lyrics()
 		return
 
 	var response := body.get_string_from_utf8()
-
-	var m := lyrics_block_regex.search(response)
+	if response.is_empty():
+		get_lyrics()
+		return
+	
+	var titles : PackedStringArray = []
+	for r in lyrics_title_regexes:
+		var m := (r as RegEx).search(response)
+		if m:
+			var t := m.get_string(1)
+			if not t.is_empty():
+				titles.append(t)
+	var title : String = NCR.decode_ncr("\n".join(titles))
+	var artist : String
+	var m := lyrics_artist_regex.search(response)
 	if m:
-		var lyrics := m.get_string(1)
-		for r in site_param["lyrics_replacers"]:
-			var replace_regex = RegEx.create_from_string(r[0])
-			lyrics = replace_regex.sub(lyrics,r[1],true)
-		finder_result.append(info + lyrics)
+		artist = NCR.decode_ncr(m.get_string(1))
+	var lyricist : String
+	m = lyrics_lyricist_regex.search(response)
+	if m:
+		lyricist = NCR.decode_ncr(m.get_string(1))
+	var composer : String
+	m = lyrics_composer_regex.search(response)
+	if m:
+		composer = NCR.decode_ncr(m.get_string(1))
+	var arranger : String
+	m = lyrics_arranger_regex.search(response)
+	if m:
+		arranger = NCR.decode_ncr(m.get_string(1))
+
+	m = lyrics_block_regex.search(response)
+	if not m:
+		get_lyrics()
+		return
+	var lyrics := m.get_string(1)
+	for r in site_param["lyrics_replacers"]:
+		var replace_regex = RegEx.create_from_string(r[0])
+		lyrics = replace_regex.sub(lyrics,r[1],true)
+		
+	var output : PackedStringArray = [url,title,artist]
+	if not lyricist.is_empty():
+		output.append("作詞:" + lyricist)
+	if not composer.is_empty():
+		output.append("作曲:" + composer)
+	if not arranger.is_empty():
+		output.append("編曲:" + arranger)
+
+	lyrics = NCR.decode_ncr(lyrics)
+
+	finder_result.append("\n".join(output) + "\n\n" + lyrics)
 
 	OS.shell_open(url)
 	get_lyrics()

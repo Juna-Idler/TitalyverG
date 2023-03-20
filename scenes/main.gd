@@ -18,6 +18,9 @@ const MENU_ID_RECEIVER := 4
 
 @onready var receiver : ReceiverManager = $receiver_manager
 
+@onready var image_manager : ImageManager = $image_manager
+
+
 var finders := LyricsFinders.new()
 var savers := LyricsSavers.new()
 var loaders := LyricsLoaders.new()
@@ -57,7 +60,8 @@ func _ready():
 	
 	settings.initialize_receiver_settings(receiver)
 	
-	$ColorRect.color = settings.get_background_color()
+	image_manager.set_bg_color(settings.get_background_color())
+	settings.initialize_image_settings(image_manager)
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	settings.initialize_finders_settings(finders)
 	settings.initialize_saver_settings(savers,$PopupMenu/PopupMenuSave)
@@ -195,6 +199,10 @@ func _on_receiver_received(data : PlaybackData):
 	
 	ruby_lyrics_view.song_duration = data.duration
 
+	find_lyrics_async(data)
+	image_manager.find_async(data.title,data.artists,data.album,data.file_path,data.meta_data)
+
+func find_lyrics_async(data : PlaybackData):
 	var first := true
 	var it := finders.get_iterator(self)
 	while not it.is_end():
@@ -207,7 +215,6 @@ func _on_receiver_received(data : PlaybackData):
 				first = false
 			else:
 				add_lyrics(result)
-
 
 func _on_button_prev_pressed():
 	var index = source_text_index - 1
@@ -264,7 +271,7 @@ func change_lyrics_source(index : int):
 
 
 func _on_settings_display_background_color_changed(color):
-	$ColorRect.color = color
+	image_manager.set_bg_color(color)
 
 
 func _on_notice_gui_input(event):

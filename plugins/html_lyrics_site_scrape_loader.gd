@@ -17,6 +17,16 @@ var site_param : Dictionary = {
 	"item_title_regex" : "<a href=\"/lyric/[^>]*>\\s*(.+?)\\s*</a>",
 	"item_artist_regex" : "<a href=\"/artist/[^>]*>\\s*(.+?)\\s*</a>",
 	
+	"lyrics_title_regex": [
+		"""<h2 class="newLyricTitle__main">\\s*(\\S+.*?)\\s*<span class="newLyricTitle_afterTxt">""",
+		"""<span class="newLyricTitle__subTitle">\\s*(\\S+.*?)\\s*</span>""",
+		],
+	"lyrics_artist_regex" : """<dt class="newLyricWork__name">\\s*<h3>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
+	
+	"lyrics_lyricist_regex" : """<dt class="newLyricWork__title">作詞</dt>\\s*<dd[^>]+>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
+	"lyrics_composer_regex" : """<dt class="newLyricWork__title">作曲</dt>\\s*<dd[^>]+>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
+	"lyrics_arranger_regex" : """<dt class="newLyricWork__title">編曲</dt>\\s*<dd[^>]+>\\s*<a[^>]+>\\s*(\\S+.*?)\\s*</a>""",
+	
 	"lyrics_block_regex" :  """<div class="hiragana" >([\\s\\S]+?)<\\/div>""",
 	"lyrics_replacers" : [
 		[
@@ -44,13 +54,23 @@ var site_param : Dictionary = {
 			"\n"
 		],
 		[
-			"<[^>]*>",
+			"<[^ ][^<>]*>",
 			""
 		]
 	]
 }
 
+var title_regexes : Array
+var artist_regex : RegEx
+var lyricist_regex : RegEx
+var composer_regex : RegEx
+var arranger_regex : RegEx
+
 var block_regex : RegEx
+
+var url : String
+
+var NCR : GDScript
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
@@ -59,6 +79,8 @@ func _notification(what):
 				scene.free()
 
 func _initialize(script_path : String):
+	NCR = load(script_path.get_base_dir() + "/named_character_references.gd")
+	
 	var Scene : PackedScene = load(script_path.get_base_dir() + "/html_lyrics_site_scrape_loader.tscn")
 	scene = Scene.instantiate()
 	line_edit = scene.get_node("LineEdit")
@@ -71,6 +93,14 @@ func _initialize(script_path : String):
 	http.set_tls_options(TLSOptions.client())
 	
 	block_regex = RegEx.create_from_string(site_param["lyrics_block_regex"])
+	
+	title_regexes = []
+	for r in site_param["lyrics_title_regex"]:
+		title_regexes.append(RegEx.create_from_string(r))
+	artist_regex = RegEx.create_from_string(site_param["lyrics_artist_regex"])
+	lyricist_regex = RegEx.create_from_string(site_param["lyrics_lyricist_regex"])
+	composer_regex = RegEx.create_from_string(site_param["lyrics_composer_regex"])
+	arranger_regex = RegEx.create_from_string(site_param["lyrics_arranger_regex"])
 
 
 func _get_name() -> String:
@@ -88,13 +118,13 @@ func _close():
 
 
 func _on_button_pressed():
-	var url : String = line_edit.text
+	url = line_edit.text
 	if not url.begins_with(site_param["host"]):
 		return
-	get_lyrics(url)
+	get_lyrics()
 
 
-func get_lyrics(url : String):
+func get_lyrics():
 	var headers := PackedStringArray([])
 	http.request_completed.connect(_on_http_request_completed,CONNECT_ONE_SHOT)
 	if http.request(url,headers,HTTPClient.METHOD_GET) != OK:
@@ -109,8 +139,33 @@ func _on_http_request_completed(result : int,response_code : int,
 	if response.is_empty():
 		loaded.emit([""],"response no body")
 		return
+	
+	var titles : PackedStringArray = []
+	for r in title_regexes:
+		var m := (r as RegEx).search(response)
+		if m:
+			var t := m.get_string(1)
+			if not t.is_empty():
+				titles.append(t)
+	var title : String = NCR.decode_ncr("\n".join(titles))
+	var artist : String
+	var m := artist_regex.search(response)
+	if m:
+		artist = NCR.decode_ncr(m.get_string(1))
+	var lyricist : String
+	m = lyricist_regex.search(response)
+	if m:
+		lyricist = NCR.decode_ncr(m.get_string(1))
+	var composer : String
+	m = composer_regex.search(response)
+	if m:
+		composer = NCR.decode_ncr(m.get_string(1))
+	var arranger : String
+	m = arranger_regex.search(response)
+	if m:
+		arranger = NCR.decode_ncr(m.get_string(1))
 
-	var m := block_regex.search(response)
+	m = block_regex.search(response)
 	if not m:
 		loaded.emit([""],"no match")
 		return
@@ -118,7 +173,19 @@ func _on_http_request_completed(result : int,response_code : int,
 	for r in site_param["lyrics_replacers"]:
 		var replace_regex = RegEx.create_from_string(r[0])
 		lyrics = replace_regex.sub(lyrics,r[1],true)
-	loaded.emit([line_edit.text + "\n\n" + lyrics],"")
+		
+	var output : PackedStringArray = [url,title,artist]
+	if not lyricist.is_empty():
+		output.append("作詞:" + lyricist)
+	if not composer.is_empty():
+		output.append("作曲:" + composer)
+	if not arranger.is_empty():
+		output.append("編曲:" + arranger)
+
+	lyrics = NCR.decode_ncr(lyrics)
+
+
+	loaded.emit(["\n".join(output) + "\n\n" + lyrics],"")
 
 
 func _on_button_brower_pressed():

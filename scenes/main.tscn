@@ -1,10 +1,11 @@
-[gd_scene load_steps=23 format=3 uid="uid://bq3mop0sgipn"]
+[gd_scene load_steps=24 format=3 uid="uid://bq3mop0sgipn"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_25nab"]
+[ext_resource type="Script" path="res://image/image_manager.gd" id="2_u1hf4"]
 [ext_resource type="PackedScene" uid="uid://bj43idxrswfsp" path="res://ruby_lyrics_view/ruby_lyrics_view.tscn" id="4_c1jr5"]
 [ext_resource type="PackedScene" uid="uid://cfvium7sqii0l" path="res://scenes/window_ui.tscn" id="4_tcylf"]
 [ext_resource type="PackedScene" uid="uid://cluue5kyaytsq" path="res://settings/settings_window.tscn" id="5_8xix0"]
-[ext_resource type="PackedScene" uid="uid://ofewmns37338" path="res://receiver/receiver_manager.tscn" id="5_mkear"]
+[ext_resource type="Script" path="res://receiver/receiver_manager.gd" id="6_x568j"]
 
 [sub_resource type="SystemFont" id="SystemFont_ha14a"]
 font_names = PackedStringArray("Shippori Antique")
@@ -92,14 +93,14 @@ grow_vertical = 2
 script = ExtResource("1_25nab")
 input = "Titalyver G"
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="image_manager" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.74902)
+script = ExtResource("2_u1hf4")
 
 [node name="RubyLyricsView" parent="." instance=ExtResource("4_c1jr5")]
 layout_mode = 1
@@ -253,7 +254,8 @@ title = "Receiver"
 size = Vector2i(320, 300)
 visible = false
 
-[node name="receiver_manager" parent="." instance=ExtResource("5_mkear")]
+[node name="receiver_manager" type="Node" parent="."]
+script = ExtResource("6_x568j")
 
 [connection signal="middle_clicked" from="WindowUI" to="." method="_on_window_ui_middle_clicked"]
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
@@ -266,9 +268,12 @@ visible = false
 [connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]
 [connection signal="gui_input" from="Notice" to="." method="_on_notice_gui_input"]
+[connection signal="background_color_changed" from="SettingsWindow/MarginContainer/VBoxContainer/TabContainer/Display" to="." method="_on_settings_display_background_color_changed"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
 [connection signal="index_pressed" from="PopupMenu/PopupMenuSave" to="." method="_on_popup_menu_save_index_pressed"]
 [connection signal="index_pressed" from="PopupMenu/PopupMenuLoad" to="." method="_on_popup_menu_load_index_pressed"]
 [connection signal="close_requested" from="LoaderWindow" to="." method="_on_loader_window_close_requested"]
 [connection signal="close_requested" from="ReceiverWindow" to="." method="_on_receiver_window_close_requested"]
 [connection signal="received" from="receiver_manager" to="." method="_on_receiver_received"]
+
+[editable path="SettingsWindow"]

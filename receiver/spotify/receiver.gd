@@ -126,7 +126,7 @@ func _get_controler() -> Control:
 	return controler
 
 func set_controler_text(json : Dictionary):
-	controler.get_node("%TextEdit").text = JSON.stringify(json," ",false)
+	controler.get_node("%TextEdit").text = JSON.stringify(json,"  ",false)
 	pass
 
 func _on_controler_button_pressed():

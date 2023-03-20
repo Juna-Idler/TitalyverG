@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://vnf7p02qpdfj"
-path="res://.godot/imported/Titalyver.svg-96b196f0a6b1a3d2d00faf5cd3de5b9f.ctex"
+path="res://.godot/imported/Titalyver.svg-a40a980c75c5ddff5ab891923350451b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/Titalyver.svg"
-dest_files=["res://.godot/imported/Titalyver.svg-96b196f0a6b1a3d2d00faf5cd3de5b9f.ctex"]
+source_file="res://image_data/Titalyver.svg"
+dest_files=["res://.godot/imported/Titalyver.svg-a40a980c75c5ddff5ab891923350451b.ctex"]
 
 [params]
 

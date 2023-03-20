@@ -18,6 +18,17 @@ func initialize_receiver_settings(receiver : ReceiverManager):
 	var receiver_name : String = config.get_value("Receiver","receiver",ReceiverManager.RECEIVERS.keys()[0])
 	receiver.change_receiver(receiver_name)
 
+func initialize_image_settings(image_manager : ImageManager):
+	var plugins = config.get_value("Image","Finder_plug_in",[])
+	if plugins.is_empty():
+		image_manager.finders.plugins.append(ImageFinders.Plugin.create(ImageFinders.BUILTIN_FILE_PATH_FINDER))
+		image_manager.finders.plugins.append(ImageFinders.Plugin.create(ImageFinders.BUILTIN_SPOTIFY_IMAGE_FINDER))
+	else:
+		image_manager.finders.deserialize(plugins)
+		#正常に読めたもののみ書き戻す
+		config.set_value("Image","Finder_plug_in",image_manager.finders.serialize())
+
+
 
 func initialize_ruby_lyrics_view_settings(rlv : RubyLyricsView):
 	if config.get_value("Font","is_system",true):
