@@ -110,6 +110,7 @@ func _get_name() -> String:
 func _open(_title : String, _artists : PackedStringArray, _album : String,
 		_file_path : String,_meta : Dictionary) -> Control:
 	line_edit.text = ""
+	line_edit.grab_focus.call_deferred()
 	return scene
 
 func _close():

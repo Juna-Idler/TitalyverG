@@ -93,6 +93,9 @@ grow_vertical = 2
 script = ExtResource("1_25nab")
 input = "Titalyver G"
 
+[node name="receiver_manager" type="Node" parent="."]
+script = ExtResource("6_x568j")
+
 [node name="image_manager" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -232,10 +235,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="SettingsWindow" parent="." instance=ExtResource("5_8xix0")]
-unique_name_in_owner = true
-visible = false
-
 [node name="PopupMenu" type="PopupMenu" parent="."]
 unique_name_in_owner = true
 size = Vector2i(100, 62)
@@ -243,6 +242,10 @@ size = Vector2i(100, 62)
 [node name="PopupMenuSave" type="PopupMenu" parent="PopupMenu"]
 
 [node name="PopupMenuLoad" type="PopupMenu" parent="PopupMenu"]
+
+[node name="SettingsWindow" parent="." instance=ExtResource("5_8xix0")]
+unique_name_in_owner = true
+visible = false
 
 [node name="LoaderWindow" type="Window" parent="."]
 visible = false
@@ -254,9 +257,7 @@ title = "Receiver"
 size = Vector2i(320, 300)
 visible = false
 
-[node name="receiver_manager" type="Node" parent="."]
-script = ExtResource("6_x568j")
-
+[connection signal="received" from="receiver_manager" to="." method="_on_receiver_received"]
 [connection signal="middle_clicked" from="WindowUI" to="." method="_on_window_ui_middle_clicked"]
 [connection signal="right_clicked" from="WindowUI" to="." method="_on_window_ui_right_clicked"]
 [connection signal="scroll_pad_dragging" from="WindowUI" to="." method="_on_window_ui_scroll_pad_dragging"]
@@ -268,12 +269,11 @@ script = ExtResource("6_x568j")
 [connection signal="pressed" from="LyricsCount/ButtonPrev" to="." method="_on_button_prev_pressed"]
 [connection signal="pressed" from="LyricsCount/ButtonNext" to="." method="_on_button_next_pressed"]
 [connection signal="gui_input" from="Notice" to="." method="_on_notice_gui_input"]
-[connection signal="background_color_changed" from="SettingsWindow/MarginContainer/VBoxContainer/TabContainer/Display" to="." method="_on_settings_display_background_color_changed"]
 [connection signal="id_pressed" from="PopupMenu" to="." method="_on_popup_menu_id_pressed"]
 [connection signal="index_pressed" from="PopupMenu/PopupMenuSave" to="." method="_on_popup_menu_save_index_pressed"]
 [connection signal="index_pressed" from="PopupMenu/PopupMenuLoad" to="." method="_on_popup_menu_load_index_pressed"]
+[connection signal="background_color_changed" from="SettingsWindow/MarginContainer/VBoxContainer/TabContainer/Display" to="." method="_on_settings_display_background_color_changed"]
 [connection signal="close_requested" from="LoaderWindow" to="." method="_on_loader_window_close_requested"]
 [connection signal="close_requested" from="ReceiverWindow" to="." method="_on_receiver_window_close_requested"]
-[connection signal="received" from="receiver_manager" to="." method="_on_receiver_received"]
 
 [editable path="SettingsWindow"]

@@ -39,18 +39,22 @@ func _get_settings(config : ConfigFile) -> Control:
 	settings = DIPSettings.instantiate()
 	settings.tree_exited.connect(func():settings.queue_free())
 	var size_rate : SpinBox = settings.get_node("%SpinBoxSizeRate")
+	var val = config.get_value("DefaultImageProcessor","size_rate",100)
+	size_rate.value = val
+	set_texture_size(val)
 	size_rate.value_changed.connect(func(v):
 			set_texture_size(v)
 			config.set_value("DefaultImageProcessor","size_rate",v)
 			)
-	set_texture_size(config.get_value("DefaultImageProcessor","size_rate",100))
 	
 	var opacity : SpinBox = settings.get_node("%SpinBoxOpacity")
+	val = config.get_value("DefaultImageProcessor","opacity",100)
+	opacity.value = val
+	set_texture_opacity(val)
 	opacity.value_changed.connect(func(v):
 			set_texture_opacity(v)
 			config.set_value("DefaultImageProcessor","opacity",v)
 			)
-	set_texture_opacity(config.get_value("DefaultImageProcessor","opacity",100))
 	
 	return settings
 
