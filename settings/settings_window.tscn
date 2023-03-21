@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cluue5kyaytsq"]
+[gd_scene load_steps=10 format=3 uid="uid://cluue5kyaytsq"]
 
 [ext_resource type="Script" path="res://settings/settings_window.gd" id="1_ff5r0"]
 [ext_resource type="PackedScene" uid="uid://2eewjl0nd8t5" path="res://settings/display.tscn" id="2_ciu6t"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://gl52qxyhtn07" path="res://settings/receiver.tscn" id="4_8j5bj"]
 [ext_resource type="PackedScene" uid="uid://1mp0cqt0r6a0" path="res://settings/saver.tscn" id="5_j1oqk"]
 [ext_resource type="PackedScene" uid="uid://mq3q3i6815ts" path="res://settings/loader.tscn" id="6_yy3mp"]
+[ext_resource type="PackedScene" uid="uid://opog0xskg058" path="res://settings/image_processor.tscn" id="8_0bumj"]
+[ext_resource type="PackedScene" uid="uid://b5ie6bv70uom8" path="res://settings/image_finder.tscn" id="8_dbc3o"]
 
 [node name="SettingsWindow" type="Window"]
 gui_embed_subwindows = true
@@ -49,20 +51,33 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Plugins" type="TabContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+[node name="Lyrics" type="TabContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
 
-[node name="Finder" parent="MarginContainer/VBoxContainer/TabContainer/Plugins" instance=ExtResource("3_5xy5c")]
+[node name="Finder" parent="MarginContainer/VBoxContainer/TabContainer/Lyrics" instance=ExtResource("3_5xy5c")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Saver" parent="MarginContainer/VBoxContainer/TabContainer/Plugins" instance=ExtResource("5_j1oqk")]
+[node name="Saver" parent="MarginContainer/VBoxContainer/TabContainer/Lyrics" instance=ExtResource("5_j1oqk")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Loader" parent="MarginContainer/VBoxContainer/TabContainer/Plugins" instance=ExtResource("6_yy3mp")]
+[node name="Loader" parent="MarginContainer/VBoxContainer/TabContainer/Lyrics" instance=ExtResource("6_yy3mp")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Image" type="TabContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="ImageProcessor" parent="MarginContainer/VBoxContainer/TabContainer/Image" instance=ExtResource("8_0bumj")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ImageFinder" parent="MarginContainer/VBoxContainer/TabContainer/Image" instance=ExtResource("8_dbc3o")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

@@ -62,6 +62,7 @@ func _ready():
 	
 	image_manager.set_bg_color(settings.get_background_color())
 	settings.initialize_image_settings(image_manager)
+	
 	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
 	settings.initialize_finders_settings(finders)
 	settings.initialize_saver_settings(savers,$PopupMenu/PopupMenuSave)
@@ -73,6 +74,7 @@ func _ready():
 			settings,ruby_lyrics_view,finders,
 			savers,$PopupMenu/PopupMenuSave,
 			loaders,$PopupMenu/PopupMenuLoad,
+			image_manager,
 			receiver)
 
 

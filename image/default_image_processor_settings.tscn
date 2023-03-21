@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://da1chuyni5oty"]
+
+[node name="Settings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/CenterContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="LabelSizeRate" type="Label" parent="VBoxContainer/CenterContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "size rate"
+
+[node name="SpinBoxSizeRate" type="SpinBox" parent="VBoxContainer/CenterContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+min_value = 1.0
+value = 100.0
+
+[node name="LabelOpacity" type="Label" parent="VBoxContainer/CenterContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "opacity"
+
+[node name="SpinBoxOpacity" type="SpinBox" parent="VBoxContainer/CenterContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+value = 100.0
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+layout_mode = 2

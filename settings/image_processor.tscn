@@ -1,0 +1,81 @@
+[gd_scene load_steps=2 format=3 uid="uid://opog0xskg058"]
+
+[ext_resource type="Script" path="res://settings/image_processor.gd" id="1_h1cu3"]
+
+[node name="Processor" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("1_h1cu3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Selected Processor"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemList" type="ItemList" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonChange" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+text = "Change"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ButtonInsertPlugin" type="Button" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Insert Plug-in"
+
+[node name="ButtonDelete" type="Button" parent="VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Delete"
+
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SettingContainer" type="MarginContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Select Finder Plugin"
+position = Vector2i(0, 64)
+size = Vector2i(600, 400)
+unresizable = true
+ok_button_text = "開く"
+mode_overrides_title = false
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.gd ; GDScript")
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ButtonChange" to="." method="_on_button_change_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/ButtonInsertPlugin" to="." method="_on_button_insert_plugin_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/ButtonDelete" to="." method="_on_button_delete_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]

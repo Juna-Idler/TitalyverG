@@ -19,6 +19,7 @@ func initialize_receiver_settings(receiver : ReceiverManager):
 	receiver.change_receiver(receiver_name)
 
 func initialize_image_settings(image_manager : ImageManager):
+	
 	var plugins = config.get_value("Image","Finder_plug_in",[])
 	if plugins.is_empty():
 		image_manager.finders.plugins.append(ImageFinders.Plugin.create(ImageFinders.BUILTIN_FILE_PATH_FINDER))
@@ -28,6 +29,16 @@ func initialize_image_settings(image_manager : ImageManager):
 		#正常に読めたもののみ書き戻す
 		config.set_value("Image","Finder_plug_in",image_manager.finders.serialize())
 
+	plugins = config.get_value("Image","Processor_plug_in",[])
+	if plugins.is_empty():
+		image_manager.plugins.append(ImageManager.Plugin.create(ImageManager.BUILTIN_NO_IMAGE_PROCESSOR))
+		image_manager.plugins.append(ImageManager.Plugin.create(ImageManager.BUILTIN_DEFAULT_IMAGE_PROCESSOR))
+	else:
+		image_manager.deserialize_processors(plugins)
+		#正常に読めたもののみ書き戻す
+		config.set_value("Image","Processor_plug_in",image_manager.serialize_processors())
+	
+	image_manager.set_processor(config.get_value("Image","processor",""))
 
 
 func initialize_ruby_lyrics_view_settings(rlv : RubyLyricsView):

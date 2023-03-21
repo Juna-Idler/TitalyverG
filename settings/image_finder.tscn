@@ -1,0 +1,93 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5ie6bv70uom8"]
+
+[ext_resource type="Script" path="res://settings/image_finder.gd" id="1_m4vwa"]
+
+[node name="Finder" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("1_m4vwa")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemList" type="ItemList" parent="VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="ButtonUp" type="Button" parent="VBoxContainer/HBoxContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+size_flags_vertical = 3
+text = "↑"
+
+[node name="ButtonDown" type="Button" parent="VBoxContainer/HBoxContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+size_flags_vertical = 3
+text = "↓"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MenuButtonInsertB" type="MenuButton" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_vertical = 4
+action_mode = 1
+text = "Insert Built-in"
+flat = false
+switch_on_hover = true
+
+[node name="ButtonInsertPlugin" type="Button" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Insert Plug-in"
+
+[node name="ButtonDelete" type="Button" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+size_flags_vertical = 4
+text = "Delete"
+
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Select Finder Plugin"
+position = Vector2i(0, 64)
+size = Vector2i(600, 400)
+unresizable = true
+ok_button_text = "開く"
+mode_overrides_title = false
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.gd ; GDScript")
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/VBoxContainer/ButtonUp" to="." method="_on_button_up_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/VBoxContainer/ButtonDown" to="." method="_on_button_down_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ButtonInsertPlugin" to="." method="_on_button_insert_plugin_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ButtonDelete" to="." method="_on_button_delete_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
