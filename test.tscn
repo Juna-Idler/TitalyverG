@@ -1,25 +1,141 @@
-[gd_scene load_steps=2 format=3 uid="uid://4wqupphk3w4v"]
+[gd_scene load_steps=8 format=3 uid="uid://4wqupphk3w4v"]
 
 [ext_resource type="Script" path="res://test.gd" id="1_xd6pd"]
+
+[sub_resource type="Shader" id="Shader_bs8gj"]
+code = "shader_type canvas_item;
+
+uniform float weight_table[21];
+uniform int range : hint_range(0, 10, 1) = 1;
+
+void fragment() {
+	vec4 color = vec4(0,0,0,1);
+	for (int i = 0; i < 1 + range * 2;i++)
+	{
+		vec4 c = texture(TEXTURE,UV + vec2(TEXTURE_PIXEL_SIZE.x * float(i - range),0));
+		color += c * weight_table[i];
+	}
+    COLOR = color;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f442v"]
+shader = SubResource("Shader_bs8gj")
+shader_parameter/weight_table = PackedFloat32Array(1, 0.25, 0.375, 0.25, 0.063)
+shader_parameter/range = 0
+
+[sub_resource type="Shader" id="Shader_e3k37"]
+code = "shader_type canvas_item;
+
+uniform float weight_table[21];
+uniform int range : hint_range(0, 10, 1) = 2;
+
+uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
+
+void fragment() {
+	vec4 color = vec4(0,0,0,0);
+	for (int i = 0; i < 1 + range * 2;i++)
+	{
+		vec4 c = texture(SCREEN_TEXTURE,vec2(SCREEN_UV.x + SCREEN_PIXEL_SIZE.x * float(i - range),SCREEN_UV.y));
+		color += c * weight_table[i];
+	}
+    COLOR = color;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5b08i"]
+shader = SubResource("Shader_e3k37")
+shader_parameter/weight_table = PackedFloat32Array(0.063, 0.25, 0.375, 0.25, 0.063)
+shader_parameter/range = 2
+
+[sub_resource type="Shader" id="Shader_2lk6m"]
+code = "shader_type canvas_item;
+
+uniform float weight_table[21];
+uniform int range : hint_range(0, 10, 1) = 2;
+
+uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
+
+void fragment() {
+	vec4 color = vec4(0,0,0,0);
+	for (int i = 0; i < 1 + range * 2;i++)
+	{
+		vec4 c = texture(SCREEN_TEXTURE, SCREEN_UV + vec2(0,SCREEN_PIXEL_SIZE.y * float(i - range)));
+		color += c * weight_table[i];
+	}
+    COLOR = color;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s3818"]
+shader = SubResource("Shader_2lk6m")
+shader_parameter/weight_table = PackedFloat32Array(0.063, 0.25, 0.375, 0.25, 0.063)
+shader_parameter/range = 2
 
 [node name="test" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 339.0
+offset_bottom = 187.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xd6pd")
 
-[node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = -1
+[node name="SubViewport" type="SubViewport" parent="."]
+unique_name_in_owner = true
+handle_input_locally = false
+render_target_clear_mode = 2
+render_target_update_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="SubViewport"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_f442v")
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="SubViewport"]
+
+[node name="ColorRect" type="ColorRect" parent="SubViewport/CanvasLayer"]
+material = SubResource("ShaderMaterial_5b08i")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="SubViewport"]
+
+[node name="ColorRect2" type="ColorRect" parent="SubViewport/CanvasLayer2"]
+material = SubResource("ShaderMaterial_s3818")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+visible = false
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = -83.0
+offset_top = 25.0
+offset_right = 676.0
+offset_bottom = 402.0
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 5
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 346.0
+offset_bottom = 291.0

@@ -2,8 +2,8 @@
 class_name I_ImageProcessor
 
 
-func _initialize(_script_path : String):
-	pass
+func _initialize(_script_path : String) -> bool:
+	return false
 	
 func _get_name() -> String:
 	return ""
