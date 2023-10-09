@@ -5,7 +5,7 @@ class_name LyricsContainer
 enum SyncMode { UNSYNC = 0, LINE = 1, KARAOKE = 3 }
 
 
-var lines : Array
+var lines : Array[LyricsLine]
 var at_tag_container : AtTagContainer
 var sync_mode : SyncMode
 
@@ -20,8 +20,8 @@ func _init(lyrics_text : String):
 		var line := LyricsLine.create(l,at_tag_container)
 		lines.append(line)
 
-		@warning_ignore("int_as_enum_without_cast")
-		sync_mode = sync_mode | line.sync_mode
+#		@warning_ignore("int_as_enum_without_cast")
+		sync_mode = (sync_mode | line.sync_mode) as SyncMode
 		
 
 func get_end_time() -> float:
@@ -33,7 +33,7 @@ func get_end_time() -> float:
 
 
 class LyricsLine:
-	var units : Array # of LyricsLine.Unit
+	var units : Array[Unit] # of LyricsLine.Unit
 	var sync_mode : SyncMode
 	
 	func _init(u,sm):
@@ -41,14 +41,14 @@ class LyricsLine:
 		sync_mode = sm
 	
 	static func create(lyrics_line : String,at_tag : AtTagContainer) -> LyricsLine:
-		var units_ : Array = []
+		var units_ : Array[Unit] = []
 		var sync_mode_ : SyncMode
 		var ruby_units := at_tag.translate(lyrics_line)
 		var tt_count := 0
 		for u in ruby_units:
 			var unit := u as RubyUnit
 			var base := TimeTag.parse(unit.base_text)
-			var ruby := TimeTag.parse(unit.ruby_text) if unit.has_ruby() else []
+			var ruby := TimeTag.parse(unit.ruby_text) if unit.has_ruby() else ([] as Array[TimeTag])
 			units_.append(Unit.new(base,ruby))
 			
 			if base[0].start_time >= 0 or base.size() > 1:
@@ -107,8 +107,8 @@ class LyricsLine:
 		return -1.0
 
 	class Unit:
-		var base : Array # of TimeTag
-		var ruby : Array # of TimeTag
+		var base : Array[TimeTag] # of TimeTag
+		var ruby : Array[TimeTag] # of TimeTag
 		
 		func _init(b,r):
 			base = b
@@ -130,7 +130,7 @@ class LyricsLine:
 		
 		func get_start_time() -> float:
 			var start : float = base[0].start_time
-			var rstart : float = ruby[0].start_time if not ruby.is_empty() else -1
+			var rstart : float = ruby[0].start_time if not ruby.is_empty() else -1.0
 			if start >= 0:
 				if rstart >= 0:
 					start = min(start,rstart)
@@ -196,7 +196,7 @@ class TimeTag:
 			return TimeTag.new(sec,m.get_string(4))
 		return TimeTag.new(-1,text_);
 
-	static func parse(text_ : String) -> Array:
+	static func parse(text_ : String) -> Array[TimeTag]:
 		var karaoke_regex := RegEx.create_from_string(KARAOKE_PATTERN)
 		var k = karaoke_regex.search_all(text_)
 		if k.is_empty():
@@ -238,10 +238,10 @@ class AtTagContainer:
 	var ruby_parent : String
 	var ruby_begin : String
 	var ruby_end : String
-	var rubying : Array
+	var rubying : PackedStringArray
 	var offset : float
 
-	var tags : Array
+	var tags : Array[Tag]
 	
 	var other_lines : PackedStringArray
 
@@ -311,9 +311,9 @@ class AtTagContainer:
 			_ruby_pattern_regex = null
 		return
 
-	func translate(text : String) -> Array:
+	func translate(text : String) -> Array[RubyUnit]:
 		var target_text := text
-		var result : Array = []
+		var result : Array[RubyUnit] = []
 		if _ruby_pattern_regex:
 			while true:
 				var ruby = _ruby_pattern_regex.search(target_text)

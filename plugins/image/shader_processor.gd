@@ -29,7 +29,7 @@ func _initialize(script_path : String) -> bool:
 func _get_name() -> String:
 	return "Shader Image Processor"
 
-func _set_images(images : Array):
+func _set_images(images : Array[Image]):
 	if images.is_empty():
 		texture_rect.texture = null
 		return

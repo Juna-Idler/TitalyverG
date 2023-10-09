@@ -34,7 +34,7 @@ class Plugin:
 		return Plugin.new(finder_,file_path_)
 
 
-var plugins : Array = [] # of Plugin
+var plugins : Array[Plugin] = [] # of Plugin
 
 
 func _init():

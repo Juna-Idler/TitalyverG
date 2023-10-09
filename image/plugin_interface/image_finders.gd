@@ -38,7 +38,7 @@ class Plugin:
 		return Plugin.new(finder_,file_path_)
 
 
-var plugins : Array = [] # of Plugin
+var plugins : Array[Plugin] = [] # of Plugin
 
 
 func _init():
@@ -59,8 +59,8 @@ func deserialize(strings : PackedStringArray):
 
 
 func find_async(title : String,artists : PackedStringArray,album : String,
-			file_path : String,meta : Dictionary,parent_node : Node) -> Array:
-	var result := []
+			file_path : String,meta : Dictionary,parent_node : Node) -> Array[Image]:
+	var result : Array[Image] = []
 	var index : int = 0
 	while index < plugins.size():
 		var plugin : Plugin = plugins[index]
@@ -98,7 +98,7 @@ class FilePathFinder extends  I_ImageFinder:
 	
 	const EXTENTIONS : PackedStringArray = [".png",".jpg",".jpeg",".bmp",".webp"]
 	
-	var result : Array
+	var result : Array[Image]
 	
 	func _get_name() -> String:
 		return BUILTIN_FILE_PATH_FINDER
@@ -134,13 +134,13 @@ class FilePathFinder extends  I_ImageFinder:
 						result.append(img)
 		return null
 
-	func _get_result() -> Array: # of Image
+	func _get_result() -> Array[Image]: # of Image
 		return result
 
 
 class SoptifyImageFinder extends  I_ImageFinder:
 	
-	var result_images : Array
+	var result_images : Array[Image]
 	var http : HTTPRequest
 	
 	func _init():
@@ -211,5 +211,5 @@ class SoptifyImageFinder extends  I_ImageFinder:
 		finished.emit()
 		return
 
-	func _get_result() -> Array: # of Image
+	func _get_result() -> Array[Image]: # of Image
 		return result_images

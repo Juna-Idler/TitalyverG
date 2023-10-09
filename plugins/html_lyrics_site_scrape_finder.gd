@@ -105,7 +105,7 @@ var lyrics_block_regex : RegEx
 var search_title : String
 var search_artist : String
 
-var lyrics_title_regexes : Array
+var lyrics_title_regexes : Array[RegEx]
 var lyrics_artist_regex : RegEx
 var lyrics_lyricist_regex : RegEx
 var lyrics_composer_regex : RegEx
@@ -122,7 +122,7 @@ class ListData:
 		title = t
 		artist = a
 
-var list : Array # of ListData
+var list : Array[ListData] # of ListData
 var index : int = 0
 
 

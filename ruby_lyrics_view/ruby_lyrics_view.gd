@@ -177,9 +177,9 @@ var splitter : Callable = func(text : String) :
 
 var line_break : LineBreak.ILineBreak = LineBreak.JapaneaseLineBreak.new()
 var lyrics : LyricsContainer
-var built_lines : Array # of BuiltLine
-var linebreak_lines : Array # of LinebreakLine
-var displayed_lines : Array # of DisplayedLine
+var built_lines : Array[BuiltLine] # of BuiltLine
+var linebreak_lines : Array[LinebreakLine] # of LinebreakLine
+var displayed_lines : Array[DisplayedLine] # of DisplayedLine
 
 var layout_height : float
 var time_y_offset : float
@@ -205,7 +205,7 @@ class Unit:
 		x = x_
 		y = y_
 		
-	static func interpolate(units : Array,start_ : float,end_ : float):
+	static func interpolate(units : Array[Unit],start_ : float,end_ : float):
 		units[0].start = start_
 		units[units.size()-1].end = end_
 		for i in range(1, units.size()):
@@ -231,8 +231,8 @@ class Unit:
 		
 class BuiltLine:
 	class Part:
-		var base : Array # of Unit
-		var ruby : Array # of Unit
+		var base : Array[Unit] # of Unit
+		var ruby : Array[Unit] # of Unit
 		var start : float
 		var end : float
 		var base_width : float = 0
@@ -314,7 +314,7 @@ class BuiltLine:
 					return [r_time,get_width() * r_width / ruby_width]
 			return []
 		
-	var parts : Array # of Part
+	var parts : Array[Part] # of Part
 	var start : float
 	var end : float
 	func _init(p,s,e):
@@ -329,8 +329,8 @@ class BuiltLine:
 
 class LinebreakLine:
 	class Unbreakable:
-		var base : Array # of Unit
-		var ruby : Array # of Unit
+		var base : Array[Unit] # of Unit
+		var ruby : Array[Unit] # of Unit
 		var width : float = 0
 		func _init(b,r,w):
 			base = b
@@ -341,7 +341,7 @@ class LinebreakLine:
 		func get_right_ruby_buffer() -> float:
 			return width - (0.0 if ruby.is_empty() else ruby.back().x - base[0].x + ruby.back().width)
 	
-	var unbreakables : Array
+	var unbreakables : Array[Unbreakable]
 	var start : float
 	var end : float
 	func _init(ub,s,e):
@@ -350,8 +350,8 @@ class LinebreakLine:
 		end = e
 
 class DisplayedLine:
-	var base : Array # of Unit
-	var ruby : Array # of Unit
+	var base : Array[Unit] # of Unit
+	var ruby : Array[Unit] # of Unit
 	
 	var start : float
 	var end : float
@@ -374,16 +374,16 @@ func build():
 	built_lines.clear()
 	if lyrics.sync_mode == LyricsContainer.SyncMode.UNSYNC:
 		for l in lyrics.lines:
-			var parts : Array = []
+			var parts : Array[BuiltLine.Part] = []
 			for u in l.units:
 				var unit := u as LyricsContainer.LyricsLine.Unit
-				var bases : Array = []
+				var bases : Array[Unit] = []
 				for t in unit.base:
 					var clusters : PackedStringArray = splitter.call(t.text)
 					for c in clusters:
 						var w := font.get_string_size(c,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x
 						bases.append(Unit.new(w,c))
-				var rubys : Array = []
+				var rubys : Array[Unit] = []
 				for t in unit.ruby:
 					var clusters : PackedStringArray = splitter.call(t.text)
 					for c in clusters:
@@ -392,7 +392,7 @@ func build():
 				parts.append(BuiltLine.Part.new(bases,rubys,-1,-1))
 			built_lines.append(BuiltLine.new(parts,-1,-1))
 	else:
-		var lines : Array = [] # of LyricsContainer.LyricsLine
+		var lines : Array[LyricsContainer.LyricsLine] = [] # of LyricsContainer.LyricsLine
 		lines.append(LyricsContainer.LyricsLine.create_from_time_tag(LyricsContainer.TimeTag.new(0,"")))
 		for l in lyrics.lines:
 			if l.sync_mode == LyricsContainer.SyncMode.UNSYNC:
@@ -400,10 +400,10 @@ func build():
 			lines.append(l)
 		lines.append(LyricsContainer.LyricsLine.create_from_time_tag(LyricsContainer.TimeTag.new(24*60*60,"")))
 		for i in range(lines.size()-1):
-			var parts : Array = [] # of BuiltLine.Part
+			var parts : Array[BuiltLine.Part] = [] # of BuiltLine.Part
 			for u in lines[i].units:
 				var unit := u as LyricsContainer.LyricsLine.Unit
-				var bases : Array = [] # of Unit
+				var bases : Array[Unit] = [] # of Unit
 				for t in unit.base:
 					var tt := t as LyricsContainer.TimeTag
 					var clusters : PackedStringArray = splitter.call(tt.text)
@@ -414,7 +414,7 @@ func build():
 					bases[index].start = tt.start_time
 					if index - 1 >= 0 and bases[index - 1].end < 0:
 						bases[index - 1].end = tt.start_time
-				var rubys : Array = [] # of Unit
+				var rubys : Array[Unit] = [] # of Unit
 				for t in unit.ruby:
 					var tt := t as LyricsContainer.TimeTag
 					var clusters : PackedStringArray = splitter.call(tt.text)
@@ -475,9 +475,9 @@ func layout():
 	linebreak_lines.clear()
 	for l in built_lines:
 		var line := l as BuiltLine
-		var linebreak_line : Array = []
-		var unbreak_base : Array = []
-		var unbreak_ruby : Array = []
+		var linebreak_line : Array[LinebreakLine.Unbreakable] = []
+		var unbreak_base : Array[Unit] = []
+		var unbreak_ruby : Array[Unit] = []
 
 		var ubx : float = 0
 		for p in line.parts:
@@ -544,8 +544,8 @@ func layout():
 		
 #		var ruby_buffer : float = buffer_left_padding
 
-		var displayed_base : Array = []
-		var displayed_ruby : Array = []
+		var displayed_base : Array[Unit] = []
+		var displayed_ruby : Array[Unit] = []
 
 		var ruby_padding : float = line.unbreakables[0].get_right_ruby_buffer()
 		var x : float = left_padding

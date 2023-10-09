@@ -37,14 +37,14 @@ class Plugin:
 		return Plugin.new(processor_,file_path_)
 
 
-var plugins : Array = [] # of Plugin
+var plugins : Array[Plugin] = [] # of Plugin
 
 var _processor : I_ImageProcessor
 
 var finders : ImageFinders = ImageFinders.new()
 
 
-var _current_images : Array
+var _current_images : Array[Image]
 var _bg_color : Color
 
 
@@ -138,7 +138,7 @@ class NoImageProcessor extends I_ImageProcessor:
 	func _get_settings(_config : ConfigFile) -> Control:
 		return null
 
-	func _set_images(_images : Array):
+	func _set_images(_images : Array[Image]):
 		return
 
 	func _set_bg_color(color : Color):

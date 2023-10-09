@@ -68,7 +68,7 @@ func set_texture_size(v : float):
 func set_texture_opacity(rate : float):
 	texture_rect.modulate.a = rate / 100
 
-func _set_images(images : Array):
+func _set_images(images : Array[Image]):
 	if images.is_empty():
 		texture_rect.texture = null
 		return

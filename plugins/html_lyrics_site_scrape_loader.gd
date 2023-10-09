@@ -60,7 +60,7 @@ var site_param : Dictionary = {
 	]
 }
 
-var title_regexes : Array
+var title_regexes : Array[RegEx]
 var artist_regex : RegEx
 var lyricist_regex : RegEx
 var composer_regex : RegEx

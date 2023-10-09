@@ -331,8 +331,8 @@ func set_regex() -> bool:
 
 var ruby_regex : RegEx = RegEx.new()
 var line_break_word : Ruby.LineBreakWord = Ruby.LineBreakWord.new()
-var unbreakable_words : Array # of UnbreakableWordData
-var lines : Array # of RubyLabelLine
+var unbreakable_words : Array[UnbreakableWordData] # of UnbreakableWordData
+var lines : Array[RubyLabelLine] # of RubyLabelLine
 var layout_height : float
 
 
@@ -359,14 +359,14 @@ class RubyLabelChar:
 		end = e
 
 class RubyLabelLine:
-	var base : Array # of RubyLabelChar
-	var ruby : Array # of RubyLabelChar
+	var base : Array[RubyLabelChar] # of RubyLabelChar
+	var ruby : Array[RubyLabelChar] # of RubyLabelChar
 	
 	func _init(b,r):
 		base = b
 		ruby = r
 	
-	static func create(line_words : Array,line_words_x : PackedFloat32Array,
+	static func create(line_words : Array[UnbreakableWordData],line_words_x : PackedFloat32Array,
 			font : Font,font_size : int,ruby_size : int,
 			text_pos : int,y:float,has_ruby:bool,ruby_distance : float,no_ruby_space : float) -> RubyLabelLine:
 		var line_chars = []
@@ -375,11 +375,11 @@ class RubyLabelLine:
 		
 		var by = y + (ruby_height if has_ruby else float(no_ruby_space)) + font.get_ascent(font_size)
 		for i in line_words.size():
-			var word := line_words[i] as UnbreakableWordData
+			var word := line_words[i]
 			var start_pos : PackedFloat32Array = []
 			for j in word.base_text_data.size():
 				start_pos.append(text_pos)
-				var unit = word.base_text_data[j] as RubyUnitWordData
+				var unit = word.base_text_data[j]
 				var bx = line_words_x[i] + word.base_text_x[j]
 				for k in unit.char_width.size():
 					var c = RubyLabelChar.new(bx,by,unit.char_width[k],
@@ -402,7 +402,7 @@ class RubyLabelLine:
 					line_ruby_chars.append(c)
 		return RubyLabelLine.new(line_chars,line_ruby_chars)
 
-	static func create_by_phonetic(line_words : Array,line_words_x : PackedFloat32Array,
+	static func create_by_phonetic(line_words : Array[UnbreakableWordData],line_words_x : PackedFloat32Array,
 			font : Font,font_size : int,ruby_size : int,
 			text_pos : int,y:float,has_ruby:bool,ruby_distance : float,no_ruby_space : float) -> RubyLabelLine:
 		var line_chars = []
@@ -411,7 +411,7 @@ class RubyLabelLine:
 		
 		var by = y + (ruby_height if has_ruby else float(no_ruby_space)) + font.get_ascent(font_size)
 		for i in line_words.size():
-			var word := line_words[i] as UnbreakableWordData
+			var word := line_words[i]
 			if not word.has_ruby():
 				for j in word.base_text_data.size():
 					var unit = word.base_text_data[j] as RubyUnitWordData
@@ -468,9 +468,9 @@ class RubyUnitWordData:
 			width += char_width[i]
 
 class UnbreakableWordData:
-	var base_text_data : Array = [] # of RubyUnitWordData
+	var base_text_data : Array[RubyUnitWordData] = [] # of RubyUnitWordData
 	var base_text_x : PackedFloat32Array = []
-	var ruby_text_data : Array = [] # of RubyUnitWordData
+	var ruby_text_data : Array[RubyUnitWordData] = [] # of RubyUnitWordData
 	var ruby_text_x : PackedFloat32Array = []
 	var ruby_target : PackedInt32Array = [] # of target base_text index
 	var width : float

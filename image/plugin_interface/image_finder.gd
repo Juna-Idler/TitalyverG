@@ -16,5 +16,5 @@ func _find(_title : String,_artists : PackedStringArray,_album : String,
 		_file_path : String,_meta : Dictionary) -> Node:
 	return null
 
-func _get_result() -> Array: # of Image
+func _get_result() -> Array[Image]: # of Image
 	return []
