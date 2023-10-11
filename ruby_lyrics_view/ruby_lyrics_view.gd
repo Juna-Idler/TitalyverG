@@ -405,31 +405,29 @@ func build():
 				var unit := u as LyricsContainer.LyricsLine.Unit
 				var bases : Array[Unit] = [] # of Unit
 				for t in unit.base:
-					var tt := t as LyricsContainer.TimeTag
-					var clusters : PackedStringArray = splitter.call(tt.text)
+					var clusters : PackedStringArray = splitter.call(t.text)
 					var index = bases.size()
 					for c in clusters:
 						var w := font.get_string_size(c,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size).x
 						bases.append(Unit.new(w,c))
-					bases[index].start = tt.start_time
+					bases[index].start = t.start_time
 					if index - 1 >= 0 and bases[index - 1].end < 0:
-						bases[index - 1].end = tt.start_time
+						bases[index - 1].end = t.start_time
 				var rubys : Array[Unit] = [] # of Unit
 				for t in unit.ruby:
-					var tt := t as LyricsContainer.TimeTag
-					var clusters : PackedStringArray = splitter.call(tt.text)
+					var clusters : PackedStringArray = splitter.call(t.text)
 					var index = rubys.size()
 					for c in clusters:
 						var w := font.get_string_size(c,HORIZONTAL_ALIGNMENT_LEFT,-1,font_ruby_size).x
 						rubys.append(Unit.new(w,c))
-					rubys[index].start = tt.start_time
+					rubys[index].start = t.start_time
 					if index - 1 >= 0 and rubys[index - 1].end < 0:
-						rubys[index - 1].end = tt.start_time
+						rubys[index - 1].end = t.start_time
 				parts.append(BuiltLine.Part.new(bases,rubys,unit.get_start_time(),unit.get_end_time()))
 			var line_end : float = lines[i].get_end_time()
 			var next = lines[i+1].get_start_time()
 			if line_end < 0 or next > line_end:
-				line_end = lines[i+1].get_start_time()
+				line_end = next
 			built_lines.append(BuiltLine.new(parts,lines[i].get_start_time(),line_end))
 		
 		if lyrics.sync_mode == LyricsContainer.SyncMode.KARAOKE:

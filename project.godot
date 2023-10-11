@@ -34,6 +34,37 @@ run/main_run_args="--verbose"
 
 enabled=PackedStringArray("res://addons/ruby_label/plugin.cfg")
 
+[filesystem]
+
+import/blender/enabled=false
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+
+[shader_globals]
+
+standby_color={
+"type": "color",
+"value": Color(1, 1, 1, 1)
+}
+standby_outline_color={
+"type": "color",
+"value": Color(0, 0, 1, 1)
+}
+active_outline_color={
+"type": "color",
+"value": Color(1, 0, 0, 1)
+}
+active_color={
+"type": "color",
+"value": Color(1, 1, 1, 1)
+}
+sleep_color={
+"type": "color",
+"value": Color(0.498039, 0.498039, 0.498039, 1)
+}
+sleep_outline_color={
+"type": "color",
+"value": Color(0, 0, 0, 1)
+}

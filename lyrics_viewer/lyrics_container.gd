@@ -205,7 +205,9 @@ class TimeTag:
 			var elements := [TimeTag.create(text_.substr(0,k[0].get_start()))]
 			elements.append_array(k.map(func(v) : return TimeTag.create(v.get_string())))
 			return elements
-		return k.map(func(v) : return TimeTag.create(v.get_string()))
+		var result : Array[TimeTag] = []
+		result.assign(k.map(func(v) : return TimeTag.create(v.get_string())))
+		return result
 
 
 
