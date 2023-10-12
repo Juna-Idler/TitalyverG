@@ -1,7 +1,7 @@
 extends TextureRect
 
 
-const shader_material := preload("res://lyrics_viewer/karaoke_wipe_viewer/wipe_shader_material.tres")
+const shader_material := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_shader_material.tres")
 
 @onready var sub_viewport = $SubViewport
 @onready var control = $SubViewport/Control
@@ -62,6 +62,7 @@ func set_sleep():
 	
 
 func _ready():
+	texture = sub_viewport.get_texture()
 	material = shader_material.duplicate()
 
 

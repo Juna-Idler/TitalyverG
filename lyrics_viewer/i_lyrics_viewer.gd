@@ -17,7 +17,7 @@ func _set_user_offset(_offset : float) -> void:
 func _get_view_size() -> float:
 	return 0
 
-func _initialize(_view_parent : Container,_settings_parent : Container,_config : ConfigFile) -> bool:
+func _initialize(_view_parent : Control,_settings_parent : Control,_config : ConfigFile) -> bool:
 	return false
 
 func _terminalize() -> void:

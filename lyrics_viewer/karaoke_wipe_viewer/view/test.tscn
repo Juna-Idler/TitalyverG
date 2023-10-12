@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkc4d0hilfokv"]
+
+[ext_resource type="Script" path="res://lyrics_viewer/karaoke_wipe_viewer/view/test.gd" id="1_11bty"]
+[ext_resource type="PackedScene" uid="uid://c4b7l0w54wx1s" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_line.tscn" id="2_xu0sc"]
+
+[node name="test" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_11bty")
+
+[node name="WipeLine" parent="." instance=ExtResource("2_xu0sc")]
+offset_top = 31.0
+offset_right = 598.0
+offset_bottom = 316.0
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 391.0
+offset_right = 408.0
+offset_bottom = 477.0
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

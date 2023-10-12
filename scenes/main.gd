@@ -7,8 +7,6 @@ extends Control
 var settings := Settings.new()
 
 
-@onready var ruby_lyrics_view : RubyLyricsView = $RubyLyricsView
-
 @onready var popup_menu = $PopupMenu
 const MENU_ID_SETTINGS := 0
 const MENU_ID_ALWAYS_ON_TOP := 1
@@ -17,8 +15,8 @@ const MENU_ID_LOAD := 3
 const MENU_ID_RECEIVER := 4
 
 @onready var receiver : ReceiverManager = $receiver_manager
-
 @onready var image_manager : ImageManager = $image_manager
+@onready var lyrics_viewer_manager = %LyricsViewerManager
 
 
 var finders := LyricsFinders.new()
@@ -35,6 +33,8 @@ var playing : bool = false
 
 var time_offset : float = 0
 
+var time : float
+var user_offset : float
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -62,8 +62,7 @@ func _ready():
 	
 	image_manager.set_bg_color(settings.get_background_color())
 	settings.initialize_image_settings(image_manager)
-	
-	settings.initialize_ruby_lyrics_view_settings(ruby_lyrics_view)
+	settings.initialize_viewer_settings(lyrics_viewer_manager)
 	settings.initialize_finders_settings(finders)
 	settings.initialize_saver_settings(savers,$PopupMenu/PopupMenuSave)
 	settings.initialize_loader_settings(loaders,$PopupMenu/PopupMenuLoad)
@@ -71,16 +70,17 @@ func _ready():
 	reset_lyrics([input],0)
 
 	%SettingsWindow.initialize(
-			settings,ruby_lyrics_view,finders,
+			settings,
+			lyrics_viewer_manager,
+			finders,
 			savers,$PopupMenu/PopupMenuSave,
 			loaders,$PopupMenu/PopupMenuLoad,
 			image_manager,
 			receiver)
 
-
-func _process(delta):
-	ruby_lyrics_view.set_time_and_target_y(
-			ruby_lyrics_view.time + (delta if playing else 0))
+func _process(delta : float):
+	time += delta if playing else 0.0
+	lyrics_viewer_manager.set_time(time)
 
 
 func _on_button_pressed():
@@ -106,13 +106,16 @@ func _on_window_ui_right_clicked(position_):
 
 
 func _on_window_ui_wheel_moved(delta):
-	ruby_lyrics_view.user_y_offset += delta * 30
+	user_offset += delta * 30
+	lyrics_viewer_manager.set_user_offset(user_offset)
 
 func _on_window_ui_scroll_pad_dragging(delta):
-	ruby_lyrics_view.user_y_offset += delta * ruby_lyrics_view.layout_height / ruby_lyrics_view.size.y
+	user_offset += delta * lyrics_viewer_manager.get_view_size() / lyrics_viewer_manager.size.y
+	lyrics_viewer_manager.set_user_offset(user_offset)
 
 func _on_window_ui_middle_clicked():
-	ruby_lyrics_view.user_y_offset = 0
+	user_offset = 0
+	lyrics_viewer_manager.set_user_offset(0)
 
 
 func _on_popup_menu_id_pressed(id):
@@ -194,12 +197,13 @@ func _on_receiver_received(data : PlaybackData):
 	if data.playback_only or playback_data.same_song(data):
 		if data.playback_event & PlaybackData.PlaybackEvent.SEEK_FLAG:
 			var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
-			var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
-			ruby_lyrics_view.set_time_and_target_y(time + time_offset)
+			var new_time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0 - lyrics.at_tag_container.offset
+			time = new_time + time_offset
+			lyrics_viewer_manager.set_time(time)
 		return
 	playback_data = data
 	
-	ruby_lyrics_view.song_duration = data.duration
+	lyrics_viewer_manager.set_song_duration(data.duration)
 
 	find_lyrics_async(data)
 	image_manager.find_async(data.title,data.artists,data.album,data.file_path,data.meta_data)
@@ -212,8 +216,8 @@ func find_lyrics_async(data : PlaybackData):
 		if not result.is_empty():
 			if first:
 				var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
-				var time : float = data.seek_time + float(msec - data.time_of_day) / 1000.0
-				reset_lyrics(result,time)
+				var time_ : float = data.seek_time + float(msec - data.time_of_day) / 1000.0
+				reset_lyrics(result,time_)
 				first = false
 			else:
 				add_lyrics(result)
@@ -234,13 +238,15 @@ func _on_button_next_pressed():
 
 
 func reset_lyrics(lyrics_source : PackedStringArray,time_ : float):
-	ruby_lyrics_view.user_y_offset = 0
+	user_offset = 0
+	lyrics_viewer_manager.set_user_offset(0)
 	source_texts = lyrics_source.duplicate()
 	source_text_index = 0
 	lyrics = LyricsContainer.new(source_texts[0])
-	ruby_lyrics_view.lyrics = lyrics
-	ruby_lyrics_view.build()
-	ruby_lyrics_view.set_time_and_target_y(time_ + time_offset - lyrics.at_tag_container.offset)
+	lyrics_viewer_manager.set_lyrics(lyrics)
+	time = time_ + time_offset - lyrics.at_tag_container.offset
+	lyrics_viewer_manager.set_time(time)
+	
 	if source_texts.size() <= 1:
 		$LyricsCount.hide()
 	else:
@@ -264,11 +270,11 @@ func change_lyrics_source(index : int):
 	var old_offset := lyrics.at_tag_container.offset
 	source_text_index = index
 	lyrics = LyricsContainer.new(source_texts[source_text_index])
-	ruby_lyrics_view.lyrics = lyrics
-	ruby_lyrics_view.user_y_offset = 0
-	ruby_lyrics_view.build()
-	ruby_lyrics_view.set_time_and_target_y(ruby_lyrics_view.time
-			+ old_offset - lyrics.at_tag_container.offset)
+	lyrics_viewer_manager.set_lyrics(lyrics)
+	user_offset = 0
+	lyrics_viewer_manager.set_user_offset(0)
+	time += old_offset - lyrics.at_tag_container.offset
+	lyrics_viewer_manager.set_time(time)
 	$LyricsCount.text = "<%d/%d>" % [source_text_index + 1,source_texts.size()]
 
 
@@ -285,9 +291,10 @@ func _on_button_offset_toggled(button_pressed):
 	$HSlider.visible = button_pressed
 
 func _on_h_slider_value_changed(value):
-	ruby_lyrics_view.time -= time_offset
+	time -= time_offset
 	time_offset = value / 100.0
-	ruby_lyrics_view.time += time_offset
+	time += time_offset
+	lyrics_viewer_manager.set_time(time)
 
 func _on_h_slider_gui_input(event):
 	if event is InputEventMouseButton:

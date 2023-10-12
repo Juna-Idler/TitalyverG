@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://c6ax601gve5mx"]
+
+[ext_resource type="Script" path="res://lyrics_viewer/ruby_lyrics_view/settings/settings.gd" id="1_1fko8"]
+[ext_resource type="PackedScene" uid="uid://2eewjl0nd8t5" path="res://lyrics_viewer/ruby_lyrics_view/settings/display.tscn" id="2_tkyoe"]
+[ext_resource type="PackedScene" uid="uid://bybb8b0e1ppl8" path="res://lyrics_viewer/ruby_lyrics_view/settings/unsync.tscn" id="3_5o5rk"]
+
+[node name="settings" type="TabContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1fko8")
+
+[node name="Display" parent="." instance=ExtResource("2_tkyoe")]
+layout_mode = 2
+
+[node name="Unsync" parent="." instance=ExtResource("3_5o5rk")]
+visible = false
+layout_mode = 2

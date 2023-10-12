@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bybb8b0e1ppl8"]
 
-[ext_resource type="Script" path="res://settings/unsync.gd" id="1_igb42"]
+[ext_resource type="Script" path="res://lyrics_viewer/ruby_lyrics_view/settings/unsync.gd" id="1_igb42"]
 
 [node name="Unsync" type="MarginContainer"]
 anchors_preset = 15

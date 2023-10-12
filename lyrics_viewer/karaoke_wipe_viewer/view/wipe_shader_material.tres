@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cgyh2c8qwnyi5"]
 
-[ext_resource type="Shader" path="res://lyrics_viewer/karaoke_wipe_viewer/wipe_shader_material.gdshader" id="1_egw1g"]
+[ext_resource type="Shader" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_shader_material.gdshader" id="1_egw1g"]
 
 [resource]
 shader = ExtResource("1_egw1g")

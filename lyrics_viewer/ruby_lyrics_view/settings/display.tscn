@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://2eewjl0nd8t5"]
 
-[ext_resource type="Script" path="res://settings/display.gd" id="1_werp8"]
+[ext_resource type="Script" path="res://lyrics_viewer/ruby_lyrics_view/settings/display.gd" id="1_2lrt5"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_4a4g2"]
 resource_name = "Font"
@@ -15,7 +15,7 @@ theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
-script = ExtResource("1_werp8")
+script = ExtResource("1_2lrt5")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -191,6 +191,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
+disabled = true
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer"]
 layout_mode = 2

@@ -2,7 +2,7 @@ extends Control
 
 class_name WipeViewerLine
 
-const WipeUnit := preload("res://lyrics_viewer/karaoke_wipe_viewer/wipe_unit.tscn")
+const WipeUnit := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_unit.tscn")
 
 
 var font : Font
@@ -396,8 +396,6 @@ func layout_lyrics():
 	size.y = y
 
 
-
-	
 	pass
 
 
@@ -408,22 +406,12 @@ func set_time(_time : float):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS,false)
-	
-	font = load("res://fonts/ShipporiAntique-Medium.otf")
-	var lyrics := LyricsContainer.new("""@ruby_set=[｜][《][》]
-[00:00.00]test ｜文字列《もじれつ》[00:10.00]""")
-	set_lyrics(lyrics.lines[0],-1)
+
 	
 	pass # Replace with function body.
 
 
-var time_ : float = 0
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	time_ += _delta
-	if time_ > 10.0:
-		time_ = 0
-	for c in get_children():
-		c.set_time(time_)
+
 	pass
