@@ -10,7 +10,7 @@ const shader_material := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/w
 var timetable : PackedFloat64Array
 var x_table : PackedFloat64Array
 
-
+var invalid := true
 
 func initialize(block : Array[WipeViewerLine.MeasuredUnit],
 		font : Font,font_size : int,outline_size : int):
@@ -32,10 +32,18 @@ func initialize(block : Array[WipeViewerLine.MeasuredUnit],
 	size = Vector2(block[-1].x - x_start + block[-1].width + outline_size * 2,
 			font.get_height(font_size) + outline_size * 2)
 	sub_viewport.size = size
-	sub_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+#	sub_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	invalid = true
+
+func activate():
+	if invalid:
+		sub_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+		invalid = false
+	
 
 
 func set_time(time : float):
+	activate()
 	if time < timetable[0]:
 		(material as ShaderMaterial).set_shader_parameter("junction",0.0)
 	elif time > timetable[-1]:

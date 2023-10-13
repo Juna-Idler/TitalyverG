@@ -1,16 +1,16 @@
 [gd_scene load_steps=4 format=3 uid="uid://sbelna2t0k6g"]
 
-[ext_resource type="Material" uid="uid://cgyh2c8qwnyi5" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_shader_material.tres" id="1_trt28"]
-[ext_resource type="Script" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_unit.gd" id="2_su7f7"]
-[ext_resource type="Script" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_unit_draw.gd" id="3_pikg6"]
+[ext_resource type="Material" uid="uid://cgyh2c8qwnyi5" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_shader_material.tres" id="1_amqjk"]
+[ext_resource type="Script" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_unit.gd" id="2_xmn32"]
+[ext_resource type="Script" path="res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_unit_draw.gd" id="3_gesni"]
 
 [node name="WipeBaseUnit" type="TextureRect"]
-material = ExtResource("1_trt28")
+material = ExtResource("1_amqjk")
 offset_right = 256.0
 offset_bottom = 64.0
 expand_mode = 1
-stretch_mode = 4
-script = ExtResource("2_su7f7")
+stretch_mode = 2
+script = ExtResource("2_xmn32")
 
 [node name="SubViewport" type="SubViewport" parent="."]
 transparent_bg = true
@@ -22,4 +22,4 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
-script = ExtResource("3_pikg6")
+script = ExtResource("3_gesni")

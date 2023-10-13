@@ -31,7 +31,7 @@ var line_break : LineBreak.ILineBreak = LineBreak.JapaneaseLineBreak.new()
 
 class MeasuredUnit:
 	var x : float = 0
-	var y : float = 0
+	var rx : float = 0
 	var width : float = -1
 	var cluster : String
 	var start : float = -1
@@ -39,9 +39,6 @@ class MeasuredUnit:
 
 	func _init(c):
 		cluster = c
-	func set_xy(x_ : float,y_ : float):
-		x = x_
-		y = y_
 		
 	static func interpolate(units : Array[MeasuredUnit],start_ : float,end_ : float):
 		units[0].start = start_
@@ -158,6 +155,14 @@ class Unbreakable:
 	func get_right_ruby_buffer() -> float:
 		return width - (0.0 if ruby.is_empty() else (ruby.back().x - base[0].x + ruby.back().width))
 
+class DisplayedRuby:
+	var ruby : Array[MeasuredUnit]
+	var x : float
+	func _init(r : Array[MeasuredUnit],x_ : float):
+		ruby = r
+		x = x_
+
+
 var unbreakables : Array[Unbreakable] = []
 var ruby_blocks : Array[MeasuredRubyBlock] = []
 
@@ -252,12 +257,12 @@ func measure_lyrics():
 			ubx = 0
 		
 		if rb.ruby.is_empty():
-			rb.base[0].x = ubx
+			rb.base[0].rx = ubx
 			ub_base.append(rb.base[0])
 			ubx += rb.base[0].width
 			for i in range(1,rb.base.size()):
 				if line_break._is_link(rb.base[i-1].cluster,rb.base[i].cluster):
-					rb.base[i].x = ubx
+					rb.base[i].rx = ubx
 					ub_base.append(rb.base[i])
 					ubx += rb.base[i].width
 				else:
@@ -267,17 +272,17 @@ func measure_lyrics():
 					unbreakables.append(Unbreakable.new(ub_base,ub_ruby,width))
 					ub_base = []
 					ub_ruby = []
-					rb.base[i].x = 0
+					rb.base[i].rx = 0
 					ub_base.append(rb.base[i])
 					ubx = rb.base[i].width
 		else:
 			var rx : float = ubx + (rb.base_width - rb.ruby_width) / 2
 			for b in rb.base:
-				b.x = ubx
+				b.rx = ubx
 				ub_base.append(b)
 				ubx += b.width
 			for r in rb.ruby:
-				r.x = rx
+				r.rx = rx
 				ub_ruby.append(r)
 				rx += r.width
 
@@ -298,27 +303,34 @@ func ruby_align():
 func layout_lyrics():
 	if not font or unbreakables.is_empty():
 		return
+	
+	for c in get_children():
+		remove_child(c)
+		c.queue_free()
 
 	var y : float = 0
+	var width : float = 0 
 	
 	var ruby_height : float = font.get_height(font_ruby_size) + ruby_distance
 	var base_height : float = font.get_height(font_size) + line_height
 	
 	if unbreakables.is_empty():
-		custom_minimum_size = Vector2(1,base_height + no_ruby_space)
+		custom_minimum_size = Vector2(0,base_height + no_ruby_space)
 		return
 
 	var displayed_base : Array[MeasuredUnit] = []
-	var displayed_rubys : Array[Array] = [] #Array of Array[MeasuredUnit]
+	var displayed_rubys : Array[DisplayedRuby] = []
 
 	var ruby_padding : float = unbreakables[0].get_right_ruby_buffer()
 	for b in unbreakables[0].base:
+		b.x = b.rx
 		displayed_base.append(b)
 	if not unbreakables[0].ruby.is_empty():
 		var ruby : Array[MeasuredUnit] = []
 		for r in unbreakables[0].ruby:
+			r.x = r.rx
 			ruby.append(r)
-		displayed_rubys.append(ruby)
+		displayed_rubys.append(DisplayedRuby.new(ruby,0 + unbreakables[0].ruby[0].x))
 	var x := unbreakables[0].width
 
 	for i in range(1,unbreakables.size()):
@@ -334,69 +346,52 @@ func layout_lyrics():
 		if right > size.x - right_padding or (not unbreakable.ruby.is_empty()
 				and right - unbreakable.get_right_ruby_buffer() > size.x):
 			var base_y_distance := no_ruby_space if displayed_rubys.is_empty() else ruby_height
-			var by := base_y_distance + font.get_ascent(font_size)
-			var ry := font.get_ascent(font_ruby_size)
-			for b in displayed_base:
-				b.y = by
-			for rs in displayed_rubys:
-				for r in rs:
-					r.y = ry
-			var height = base_height + base_y_distance
 			var base := WipeUnit.instantiate()
 			add_child(base)
 			base.initialize(displayed_base,font,font_size,font_outline_size)
-			base.position = Vector2(displayed_base[0].x,y + base_y_distance)
-			for rs in displayed_rubys:
-				var displayed_ruby := rs as Array[MeasuredUnit]
+			base.position = Vector2(left_padding - font_outline_size,y + base_y_distance - font_outline_size)
+			for r in displayed_rubys:
 				var ruby := WipeUnit.instantiate()
 				add_child(ruby)
-				ruby.initialize(rs,font,font_ruby_size,font_ruby_outline_size)
-				ruby.position = Vector2(displayed_ruby[0].x,y)
+				ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_size)
+				ruby.position = Vector2(r.x,y)
 			
+			width = max(width,x)
 			x = 0
-			y += height
+			y += base_height + base_y_distance
 			displayed_base = []
 			displayed_rubys = []
 
-		for u in unbreakable.base:
-			u.x += x
-			displayed_base.append(u)
+		for b in unbreakable.base:
+			b.x = x + b.rx
+			displayed_base.append(b)
 
 		if not unbreakable.ruby.is_empty():
 			var ruby : Array[MeasuredUnit] = []
 			for r in unbreakable.ruby:
-				r.x += x
+				r.x = r.rx
 				ruby.append(r)
-			displayed_rubys.append(ruby)
+			displayed_rubys.append(DisplayedRuby.new(ruby,x + unbreakable.ruby[0].x))
 		
 		x += unbreakable.width
+	width = max(width,x)
 	
 	if not displayed_base.is_empty():
 		var base_y_distance := no_ruby_space if displayed_rubys.is_empty() else ruby_height
-		var by := base_y_distance + font.get_ascent(font_size)
-		var ry := font.get_ascent(font_ruby_size)
-		for b in displayed_base:
-			b.y = by
-		for rs in displayed_rubys:
-			for r in rs:
-				r.y = ry
 		var height = base_height + base_y_distance
 		var base := WipeUnit.instantiate()
 		add_child(base)
 		base.initialize(displayed_base,font,font_size,font_outline_size)
-		base.position = Vector2(left_padding,y + base_y_distance)
-		for rs in displayed_rubys:
-			var displayed_ruby := rs.duplicate() as Array[MeasuredUnit]
+		base.position = Vector2(left_padding - font_outline_size,y + base_y_distance - font_outline_size)
+		for r in displayed_rubys:
 			var ruby := WipeUnit.instantiate()
 			add_child(ruby)
-			ruby.initialize(displayed_ruby,font,font_ruby_size,font_ruby_outline_size)
-			ruby.position = Vector2(displayed_ruby[0].x,y)
-		
+			ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_size)
+			ruby.position = Vector2(r.x,y)
 		y += height
-	size.y = y
 
-
-	pass
+	size = Vector2(width,y)
+	custom_minimum_size = size
 
 
 func set_time(_time : float):
@@ -406,12 +401,4 @@ func set_time(_time : float):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-
-	
 	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
-
-	pass
