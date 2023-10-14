@@ -70,21 +70,34 @@ func _ready():
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS,false)
 	
 #	$WipeLine.font = load("res://fonts/ShipporiAntique-Medium.otf")
-	var test = """
-[00:33.96]｜[00:33.96]鈍《[00:33.96]に[00:34.13]ぶ》[00:34.33]く｜[00:34.54]光《[00:34.54]ひ[00:34.73]か》[00:34.98]る｜[00:35.08]邪悪《[00:35.08]じゃ[00:35.23]あ[00:35.39]く》[00:35.73]の｜[00:36.09]目《[00:36.09]め》[00:36.64]　
+	var test = \
+"""[00:33.96]｜[00:33.96]鈍《[00:33.96]に[00:34.13]ぶ》[00:34.33]く｜[00:34.54]光《[00:34.54]ひ[00:34.73]か》[00:34.98]る｜[00:35.08]邪悪《[00:35.08]じゃ[00:35.23]あ[00:35.39]く》[00:35.73]の｜[00:36.09]目《[00:36.09]め》[00:36.64]　
 [00:36.82]｜[00:36.82]迷《[00:36.82]ま[00:36.98]よ》[00:37.15]え[00:37.36]る｜[00:37.57]女神《[00:37.57]め[00:37.89]が[00:38.22]み》[00:38.43]　｜[00:38.65]突《[00:38.65]つ》[00:38.95]き｜[00:39.30]刺《[00:39.30]さ》[00:39.51]さ[00:39.67]る[00:40.50]　｜[00:41.81]哀《[00:41.81]か[00:41.97]な》[00:42.18]し[00:42.34]い｜[00:42.54]刃《[00:42.54]や[00:42.72]い[00:43.22]ば》[00:44.14]　
 @ruby_parent=｜
 @ruby_begin=《
 @ruby_end=》
 """
-#	var lyrics := LyricsContainer.new(LYRICS)
-	var lyrics := LyricsContainer.new(test)
-#	$WipeLine.set_lyrics(lyrics.lines[0],-1)
-#	$WipeLine.set_time(0)
+	var lyrics := LyricsContainer.new(LYRICS)
+
 	
-	$karaoke_wipe_view.font = load("res://fonts/ShipporiAntique-Medium.otf")
+	var param := WipeViewerLine.Parameter.new()
+	param.font = load("res://fonts/ShipporiAntique-Medium.otf")
+	param.font_size = 40
+	param.font_ruby_size = 20
+	param.font_outline_size = 4
+	param.font_ruby_outline_size = 2
+	param.horizontal_alignment = 0
+	param.left_padding = 16
+	param.right_padding = 16
+	param.ruby_distance = -12
+	$karaoke_wipe_view.parameter = param
 	$karaoke_wipe_view.set_lyrics(lyrics)
 	$karaoke_wipe_view.set_time(0)
+	
+	var test_lyrics := LyricsContainer.new(test)
+	$WipeLine.parameter = param
+	$WipeLine.set_lyrics(test_lyrics.lines[0],-1)
+	$WipeLine.set_time(0)
 	pass # Replace with function body.
 
 var time_ : float = 0
@@ -94,14 +107,12 @@ var pause : bool = true
 func _process(delta):
 	if not pause:
 		time_ += delta
-		if time_ > 40.0:
-			time_ = 33
 		$karaoke_wipe_view.set_time(time_)
 
 
 func _on_button_pressed():
 	pause = not pause
 	if not pause:
-		time_ = 33
+		time_ = 0
 		$karaoke_wipe_view.set_time(time_)
 

@@ -10,6 +10,7 @@ global uniform vec4 sleep_outline_color;
 global uniform vec4 standby_outline_color;
 global uniform vec4 active_outline_color;
 
+
 void fragment() {
 	vec4 tex = texture(TEXTURE,UV);
 	vec4 color;

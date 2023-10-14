@@ -5,21 +5,34 @@ class_name WipeViewerLine
 const WipeUnit := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_unit.tscn")
 
 
-var font : Font
+class Parameter:
+	var font : Font
 
-var font_size : int = 40
-var font_ruby_size : int = 20
+	var font_size : int
+	var font_ruby_size : int
 
-var font_outline_size : int = 4
-var font_ruby_outline_size : int = 2
+	var font_outline_size : int
+	var font_ruby_outline_size : int
 
-var ruby_distance : float
-var line_height : float
-var no_ruby_space : float
+	enum HorizontalAlignment {LEFT = 0,CENTER = 1,RIGHT = 2}
+	var horizontal_alignment : Parameter.HorizontalAlignment
+	
+	var left_padding : float
+	var right_padding : float
 
-var left_padding : float
-var right_padding : float
+	var line_height : float
+	var ruby_distance : float
+	var no_ruby_space : float
 
+	enum RubyAlignment {CENTER,SPACE121,SPACE010}
+	var alignment_ruby  : RubyAlignment
+
+	enum ParentAlignment {NOTHING,CENTER,SPACE121,SPACE010}
+	var alignment_parent  : ParentAlignment
+
+
+
+var parameter : Parameter = null
 
 
 var splitter : Callable = func(text : String) :
@@ -163,15 +176,18 @@ class DisplayedRuby:
 		x = x_
 
 
-var unbreakables : Array[Unbreakable] = []
 var ruby_blocks : Array[MeasuredRubyBlock] = []
+var unbreakables : Array[Unbreakable] = []
 
 var sync_mode : LyricsContainer.SyncMode
-var next_line_start_time : float
 
-func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time_ : float):
+var start_time : float
+var end_time : float
+
+
+func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 	sync_mode = line.sync_mode
-	next_line_start_time = next_line_start_time_
+	end_time = next_line_start_time
 	ruby_blocks = []
 	for u in line.units:
 		var bases : Array[MeasuredUnit] = []
@@ -193,13 +209,18 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time_ : float)
 			if index - 1 >= 0 and rubys[index - 1].end < 0:
 				rubys[index - 1].end = t.start_time
 		ruby_blocks.append(MeasuredRubyBlock.new(bases,rubys,u.get_start_time(),u.get_end_time()))
+	if ruby_blocks[-1].end >= 0:
+		end_time = ruby_blocks[-1].end
 
 	measure_lyrics()
 
 
 func measure_lyrics():
-	if not font or ruby_blocks.is_empty():
+	if not parameter or ruby_blocks.is_empty():
 		return
+	var font := parameter.font
+	var font_size := parameter.font_size
+	var font_ruby_size := parameter.font_ruby_size
 	
 	for rb in ruby_blocks:
 		rb.base_width = 0
@@ -221,7 +242,7 @@ func measure_lyrics():
 			elif next < 0:
 				ruby_blocks[i+1].start = rb.end
 		if not ruby_blocks.is_empty() and ruby_blocks[-1].end < 0:
-			ruby_blocks[-1].end = next_line_start_time
+			ruby_blocks[-1].end = end_time
 		
 		for i in range(1,ruby_blocks.size()):
 			if ruby_blocks[i].start < 0:
@@ -301,8 +322,18 @@ func ruby_align():
 
 
 func layout_lyrics():
-	if not font or unbreakables.is_empty():
+	if not parameter or unbreakables.is_empty():
 		return
+	var font := parameter.font
+	var font_size := parameter.font_size
+	var font_ruby_size := parameter.font_ruby_size
+	var ruby_distance := parameter.ruby_distance
+	var line_height := parameter.line_height
+	var no_ruby_space := parameter.no_ruby_space
+	var left_padding := parameter.left_padding
+	var right_padding := parameter.right_padding
+	var font_outline_size := parameter.font_outline_size
+	var font_ruby_outline_size := parameter.font_ruby_outline_size
 	
 	for c in get_children():
 		remove_child(c)
@@ -322,6 +353,7 @@ func layout_lyrics():
 	var displayed_rubys : Array[DisplayedRuby] = []
 
 	var ruby_padding : float = unbreakables[0].get_right_ruby_buffer()
+	
 	for b in unbreakables[0].base:
 		b.x = b.rx
 		displayed_base.append(b)
@@ -342,19 +374,20 @@ func layout_lyrics():
 			if padding < 0:
 				x -= padding
 			ruby_padding = unbreakable.get_right_ruby_buffer()
-		var right := x + unbreakable.width
+		var right := left_padding + x + unbreakable.width
 		if right > size.x - right_padding or (not unbreakable.ruby.is_empty()
 				and right - unbreakable.get_right_ruby_buffer() > size.x):
 			var base_y_distance := no_ruby_space if displayed_rubys.is_empty() else ruby_height
 			var base := WipeUnit.instantiate()
 			add_child(base)
 			base.initialize(displayed_base,font,font_size,font_outline_size)
-			base.position = Vector2(left_padding - font_outline_size,y + base_y_distance - font_outline_size)
+			var align_x := calculate_aligned_x(base)
+			base.position = Vector2(align_x - font_outline_size,y + base_y_distance - font_outline_size)
 			for r in displayed_rubys:
 				var ruby := WipeUnit.instantiate()
 				add_child(ruby)
 				ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_size)
-				ruby.position = Vector2(r.x,y)
+				ruby.position = Vector2(align_x + r.x - font_ruby_outline_size,y - font_ruby_outline_size)
 			
 			width = max(width,x)
 			x = 0
@@ -382,22 +415,63 @@ func layout_lyrics():
 		var base := WipeUnit.instantiate()
 		add_child(base)
 		base.initialize(displayed_base,font,font_size,font_outline_size)
-		base.position = Vector2(left_padding - font_outline_size,y + base_y_distance - font_outline_size)
+		var align_x := calculate_aligned_x(base)
+		base.position = Vector2(align_x - font_outline_size,y + base_y_distance - font_outline_size)
 		for r in displayed_rubys:
 			var ruby := WipeUnit.instantiate()
 			add_child(ruby)
 			ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_size)
-			ruby.position = Vector2(r.x,y)
+			ruby.position = Vector2(align_x + r.x - font_ruby_outline_size,y - font_ruby_outline_size)
 		y += height
 
-	size = Vector2(width,y)
-	custom_minimum_size = size
+	size.y = y
+	custom_minimum_size.y = y
+
+
+func calculate_aligned_x(base : Control) -> float:
+	match parameter.horizontal_alignment:
+		Parameter.HorizontalAlignment.LEFT:
+			return parameter.left_padding - parameter.font_outline_size * 2
+		Parameter.HorizontalAlignment.CENTER:
+			return (size.x - base.size.x) / 2
+		Parameter.HorizontalAlignment.RIGHT:
+			return size.x - base.size.x - parameter.font_outline_size * 2 - parameter.right_padding
+	assert(false)
+	return 0
 
 
 func set_time(_time : float):
 	for c in get_children():
 		c.set_time(_time)
+		
+
+#	var last_time := time
+#	time = time_
+#
+#
+#	var target_time_y_offset = get_target_y_offset()
+#	if target_time_y_offset == time_y_offset and time == last_time:
+#		return
+#
+#	var distance = abs(target_time_y_offset - time_y_offset)
+#	if distance > scroll_limit:
+#		var move : float = 0.0
+#		for i in limits.size() / 2.0:
+#			if distance <= limits[i*2]:
+#				move = limits[i*2+1]
+#				break
+#		if move == 0:
+#			move = distance
+#		time_y_offset += sign(target_time_y_offset - time_y_offset) * move
+#	else:
+#		time_y_offset = target_time_y_offset
+#	queue_redraw()
+
 	pass
+
+
+
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

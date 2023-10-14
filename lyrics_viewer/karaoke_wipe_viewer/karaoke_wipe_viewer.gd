@@ -1,16 +1,16 @@
 extends I_LyricsViewer
 
-const KaraokeWipeView := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/karaoke_wipe_view.tscn")
+const View := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/karaoke_wipe_view.tscn")
 
 var view : KaraokeWipeView = null
 var settings : Control = null
 
-func _set_lyrics(_lyrics : LyricsContainer) -> bool:
-	return false
+func _set_lyrics(lyrics : LyricsContainer) -> bool:
+	view.set_lyrics(lyrics)
+	return true
 
-func _set_time(_time : float) -> void:
-	return
-
+func _set_time(time : float) -> void:
+	view.set_time(time)
 
 func _set_song_duration(_duration : float) -> void:
 	return
@@ -24,10 +24,14 @@ func _get_view_size() -> float:
 func _set_view_visible(visible : bool):
 	view.visible = visible
 
-func _initialize(_view_parent : Control,_settings_parent : Control,_config : ConfigFile) -> bool:
-	view = KaraokeWipeView.instantiate()
-	_view_parent.add_child(view)
-	return false
+func _initialize(view_parent : Control,settings_parent : Control,config : ConfigFile) -> bool:
+	view = View.instantiate()
+	view_parent.add_child(view)
+	settings = Settings.instantiate()
+	settings_parent.add_child(settings)
+	initialize_settings(config)
+	settings.initialize(config,view)
+	return true
 
 func _terminalize() -> void:
 	if view:
@@ -38,4 +42,40 @@ func _terminalize() -> void:
 		settings.get_parent().remove_child(settings)
 		settings.queue_free()
 		settings = null
-	return
+
+func initialize_settings(config : ConfigFile):
+	if config.get_value("Font","is_system",true):
+		var font := SystemFont.new()
+		font.font_names = [config.get_value("Font","system_font","sans-serif")]
+		view.font = font
+	else:
+		view.font = load(config.get_value("Font","font_file",""))
+	
+	view.font_size = config.get_value("Font","size",32)
+	view.font_ruby_size = config.get_value("Font","ruby_size",16)
+	view.font_outline_width = config.get_value("Font","outline_width",0)
+	view.font_ruby_outline_width = config.get_value("Font","ruby_outline_width",0)
+	
+	view.font_sleep_color = config.get_value("Font","sleep_color",Color.GRAY)
+	view.font_sleep_outline_color = config.get_value("Font","sleep_outline_color",Color.BLACK)
+	view.font_active_color = config.get_value("Font","active_color",Color.WHITE)
+	view.font_active_outline_color = config.get_value("Font","active_outline_color",Color.RED)
+	view.font_standby_color = config.get_value("Font","standby_color",Color.LIGHT_GRAY)
+	view.font_standby_outline_color = config.get_value("Font","standby_outline_color",Color.BLUE)
+	
+
+	view.alignment_ruby = config.get_value("Adjust","alignment_ruby",0)
+	view.alignment_parent = config.get_value("Adjust","alignment_parent",0)
+	view.left_padding = config.get_value("Adjust","left_padding",16)
+	view.right_padding = config.get_value("Adjust","right_padding",16)
+	view.line_height = config.get_value("Adjust","line_height",0)
+	view.ruby_distance = config.get_value("Adjust","ruby_distance",0)
+	view.no_ruby_space = config.get_value("Adjust","no_ruby_space",0)
+	
+	view.horizontal_alignment = config.get_value("Display","horizontal_alignment",0)
+	view.active_back_color = config.get_value("Display","active_back_color",Color(0,0.25,0,0.25))
+
+	view.fade_in_time = config.get_value("Scroll","fade_in_time",0.5)
+	view.fade_out_time = config.get_value("Scroll","fade_out_time",0.5)
+	view.scroll_center = config.get_value("Scroll","scroll_center",true)
+	view.scrolling = config.get_value("Scroll","scrolling",false)

@@ -14,7 +14,7 @@ var invalid := true
 
 func initialize(block : Array[WipeViewerLine.MeasuredUnit],
 		font : Font,font_size : int,outline_size : int):
-	var x_start := block[0].x - outline_size
+	var x_start := block[0].x
 	var strings : PackedStringArray = []
 	var x_pos : PackedFloat32Array = []
 	for b in block:
@@ -57,16 +57,18 @@ func set_time(time : float):
 				break
 
 func set_fade_in(rate : float):
+	activate()
 	rate = clamp(rate,0.0,1.0)
 	(material as ShaderMaterial).set_shader_parameter("junction",-1.0 + rate)
 
 func set_fade_out(rate : float):
+	activate()
 	rate = clamp(rate,0.0,1.0)
 	(material as ShaderMaterial).set_shader_parameter("junction",1.0 + rate)
 
 func set_sleep():
+	activate()
 	(material as ShaderMaterial).set_shader_parameter("junction",-1.0)
-	
 	
 
 func _ready():
