@@ -40,8 +40,9 @@ func initialize_image_settings(image_manager : ImageManager):
 	image_manager.set_processor(config.get_value("Image","processor",""))
 
 func initialize_viewer_settings(viewer : LyricsViewerManager):
+	viewer.initialize_unsync_viewer(config)
 	var viewer_name : String = config.get_value("LyricsViewer","viewer",LyricsViewerManager.VIEWERS.keys()[0])
-	viewer.change_viewer(viewer_name,config)
+	viewer.change_sync_viewer(viewer_name,config)
 
 
 func initialize_finders_settings(finders : LyricsFinders):

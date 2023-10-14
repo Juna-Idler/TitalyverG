@@ -151,9 +151,9 @@ class Unbreakable:
 		ruby = r
 		width = w
 	func get_left_ruby_buffer() -> float:
-		return width if ruby.is_empty() else ruby[0].x - base[0].x
+		return width if ruby.is_empty() else ruby[0].rx - base[0].rx
 	func get_right_ruby_buffer() -> float:
-		return width - (0.0 if ruby.is_empty() else (ruby.back().x - base[0].x + ruby.back().width))
+		return width - (0.0 if ruby.is_empty() else (ruby[-1].rx - base[-1].rx + ruby[-1].width))
 
 class DisplayedRuby:
 	var ruby : Array[MeasuredUnit]

@@ -1,0 +1,66 @@
+[gd_scene load_steps=3 format=3 uid="uid://cccql60dopwgu"]
+
+[ext_resource type="Script" path="res://common_control/font_selector.gd" id="1_hatr2"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_4a4g2"]
+resource_name = "Font"
+
+[node name="FontSelector" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+alignment = 1
+script = ExtResource("1_hatr2")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "Typeface"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="CheckBoxFontFile" type="CheckBox" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+button_group = SubResource("ButtonGroup_4a4g2")
+
+[node name="ButtonFontFile" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FileDialog" type="FileDialog" parent="HBoxContainer/ButtonFontFile"]
+unique_name_in_owner = true
+title = "Open a File"
+size = Vector2i(600, 440)
+unresizable = true
+ok_button_text = "開く"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.ttf, *.ttc, *.otf, *.otc, *.woff, *.woff2 ; Font file")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="CheckBoxSysFont" type="CheckBox" parent="HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+button_group = SubResource("ButtonGroup_4a4g2")
+
+[node name="ButtonSysFont" type="OptionButton" parent="HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+action_mode = 1
+alignment = 1
+
+[connection signal="toggled" from="HBoxContainer/CheckBoxFontFile" to="." method="_on_check_box_font_file_toggled"]
+[connection signal="pressed" from="HBoxContainer/ButtonFontFile" to="." method="_on_button_font_file_pressed"]
+[connection signal="file_selected" from="HBoxContainer/ButtonFontFile/FileDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="toggled" from="HBoxContainer2/CheckBoxSysFont" to="." method="_on_check_box_sys_font_toggled"]
+[connection signal="item_selected" from="HBoxContainer2/ButtonSysFont" to="." method="_on_button_sys_font_item_selected"]

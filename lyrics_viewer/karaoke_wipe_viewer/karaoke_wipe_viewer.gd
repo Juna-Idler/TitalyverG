@@ -21,6 +21,9 @@ func _set_user_offset(_offset : float) -> void:
 func _get_view_size() -> float:
 	return 0
 
+func _set_view_visible(visible : bool):
+	view.visible = visible
+
 func _initialize(_view_parent : Control,_settings_parent : Control,_config : ConfigFile) -> bool:
 	view = KaraokeWipeView.instantiate()
 	_view_parent.add_child(view)

@@ -1,20 +1,355 @@
-[gd_scene load_steps=4 format=3 uid="uid://c6ax601gve5mx"]
+[gd_scene load_steps=4 format=3 uid="uid://2eewjl0nd8t5"]
 
 [ext_resource type="Script" path="res://lyrics_viewer/ruby_lyrics_view/settings/settings.gd" id="1_1fko8"]
-[ext_resource type="PackedScene" uid="uid://2eewjl0nd8t5" path="res://lyrics_viewer/ruby_lyrics_view/settings/display.tscn" id="2_tkyoe"]
-[ext_resource type="PackedScene" uid="uid://bybb8b0e1ppl8" path="res://lyrics_viewer/ruby_lyrics_view/settings/unsync.tscn" id="3_5o5rk"]
+[ext_resource type="PackedScene" uid="uid://cccql60dopwgu" path="res://common_control/font_selector.tscn" id="2_82gcl"]
 
-[node name="settings" type="TabContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[sub_resource type="ButtonGroup" id="ButtonGroup_u4b45"]
+resource_name = "horizontal"
+
+[node name="Display" type="MarginContainer"]
+offset_right = 600.0
+offset_bottom = 400.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 script = ExtResource("1_1fko8")
 
-[node name="Display" parent="." instance=ExtResource("2_tkyoe")]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 2
 
-[node name="Unsync" parent="." instance=ExtResource("3_5o5rk")]
-visible = false
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FontSelector" parent="ScrollContainer/VBoxContainer/HBoxContainer" instance=ExtResource("2_82gcl")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+columns = 3
+
+[node name="Space" type="Control" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="LabelSize" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Size"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="LabelOutline" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Outline"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="LabelRuby" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Ruby"
+
+[node name="SpinBoxRubySize" type="SpinBox" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 128.0
+value = 16.0
+alignment = 1
+
+[node name="SpinBoxRubyOutline" type="SpinBox" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 64.0
+alignment = 1
+
+[node name="LabelBase" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Base"
+
+[node name="SpinBoxBaseSize" type="SpinBox" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 256.0
+value = 32.0
+alignment = 1
+
+[node name="SpinBoxBaseOutline" type="SpinBox" parent="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 128.0
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Fill"
+horizontal_alignment = 1
+
+[node name="ColorPickerActiveFill" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerStandbyFill" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerSleepFill" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Stroke"
+horizontal_alignment = 1
+
+[node name="ColorPickerActiveStroke" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerStandbyStroke" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerSleepStroke" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Back"
+horizontal_alignment = 1
+
+[node name="ColorPickerActiveBack" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerBackground" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+disabled = true
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Horizontal"
+horizontal_alignment = 1
+
+[node name="ButtonLeft" type="Button" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_u4b45")
+text = "Left"
+
+[node name="ButtonCenter" type="Button" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_u4b45")
+text = "Center"
+
+[node name="ButtonRight" type="Button" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_u4b45")
+text = "Right"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Padding"
+horizontal_alignment = 1
+
+[node name="SpinBoxLeft" type="SpinBox" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="SpinBoxRight" type="SpinBox" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+columns = 4
+
+[node name="Label" type="Control" parent="ScrollContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Line Height"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Ruby Distance"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label4" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "No Ruby Space"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label5" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Adjust"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpinBoxLineHeight" type="SpinBox" parent="ScrollContainer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -256.0
+max_value = 256.0
+alignment = 1
+
+[node name="SpinBoxRubyDistance" type="SpinBox" parent="ScrollContainer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -128.0
+max_value = 128.0
+alignment = 1
+
+[node name="SpinBoxNoRubySpace" type="SpinBox" parent="ScrollContainer/VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -128.0
+max_value = 128.0
+alignment = 1
+
+[node name="HBoxContainer3" type="GridContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Scroll"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheckButtonScrollCenter" type="CheckBox" parent="ScrollContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Center"
+
+[node name="CheckButtonScrollContinuous" type="CheckBox" parent="ScrollContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Continuous"
+
+[node name="Label2" type="Label" parent="ScrollContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Fade In/Out"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpinBoxFadeIn" type="SpinBox" parent="ScrollContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 10.0
+step = 0.1
+value = 0.5
+alignment = 1
+
+[node name="SpinBoxFadeOut" type="SpinBox" parent="ScrollContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 10.0
+step = 0.1
+value = 0.5
+alignment = 1
+
+[connection signal="file_font_changed" from="ScrollContainer/VBoxContainer/HBoxContainer/FontSelector" to="." method="_on_font_selector_file_font_changed"]
+[connection signal="font_changed" from="ScrollContainer/VBoxContainer/HBoxContainer/FontSelector" to="." method="_on_font_selector_font_changed"]
+[connection signal="font_switched" from="ScrollContainer/VBoxContainer/HBoxContainer/FontSelector" to="." method="_on_font_selector_font_switched"]
+[connection signal="system_font_changed" from="ScrollContainer/VBoxContainer/HBoxContainer/FontSelector" to="." method="_on_font_selector_system_font_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer/SpinBoxRubySize" to="." method="_on_spin_box_ruby_size_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer/SpinBoxRubyOutline" to="." method="_on_spin_box_ruby_outline_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer/SpinBoxBaseSize" to="." method="_on_spin_box_base_size_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/HBoxContainer/GridContainer/SpinBoxBaseOutline" to="." method="_on_spin_box_base_outline_value_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer/ColorPickerActiveFill" to="." method="_on_color_picker_active_fill_color_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer/ColorPickerStandbyFill" to="." method="_on_color_picker_standby_fill_color_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer/ColorPickerSleepFill" to="." method="_on_color_picker_sleep_fill_color_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ColorPickerActiveStroke" to="." method="_on_color_picker_active_stroke_color_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ColorPickerStandbyStroke" to="." method="_on_color_picker_standby_stroke_color_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ColorPickerSleepStroke" to="." method="_on_color_picker_sleep_stroke_color_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/ColorPickerActiveBack" to="." method="_on_color_picker_active_back_color_changed"]
+[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/ColorPickerBackground" to="." method="_on_color_picker_background_color_changed"]
+[connection signal="toggled" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer/ButtonLeft" to="." method="_on_button_left_toggled"]
+[connection signal="toggled" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer/ButtonCenter" to="." method="_on_button_center_toggled"]
+[connection signal="toggled" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer/ButtonRight" to="." method="_on_button_right_toggled"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2/SpinBoxLeft" to="." method="_on_spin_box_left_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2/SpinBoxRight" to="." method="_on_spin_box_right_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/GridContainer/SpinBoxLineHeight" to="." method="_on_spin_box_line_height_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/GridContainer/SpinBoxRubyDistance" to="." method="_on_spin_box_ruby_distance_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/GridContainer/SpinBoxNoRubySpace" to="." method="_on_spin_box_no_ruby_space_value_changed"]
+[connection signal="toggled" from="ScrollContainer/VBoxContainer/HBoxContainer3/CheckButtonScrollCenter" to="." method="_on_check_button_scroll_center_toggled"]
+[connection signal="toggled" from="ScrollContainer/VBoxContainer/HBoxContainer3/CheckButtonScrollContinuous" to="." method="_on_check_button_scroll_continuous_toggled"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/HBoxContainer3/SpinBoxFadeIn" to="." method="_on_spin_box_fade_in_value_changed"]
+[connection signal="value_changed" from="ScrollContainer/VBoxContainer/HBoxContainer3/SpinBoxFadeOut" to="." method="_on_spin_box_fade_out_value_changed"]

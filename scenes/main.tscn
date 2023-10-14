@@ -244,6 +244,9 @@ size = Vector2i(100, 62)
 unique_name_in_owner = true
 visible = false
 
+[node name="OptionButton" parent="SettingsWindow/MarginContainer/VBoxContainer/TabContainer/Viewer/VBoxContainer/ConsoleContainer/HBoxContainer" index="0"]
+selected = -1
+
 [node name="LoaderWindow" type="Window" parent="."]
 visible = false
 exclusive = true

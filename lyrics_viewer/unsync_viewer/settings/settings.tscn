@@ -1,0 +1,150 @@
+[gd_scene load_steps=3 format=3 uid="uid://5v2rv7nnynkg"]
+
+[ext_resource type="Script" path="res://lyrics_viewer/unsync_viewer/settings/settings.gd" id="1_56eu8"]
+[ext_resource type="PackedScene" uid="uid://cccql60dopwgu" path="res://common_control/font_selector.tscn" id="2_dq1tq"]
+
+[node name="Unsync" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+script = ExtResource("1_56eu8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FontSelector" parent="VBoxContainer/HBoxContainer3" instance=ExtResource("2_dq1tq")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+columns = 3
+
+[node name="Space" type="Control" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+layout_mode = 2
+
+[node name="LabelSize" type="Label" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+layout_mode = 2
+text = "Size"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="LabelOutline" type="Label" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+layout_mode = 2
+text = "Outline"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="LabelRuby" type="Label" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+layout_mode = 2
+text = "Ruby"
+
+[node name="SpinBoxRubySize" type="SpinBox" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 128.0
+value = 16.0
+alignment = 1
+
+[node name="SpinBoxRubyOutline" type="SpinBox" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 64.0
+alignment = 1
+
+[node name="LabelBase" type="Label" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+layout_mode = 2
+text = "Base"
+
+[node name="SpinBoxBaseSize" type="SpinBox" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 256.0
+value = 32.0
+alignment = 1
+
+[node name="SpinBoxBaseOutline" type="SpinBox" parent="VBoxContainer/HBoxContainer3/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 128.0
+alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="Label" type="Control" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Fill"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Stroke"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label4" type="Label" parent="VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Color"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="ColorPickerUnsyncFill" type="ColorPickerButton" parent="VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(1, 1, 1, 1)
+
+[node name="ColorPickerUnsyncStroke" type="ColorPickerButton" parent="VBoxContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Scroll"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CheckButtonAutoScroll" type="CheckButton" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Auto Scroll"
+
+[connection signal="file_font_changed" from="VBoxContainer/HBoxContainer3/FontSelector" to="." method="_on_font_selector_file_font_changed"]
+[connection signal="font_changed" from="VBoxContainer/HBoxContainer3/FontSelector" to="." method="_on_font_selector_font_changed"]
+[connection signal="font_switched" from="VBoxContainer/HBoxContainer3/FontSelector" to="." method="_on_font_selector_font_switched"]
+[connection signal="system_font_changed" from="VBoxContainer/HBoxContainer3/FontSelector" to="." method="_on_font_selector_system_font_changed"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer3/GridContainer/SpinBoxRubySize" to="." method="_on_spin_box_ruby_size_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer3/GridContainer/SpinBoxRubyOutline" to="." method="_on_spin_box_ruby_outline_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer3/GridContainer/SpinBoxBaseSize" to="." method="_on_spin_box_base_size_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer3/GridContainer/SpinBoxBaseOutline" to="." method="_on_spin_box_base_outline_value_changed"]
+[connection signal="color_changed" from="VBoxContainer/GridContainer/ColorPickerUnsyncFill" to="." method="_on_color_picker_unsync_fill_color_changed"]
+[connection signal="color_changed" from="VBoxContainer/GridContainer/ColorPickerUnsyncStroke" to="." method="_on_color_picker_unsync_stroke_color_changed"]
+[connection signal="toggled" from="VBoxContainer/HBoxContainer/CheckButtonAutoScroll" to="." method="_on_check_button_auto_scroll_toggled"]

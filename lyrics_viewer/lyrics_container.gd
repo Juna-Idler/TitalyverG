@@ -97,7 +97,7 @@ class LyricsLine:
 		return units[0].force_get_start_time()
 
 	func get_end_time() -> float:
-		return units.back().get_end_time()
+		return units[-1].get_end_time()
 		
 	func force_get_end_time() -> float:
 		for i in range(units.size()-1,-1,-1):
@@ -153,8 +153,8 @@ class LyricsLine:
 			return start
 
 		func get_end_time() -> float:
-			var end = base.back().start_time if base.back().text.is_empty() else -1
-			var rend = ruby.back().start_time if not ruby.is_empty() and ruby.back().text.is_empty() else -1
+			var end = base[-1].start_time if base[-1].text.is_empty() else -1.0
+			var rend = ruby[-1].start_time if not ruby.is_empty() and ruby[-1].text.is_empty() else -1.0
 			if end >= 0:
 				if rend >= 0:
 					end = max(end,rend)

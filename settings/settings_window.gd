@@ -17,6 +17,9 @@ func get_settings() -> Settings:
 func get_viewer_parent() -> Control:
 	return %Viewer.get_node("VBoxContainer/ViewerContainer")
 
+func get_unsync_viewer_parent() -> Control:
+	return %Unsync
+
 func initialize(settings_ : Settings,
 		viewer : LyricsViewerManager,
 		finders : LyricsFinders,

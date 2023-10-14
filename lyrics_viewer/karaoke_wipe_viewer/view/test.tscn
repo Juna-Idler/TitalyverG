@@ -38,4 +38,15 @@ offset_top = 391.0
 offset_right = 408.0
 offset_bottom = 477.0
 
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Control" type="Control" parent="ScrollContainer"]
+layout_mode = 2
+
+[node name="Control2" type="Control" parent="ScrollContainer"]
+layout_mode = 2
+
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

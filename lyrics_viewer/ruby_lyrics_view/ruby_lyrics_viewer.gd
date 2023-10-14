@@ -4,7 +4,7 @@ const View := preload("res://lyrics_viewer/ruby_lyrics_view/view/ruby_lyrics_vie
 const Settings := preload("res://lyrics_viewer/ruby_lyrics_view/settings/settings.tscn")
 
 var view : RubyLyricsView
-var settings : RubyLyricsViewSettings
+var settings
 
 func _set_lyrics(lyrics : LyricsContainer) -> bool:
 	view.lyrics = lyrics
@@ -24,6 +24,9 @@ func _set_user_offset(offset : float) -> void:
 
 func _get_view_size() -> float:
 	return view.layout_height
+
+func _set_view_visible(visible : bool):
+	view.visible = visible
 
 func _initialize(view_parent : Control,settings_parent : Control,config : ConfigFile) -> bool:
 	view = View.instantiate()

@@ -12,7 +12,7 @@ func initialize(settings_ : Settings,viewer : LyricsViewerManager):
 	for i in LyricsViewerManager.VIEWERS.keys().size():
 		var key : String = LyricsViewerManager.VIEWERS.keys()[i]
 		option_button.add_item(key)
-		if key == viewer_manager.get_current_viewer_name():
+		if key == viewer_manager.get_current_sync_viewer_name():
 			option_button.select(i)
 			
 
