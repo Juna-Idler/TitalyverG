@@ -22,7 +22,6 @@ func initialize(config_ : ConfigFile,view : RubyLyricsView):
 	%SpinBoxBaseSize.value = view.font_size
 	%SpinBoxBaseOutline.value = view.font_outline_width
 	
-	
 	%ColorPickerActiveFill.color = view.font_active_color
 	%ColorPickerStandbyFill.color = view.font_standby_color
 	%ColorPickerSleepFill.color = view.font_sleep_color
@@ -35,20 +34,13 @@ func initialize(config_ : ConfigFile,view : RubyLyricsView):
 	
 	%ColorPickerBackground.color = config.get_value("Window","background_color",Color(0,0,0,0.8))
 	
-	match view.horizontal_alignment:
-		RubyLyricsView.HorizontalAlignment.LEFT:
-			%ButtonLeft.button_pressed = true
-		RubyLyricsView.HorizontalAlignment.CENTER:
-			%ButtonCenter.button_pressed = true
-		RubyLyricsView.HorizontalAlignment.RIGHT:
-			%ButtonRight.button_pressed = true
+	%HorizontalLayout.horizontal_alignment = view.horizontal_alignment as HorizontalLayoutSettings.Alignment
+	%HorizontalLayout.left_padding = view.left_padding
+	%HorizontalLayout.right_padding = view.right_padding
 
-	%SpinBoxLeft.value = view.left_padding
-	%SpinBoxRight.value = view.right_padding
-
-	%SpinBoxLineHeight.value = view.line_height
-	%SpinBoxRubyDistance.value = view.ruby_distance
-	%SpinBoxNoRubySpace.value = view.no_ruby_space
+	%LineHeightAdjust.line_height = view.line_height
+	%LineHeightAdjust.ruby_distance = view.ruby_distance
+	%LineHeightAdjust.no_ruby_space = view.no_ruby_space
 
 	%CheckButtonScrollCenter.button_pressed = view.scroll_center
 	%CheckButtonScrollContinuous.button_pressed = view.scrolling
@@ -110,43 +102,6 @@ func _on_color_picker_background_color_changed(color):
 #	background_color_changed.emit(color)
 
 
-func _on_button_left_toggled(button_pressed):
-	if button_pressed:
-		ruby_lyrics_view.horizontal_alignment = RubyLyricsView.HorizontalAlignment.LEFT
-		config.set_value("Display","horizontal_alignment",int(RubyLyricsView.HorizontalAlignment.LEFT))
-
-func _on_button_center_toggled(button_pressed):
-	if button_pressed:
-		ruby_lyrics_view.horizontal_alignment = RubyLyricsView.HorizontalAlignment.CENTER
-		config.set_value("Display","horizontal_alignment",int(RubyLyricsView.HorizontalAlignment.CENTER))
-
-func _on_button_right_toggled(button_pressed):
-	if button_pressed:
-		ruby_lyrics_view.horizontal_alignment = RubyLyricsView.HorizontalAlignment.RIGHT
-		config.set_value("Display","horizontal_alignment",int(RubyLyricsView.HorizontalAlignment.RIGHT))
-
-
-func _on_spin_box_left_value_changed(value):
-	ruby_lyrics_view.left_padding = value
-	config.set_value("Adjust","left_padding",value)
-
-func _on_spin_box_right_value_changed(value):
-	ruby_lyrics_view.right_padding = value
-	config.get_value("Adjust","right_padding",value)
-
-
-func _on_spin_box_line_height_value_changed(value):
-	ruby_lyrics_view.line_height = value
-	config.set_value("Adjust","line_height",value)
-
-func _on_spin_box_ruby_distance_value_changed(value):
-	ruby_lyrics_view.ruby_distance = value
-	config.set_value("Adjust","ruby_distance",value)
-
-func _on_spin_box_no_ruby_space_value_changed(value):
-	ruby_lyrics_view.no_ruby_space = value
-	config.set_value("Adjust","no_ruby_space",value)
-
 
 func _on_check_button_scroll_center_toggled(button_pressed):
 	ruby_lyrics_view.scroll_center = button_pressed
@@ -180,4 +135,36 @@ func _on_font_selector_system_font_changed(font_names):
 func _on_font_selector_file_font_changed(font_path):
 	config.set_value("Font","font_file",font_path)
 
+
+
+
+func _on_horizontal_layout_horizontal_alignment_changed(alignment : HorizontalLayoutSettings.Alignment):
+	var enum_number : int = alignment
+	ruby_lyrics_view.horizontal_alignment = enum_number as RubyLyricsView.HorizontalAlignment
+	config.set_value("Display","horizontal_alignment",enum_number)
+
+
+func _on_horizontal_layout_left_padding_changed(value):
+	ruby_lyrics_view.left_padding = value
+	config.set_value("Adjust","left_padding",value)
+
+
+func _on_horizontal_layout_right_padding_changed(value):
+	ruby_lyrics_view.right_padding = value
+	config.get_value("Adjust","right_padding",value)
+	pass # Replace with function body.
+
+
+
+func _on_line_height_adjust_line_height_changed(value):
+	ruby_lyrics_view.line_height = value
+	config.set_value("Adjust","line_height",value)
+
+func _on_line_height_adjust_no_ruby_space_changed(value):
+	ruby_lyrics_view.ruby_distance = value
+	config.set_value("Adjust","ruby_distance",value)
+
+func _on_line_height_adjust_ruby_distance_changed(value):
+	ruby_lyrics_view.no_ruby_space = value
+	config.set_value("Adjust","no_ruby_space",value)
 

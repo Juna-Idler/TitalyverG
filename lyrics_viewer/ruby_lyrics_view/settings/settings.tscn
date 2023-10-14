@@ -1,10 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://2eewjl0nd8t5"]
+[gd_scene load_steps=5 format=3 uid="uid://2eewjl0nd8t5"]
 
 [ext_resource type="Script" path="res://lyrics_viewer/ruby_lyrics_view/settings/settings.gd" id="1_1fko8"]
 [ext_resource type="PackedScene" uid="uid://cccql60dopwgu" path="res://common_control/font_selector.tscn" id="2_82gcl"]
-
-[sub_resource type="ButtonGroup" id="ButtonGroup_u4b45"]
-resource_name = "horizontal"
+[ext_resource type="PackedScene" uid="uid://t8wc7sjtcayd" path="res://common_control/horizontal_layout.tscn" id="3_fbuwg"]
+[ext_resource type="PackedScene" uid="uid://0lc2l5rkk60i" path="res://common_control/line_height_adjust.tscn" id="4_fseiu"]
 
 [node name="Display" type="MarginContainer"]
 offset_right = 600.0
@@ -160,122 +159,13 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 disabled = true
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer2"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "Horizontal"
-horizontal_alignment = 1
-
-[node name="ButtonLeft" type="Button" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+[node name="HorizontalLayout" parent="ScrollContainer/VBoxContainer" instance=ExtResource("3_fbuwg")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-toggle_mode = true
-button_pressed = true
-button_group = SubResource("ButtonGroup_u4b45")
-text = "Left"
 
-[node name="ButtonCenter" type="Button" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
+[node name="LineHeightAdjust" parent="ScrollContainer/VBoxContainer" instance=ExtResource("4_fseiu")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-toggle_mode = true
-button_group = SubResource("ButtonGroup_u4b45")
-text = "Center"
-
-[node name="ButtonRight" type="Button" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-toggle_mode = true
-button_group = SubResource("ButtonGroup_u4b45")
-text = "Right"
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer2"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "Padding"
-horizontal_alignment = 1
-
-[node name="SpinBoxLeft" type="SpinBox" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-alignment = 1
-
-[node name="SpinBoxRight" type="SpinBox" parent="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-alignment = 1
-
-[node name="GridContainer" type="GridContainer" parent="ScrollContainer/VBoxContainer"]
-layout_mode = 2
-columns = 4
-
-[node name="Label" type="Control" parent="ScrollContainer/VBoxContainer/GridContainer"]
-layout_mode = 2
-
-[node name="Label2" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "Line Height"
-horizontal_alignment = 1
-vertical_alignment = 2
-
-[node name="Label3" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "Ruby Distance"
-horizontal_alignment = 1
-vertical_alignment = 2
-
-[node name="Label4" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "No Ruby Space"
-horizontal_alignment = 1
-vertical_alignment = 2
-
-[node name="Label5" type="Label" parent="ScrollContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "Adjust"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SpinBoxLineHeight" type="SpinBox" parent="ScrollContainer/VBoxContainer/GridContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-min_value = -256.0
-max_value = 256.0
-alignment = 1
-
-[node name="SpinBoxRubyDistance" type="SpinBox" parent="ScrollContainer/VBoxContainer/GridContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-min_value = -128.0
-max_value = 128.0
-alignment = 1
-
-[node name="SpinBoxNoRubySpace" type="SpinBox" parent="ScrollContainer/VBoxContainer/GridContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-min_value = -128.0
-max_value = 128.0
-alignment = 1
 
 [node name="HBoxContainer3" type="GridContainer" parent="ScrollContainer/VBoxContainer"]
 layout_mode = 2
@@ -341,14 +231,12 @@ alignment = 1
 [connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ColorPickerSleepStroke" to="." method="_on_color_picker_sleep_stroke_color_changed"]
 [connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/ColorPickerActiveBack" to="." method="_on_color_picker_active_back_color_changed"]
 [connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/ColorPickerBackground" to="." method="_on_color_picker_background_color_changed"]
-[connection signal="toggled" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer/ButtonLeft" to="." method="_on_button_left_toggled"]
-[connection signal="toggled" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer/ButtonCenter" to="." method="_on_button_center_toggled"]
-[connection signal="toggled" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer/ButtonRight" to="." method="_on_button_right_toggled"]
-[connection signal="value_changed" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2/SpinBoxLeft" to="." method="_on_spin_box_left_value_changed"]
-[connection signal="value_changed" from="ScrollContainer/VBoxContainer/VBoxContainer2/HBoxContainer2/SpinBoxRight" to="." method="_on_spin_box_right_value_changed"]
-[connection signal="value_changed" from="ScrollContainer/VBoxContainer/GridContainer/SpinBoxLineHeight" to="." method="_on_spin_box_line_height_value_changed"]
-[connection signal="value_changed" from="ScrollContainer/VBoxContainer/GridContainer/SpinBoxRubyDistance" to="." method="_on_spin_box_ruby_distance_value_changed"]
-[connection signal="value_changed" from="ScrollContainer/VBoxContainer/GridContainer/SpinBoxNoRubySpace" to="." method="_on_spin_box_no_ruby_space_value_changed"]
+[connection signal="horizontal_alignment_changed" from="ScrollContainer/VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_horizontal_alignment_changed"]
+[connection signal="left_padding_changed" from="ScrollContainer/VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_left_padding_changed"]
+[connection signal="right_padding_changed" from="ScrollContainer/VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_right_padding_changed"]
+[connection signal="line_height_changed" from="ScrollContainer/VBoxContainer/LineHeightAdjust" to="." method="_on_line_height_adjust_line_height_changed"]
+[connection signal="no_ruby_space_changed" from="ScrollContainer/VBoxContainer/LineHeightAdjust" to="." method="_on_line_height_adjust_no_ruby_space_changed"]
+[connection signal="ruby_distance_changed" from="ScrollContainer/VBoxContainer/LineHeightAdjust" to="." method="_on_line_height_adjust_ruby_distance_changed"]
 [connection signal="toggled" from="ScrollContainer/VBoxContainer/HBoxContainer3/CheckButtonScrollCenter" to="." method="_on_check_button_scroll_center_toggled"]
 [connection signal="toggled" from="ScrollContainer/VBoxContainer/HBoxContainer3/CheckButtonScrollContinuous" to="." method="_on_check_button_scroll_continuous_toggled"]
 [connection signal="value_changed" from="ScrollContainer/VBoxContainer/HBoxContainer3/SpinBoxFadeIn" to="." method="_on_spin_box_fade_in_value_changed"]

@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://5v2rv7nnynkg"]
+[gd_scene load_steps=5 format=3 uid="uid://5v2rv7nnynkg"]
 
 [ext_resource type="Script" path="res://lyrics_viewer/unsync_viewer/settings/settings.gd" id="1_56eu8"]
 [ext_resource type="PackedScene" uid="uid://cccql60dopwgu" path="res://common_control/font_selector.tscn" id="2_dq1tq"]
+[ext_resource type="PackedScene" uid="uid://t8wc7sjtcayd" path="res://common_control/horizontal_layout.tscn" id="3_v7r13"]
+[ext_resource type="PackedScene" uid="uid://0lc2l5rkk60i" path="res://common_control/line_height_adjust.tscn" id="4_mrqnj"]
 
 [node name="Unsync" type="MarginContainer"]
 anchors_preset = 15
@@ -122,6 +124,14 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="HorizontalLayout" parent="VBoxContainer" instance=ExtResource("3_v7r13")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LineHeightAdjust" parent="VBoxContainer" instance=ExtResource("4_mrqnj")]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
@@ -147,4 +157,10 @@ text = "Auto Scroll"
 [connection signal="value_changed" from="VBoxContainer/HBoxContainer3/GridContainer/SpinBoxBaseOutline" to="." method="_on_spin_box_base_outline_value_changed"]
 [connection signal="color_changed" from="VBoxContainer/GridContainer/ColorPickerUnsyncFill" to="." method="_on_color_picker_unsync_fill_color_changed"]
 [connection signal="color_changed" from="VBoxContainer/GridContainer/ColorPickerUnsyncStroke" to="." method="_on_color_picker_unsync_stroke_color_changed"]
+[connection signal="horizontal_alignment_changed" from="VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_horizontal_alignment_changed"]
+[connection signal="left_padding_changed" from="VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_left_padding_changed"]
+[connection signal="right_padding_changed" from="VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_right_padding_changed"]
+[connection signal="line_height_changed" from="VBoxContainer/LineHeightAdjust" to="." method="_on_line_height_adjust_line_height_changed"]
+[connection signal="no_ruby_space_changed" from="VBoxContainer/LineHeightAdjust" to="." method="_on_line_height_adjust_no_ruby_space_changed"]
+[connection signal="ruby_distance_changed" from="VBoxContainer/LineHeightAdjust" to="." method="_on_line_height_adjust_ruby_distance_changed"]
 [connection signal="toggled" from="VBoxContainer/HBoxContainer/CheckButtonAutoScroll" to="." method="_on_check_button_auto_scroll_toggled"]

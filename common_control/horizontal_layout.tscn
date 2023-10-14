@@ -1,0 +1,77 @@
+[gd_scene load_steps=3 format=3 uid="uid://t8wc7sjtcayd"]
+
+[ext_resource type="Script" path="res://common_control/horizontal_layout.gd" id="1_uqycy"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_u4b45"]
+resource_name = "horizontal"
+
+[node name="HorizontalLayout" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uqycy")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Horizontal"
+horizontal_alignment = 1
+
+[node name="ButtonLeft" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_u4b45")
+text = "Left"
+
+[node name="ButtonCenter" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_u4b45")
+text = "Center"
+
+[node name="ButtonRight" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("ButtonGroup_u4b45")
+text = "Right"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Padding"
+horizontal_alignment = 1
+
+[node name="SpinBoxLeft" type="SpinBox" parent="HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1000.0
+alignment = 1
+
+[node name="SpinBoxRight" type="SpinBox" parent="HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1000.0
+alignment = 1
+
+[connection signal="toggled" from="HBoxContainer/ButtonLeft" to="." method="_on_button_left_toggled"]
+[connection signal="toggled" from="HBoxContainer/ButtonCenter" to="." method="_on_button_center_toggled"]
+[connection signal="toggled" from="HBoxContainer/ButtonRight" to="." method="_on_button_right_toggled"]
+[connection signal="value_changed" from="HBoxContainer2/SpinBoxLeft" to="." method="_on_spin_box_left_value_changed"]
+[connection signal="value_changed" from="HBoxContainer2/SpinBoxRight" to="." method="_on_spin_box_right_value_changed"]

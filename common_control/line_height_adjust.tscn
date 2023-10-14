@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3 uid="uid://0lc2l5rkk60i"]
+
+[ext_resource type="Script" path="res://common_control/line_height_adjust.gd" id="1_inb0c"]
+
+[node name="LineHeightAdjust" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_inb0c")
+
+[node name="Label" type="Label" parent="."]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Adjust"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+columns = 3
+
+[node name="Label2" type="Label" parent="GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Line Height"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Ruby Distance"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label4" type="Label" parent="GridContainer"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "No Ruby Space"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="SpinBoxLineHeight" type="SpinBox" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -256.0
+max_value = 256.0
+alignment = 1
+
+[node name="SpinBoxRubyDistance" type="SpinBox" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -128.0
+max_value = 128.0
+alignment = 1
+
+[node name="SpinBoxNoRubySpace" type="SpinBox" parent="GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -128.0
+max_value = 128.0
+alignment = 1
+
+[connection signal="value_changed" from="GridContainer/SpinBoxLineHeight" to="." method="_on_spin_box_line_height_value_changed"]
+[connection signal="value_changed" from="GridContainer/SpinBoxRubyDistance" to="." method="_on_spin_box_ruby_distance_value_changed"]
+[connection signal="value_changed" from="GridContainer/SpinBoxNoRubySpace" to="." method="_on_spin_box_no_ruby_space_value_changed"]

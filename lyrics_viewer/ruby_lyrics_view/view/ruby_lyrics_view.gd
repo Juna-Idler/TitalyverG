@@ -111,7 +111,7 @@ enum ParentAlignment {NOTHING,CENTER,SPACE121,SPACE010}
 
 @export_group("Display")
 
-enum HorizontalAlignment {LEFT,CENTER,RIGHT}
+enum HorizontalAlignment {LEFT = 0,CENTER = 1,RIGHT = 2}
 @export var horizontal_alignment : RubyLyricsView.HorizontalAlignment :
 	set(v):
 		horizontal_alignment = v

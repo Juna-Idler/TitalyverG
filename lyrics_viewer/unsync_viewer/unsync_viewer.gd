@@ -76,3 +76,4 @@ func initialize_settings(config : ConfigFile):
 	view.horizontal_alignment = config.get_value("Unsync","horizontal_alignment",0)
 	view.unsync_auto_scroll = config.get_value("Unsync","auto_scroll",true)
 
+
