@@ -84,8 +84,8 @@ func _ready():
 	param.font = load("res://fonts/ShipporiAntique-Medium.otf")
 	param.font_size = 40
 	param.font_ruby_size = 20
-	param.font_outline_size = 4
-	param.font_ruby_outline_size = 2
+	param.font_outline_width = 4
+	param.font_ruby_outline_width = 2
 	param.horizontal_alignment = 0
 	param.left_padding = 16
 	param.right_padding = 16

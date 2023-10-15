@@ -14,7 +14,6 @@ var scrolling : bool = false
 var user_offset : float = 0.0
 
 const WipeLine := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/wipe_line.tscn")
-var lyrics : LyricsContainer
 
 
 @onready var control = $Control
@@ -23,6 +22,11 @@ var lines : Array[WipeViewerLine]
 
 var layout_height : float
 
+var active_top_index : int = 0
+var active_bottom_index : int = 0
+
+var active_top_rate : float
+var active_bottom_rate : float
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -38,95 +42,98 @@ func set_font(font_ : Font):
 	for l in lines:
 		l.measure_lyrics()
 
-func set_lyrics(lyrics_ : LyricsContainer) -> bool:
+func set_lyrics(lyrics : LyricsContainer) -> bool:
 	for c in control.get_children():
 		control.remove_child(c)
 		c.queue_free()
 	lines.clear()
-	lyrics = lyrics_
+	
+	var lyrics_lines : Array[LyricsContainer.LyricsLine] = []
+#	lyrics_lines.append(LyricsContainer.LyricsLine.create_from_time_tag(LyricsContainer.TimeTag.new(0,"")))
+	for l in lyrics.lines:
+		if l.sync_mode == LyricsContainer.SyncMode.UNSYNC:
+			continue
+		lyrics_lines.append(l)
+	lyrics_lines.append(LyricsContainer.LyricsLine.create_from_time_tag(LyricsContainer.TimeTag.new((99*60+59) + 0.99,"")))
+	
 	var y := 0.0
-	for i in range(lyrics.lines.size() - 1):
+	for i in range(lyrics_lines.size() - 1):
 		var wl : WipeViewerLine = WipeLine.instantiate()
 		wl.size = Vector2(size.x,0)
 		wl.position = Vector2(0,y)
 		control.add_child(wl)
 		lines.append(wl)
 		wl.parameter = parameter
-		wl.set_lyrics(lyrics.lines[i],lyrics.lines[i+1].get_start_time())
+		wl.set_lyrics(lyrics_lines[i],lyrics_lines[i+1].get_start_time())
 		y += wl.size.y
-	var wl : WipeViewerLine = WipeLine.instantiate()
-	wl.size = Vector2(size.x,0)
-	wl.position = Vector2(0,y)
-	control.add_child(wl)
-	lines.append(wl)
-	wl.parameter = parameter
-	wl.set_lyrics(lyrics.lines[-1],(99*60+59) + 0.99)
-	layout_height = y + wl.size.y
+	layout_height = y
 	control.size.y = layout_height
 	control.custom_minimum_size.y = control.size.y
 	return true
 
 
 func set_time(time : float):
-	var y := _calculate_time_y_offset(time) + user_offset
-	var top_y := y - size.y / 2
-	var bottom_y := y + size.y / 2
+	_calculate_active_line(time)
 	for l in lines:
 		l.set_time(time)
+	
+	var top := lines[active_top_index].position.y + lines[active_top_index].size.y * active_top_rate
+	if scroll_center:
+		var bottom := lines[active_bottom_index].position.y + lines[active_bottom_index].size.y * active_bottom_rate
+		control.position.y = (size.y - (top + bottom)) / 2
+	else:
+		control.position.y = -top
 
 
-func _calculate_time_y_offset(c_time : float) -> float:
-	var active_top : float = 0
-	var active_bottom : float = 0
-	var y := 0.0
+func _calculate_active_line(c_time : float):
 	if scrolling:
 		for i in lines.size():
 			var line := lines[i]
 			if c_time <= line.end_time:
-				if c_time < line.start_time:
-					active_top = y
-				else:
+				active_top_index = i
+				if c_time >= line.start_time:
 					var duration : float = line.end_time - line.start_time
 					var rate := (c_time - line.start_time) / duration if duration > 0.0 else 0.0
-					active_top = y + line.size.y * rate
+					active_top_rate = rate
+				else:
+					active_top_rate = 0
 				break
-			y += line.size.y
-		y = layout_height
 		for i in range(lines.size() - 1,0,-1):
 			var line := lines[i]
-			y -= line.size.y
 			if c_time >= line.start_time:
 				var duration : float = line.end_time - line.start_time
 				var rate := (c_time - line.start_time) / duration if duration > 0.0 else 1.0
-				active_bottom = y + line.size.y * rate
+				active_bottom_index = i
+				active_bottom_rate = rate
 				break
 	else:
 		for i in lines.size():
 			var line := lines[i]
 			if c_time <= line.end_time:
 				var duration : float = min(line.end_time - line.start_time,fade_in_time)
+				active_top_index = i
 				if c_time > line.end_time - duration:
 					var rate := (c_time - (line.end_time - duration)) / duration if duration > 0.0 else 0.0
-					active_top = y + line.size.y * rate
+					active_top_rate = rate
 				else:
-					active_top = y
+					active_top_rate = 0
 				break
-			y += line.size.y
-		y = layout_height
 		for i in range(lines.size() - 1,0,-1):
 			var line := lines[i]
-			y -= line.size.y
 			var prev := lines[i-1]
 			var duration : float = min(prev.end_time - prev.start_time,fade_in_time)
 			if c_time >= line.start_time - duration:
+				active_bottom_index = i
 				if c_time < line.start_time:
 					var rate := (c_time - (line.start_time - duration)) / duration  if duration > 0.0 else 1.0
-					active_bottom = y + line.size.y * rate
+					active_bottom_rate = rate
 				else:
-					active_bottom = y + line.size.y
+					active_bottom_rate = 1
 				break
-	return -(active_top + active_bottom) / 2
 
+
+func set_user_offset(offset : float):
+	user_offset = offset
 
 
 func _on_resized():
@@ -141,4 +148,12 @@ func _on_resized():
 		layout_height = y
 		control.size.y = layout_height
 		control.custom_minimum_size.y = control.size.y
+
+		if not lines.is_empty():
+			var top := lines[active_top_index].position.y + lines[active_top_index].size.y * active_top_rate
+			if scroll_center:
+				var bottom := lines[active_bottom_index].position.y + lines[active_bottom_index].size.y * active_bottom_rate
+				control.position.y = (size.y - (top + bottom)) / 2
+			else:
+				control.position.y = -top
 

@@ -22,17 +22,17 @@ func initialize(config_ : ConfigFile,view : KaraokeWipeView):
 	%SpinBoxBaseSize.value = view.parameter.font_size
 	%SpinBoxBaseOutline.value = view.parameter.font_outline_width
 	
-	%ColorPickerActiveFill.color = view.font_active_color
-	%ColorPickerStandbyFill.color = view.font_standby_color
-	%ColorPickerSleepFill.color = view.font_sleep_color
+#	%ColorPickerActiveFill.color = view.font_active_color
+#	%ColorPickerStandbyFill.color = view.font_standby_color
+#	%ColorPickerSleepFill.color = view.font_sleep_color
+#
+#	%ColorPickerActiveStroke.color = view.font_active_outline_color
+#	%ColorPickerStandbyStroke.color = view.font_standby_outline_color
+#	%ColorPickerSleepStroke.color = view.font_sleep_outline_color
 	
-	%ColorPickerActiveStroke.color = view.font_active_outline_color
-	%ColorPickerStandbyStroke.color = view.font_standby_outline_color
-	%ColorPickerSleepStroke.color = view.font_sleep_outline_color
+#	%ColorPickerActiveBack.color = view.active_back_color
 	
-	%ColorPickerActiveBack.color = view.active_back_color
-	
-	%ColorPickerBackground.color = config.get_value("Window","background_color",Color(0,0,0,0.8))
+#	%ColorPickerBackground.color = config.get_value("Window","background_color",Color(0,0,0,0.8))
 	
 	%HorizontalLayout.horizontal_alignment = view.parameter.horizontal_alignment as HorizontalLayoutSettings.Alignment
 	%HorizontalLayout.left_padding = view.parameter.left_padding

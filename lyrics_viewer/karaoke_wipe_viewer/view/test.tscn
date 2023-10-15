@@ -23,6 +23,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="WipeLine" parent="." instance=ExtResource("2_xu0sc")]
+visible = false
 offset_top = 31.0
 offset_right = 598.0
 offset_bottom = 316.0

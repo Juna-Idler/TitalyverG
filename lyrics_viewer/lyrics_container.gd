@@ -36,7 +36,7 @@ class LyricsLine:
 	var units : Array[Unit] # of LyricsLine.Unit
 	var sync_mode : SyncMode
 	
-	func _init(u,sm):
+	func _init(u : Array[Unit],sm : SyncMode):
 		units = u
 		sync_mode = sm
 	
@@ -110,7 +110,7 @@ class LyricsLine:
 		var base : Array[TimeTag] # of TimeTag
 		var ruby : Array[TimeTag] # of TimeTag
 		
-		func _init(b,r):
+		func _init(b : Array[TimeTag],r : Array[TimeTag]):
 			base = b
 			ruby = r
 		

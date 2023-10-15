@@ -11,8 +11,8 @@ class Parameter:
 	var font_size : int
 	var font_ruby_size : int
 
-	var font_outline_size : int
-	var font_ruby_outline_size : int
+	var font_outline_width : int
+	var font_ruby_outline_width : int
 
 	enum HorizontalAlignment {LEFT = 0,CENTER = 1,RIGHT = 2}
 	var horizontal_alignment : Parameter.HorizontalAlignment
@@ -187,7 +187,10 @@ var end_time : float
 
 func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 	sync_mode = line.sync_mode
-	end_time = next_line_start_time
+	start_time = line.get_start_time()
+	end_time = line.get_end_time()
+	if end_time < 0 or end_time == start_time:
+		end_time = next_line_start_time
 	ruby_blocks = []
 	for u in line.units:
 		var bases : Array[MeasuredUnit] = []
@@ -209,8 +212,6 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 			if index - 1 >= 0 and rubys[index - 1].end < 0:
 				rubys[index - 1].end = t.start_time
 		ruby_blocks.append(MeasuredRubyBlock.new(bases,rubys,u.get_start_time(),u.get_end_time()))
-	if ruby_blocks[-1].end >= 0:
-		end_time = ruby_blocks[-1].end
 
 	measure_lyrics()
 
@@ -332,8 +333,8 @@ func layout_lyrics():
 	var no_ruby_space := parameter.no_ruby_space
 	var left_padding := parameter.left_padding
 	var right_padding := parameter.right_padding
-	var font_outline_size := parameter.font_outline_size
-	var font_ruby_outline_size := parameter.font_ruby_outline_size
+	var font_outline_width := parameter.font_outline_width
+	var font_ruby_outline_width := parameter.font_ruby_outline_width
 	
 	for c in get_children():
 		remove_child(c)
@@ -380,14 +381,14 @@ func layout_lyrics():
 			var base_y_distance := no_ruby_space if displayed_rubys.is_empty() else ruby_height
 			var base := WipeUnit.instantiate()
 			add_child(base)
-			base.initialize(displayed_base,font,font_size,font_outline_size)
+			base.initialize(displayed_base,font,font_size,font_outline_width)
 			var align_x := calculate_aligned_x(base)
-			base.position = Vector2(align_x - font_outline_size,y + base_y_distance - font_outline_size)
+			base.position = Vector2(align_x - font_outline_width,y + base_y_distance - font_outline_width)
 			for r in displayed_rubys:
 				var ruby := WipeUnit.instantiate()
 				add_child(ruby)
-				ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_size)
-				ruby.position = Vector2(align_x + r.x - font_ruby_outline_size,y - font_ruby_outline_size)
+				ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_width)
+				ruby.position = Vector2(align_x + r.x - font_ruby_outline_width,y - font_ruby_outline_width)
 			
 			width = max(width,x)
 			x = 0
@@ -414,14 +415,14 @@ func layout_lyrics():
 		var height = base_height + base_y_distance
 		var base := WipeUnit.instantiate()
 		add_child(base)
-		base.initialize(displayed_base,font,font_size,font_outline_size)
+		base.initialize(displayed_base,font,font_size,font_outline_width)
 		var align_x := calculate_aligned_x(base)
-		base.position = Vector2(align_x - font_outline_size,y + base_y_distance - font_outline_size)
+		base.position = Vector2(align_x - font_outline_width,y + base_y_distance - font_outline_width)
 		for r in displayed_rubys:
 			var ruby := WipeUnit.instantiate()
 			add_child(ruby)
-			ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_size)
-			ruby.position = Vector2(align_x + r.x - font_ruby_outline_size,y - font_ruby_outline_size)
+			ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_width)
+			ruby.position = Vector2(align_x + r.x - font_ruby_outline_width,y - font_ruby_outline_width)
 		y += height
 
 	size.y = y
@@ -431,11 +432,11 @@ func layout_lyrics():
 func calculate_aligned_x(base : Control) -> float:
 	match parameter.horizontal_alignment:
 		Parameter.HorizontalAlignment.LEFT:
-			return parameter.left_padding - parameter.font_outline_size * 2
+			return parameter.left_padding - parameter.font_outline_width * 2
 		Parameter.HorizontalAlignment.CENTER:
 			return (size.x - base.size.x) / 2
 		Parameter.HorizontalAlignment.RIGHT:
-			return size.x - base.size.x - parameter.font_outline_size * 2 - parameter.right_padding
+			return size.x - base.size.x - parameter.font_outline_width * 2 - parameter.right_padding
 	assert(false)
 	return 0
 

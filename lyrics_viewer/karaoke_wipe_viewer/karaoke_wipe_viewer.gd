@@ -1,6 +1,7 @@
 extends I_LyricsViewer
 
 const View := preload("res://lyrics_viewer/karaoke_wipe_viewer/view/karaoke_wipe_view.tscn")
+const Settings := preload("res://lyrics_viewer/karaoke_wipe_viewer/settings/settings.tscn")
 
 var view : KaraokeWipeView = null
 var settings : Control = null
@@ -15,11 +16,12 @@ func _set_time(time : float) -> void:
 func _set_song_duration(_duration : float) -> void:
 	return
 
-func _set_user_offset(_offset : float) -> void:
+func _set_user_offset(offset : float) -> void:
+	view.set_user_offset(offset)
 	return
 
 func _get_view_size() -> float:
-	return 0
+	return view.layout_height
 
 func _set_view_visible(visible : bool):
 	view.visible = visible
@@ -47,33 +49,32 @@ func initialize_settings(config : ConfigFile):
 	if config.get_value("Font","is_system",true):
 		var font := SystemFont.new()
 		font.font_names = [config.get_value("Font","system_font","sans-serif")]
-		view.font = font
+		view.set_font(font)
 	else:
-		view.font = load(config.get_value("Font","font_file",""))
+		view.set_font(load(config.get_value("Font","font_file","")))
 	
-	view.font_size = config.get_value("Font","size",32)
-	view.font_ruby_size = config.get_value("Font","ruby_size",16)
-	view.font_outline_width = config.get_value("Font","outline_width",0)
-	view.font_ruby_outline_width = config.get_value("Font","ruby_outline_width",0)
+	view.parameter.font_size = config.get_value("Font","size",32)
+	view.parameter.font_ruby_size = config.get_value("Font","ruby_size",16)
+	view.parameter.font_outline_width = config.get_value("Font","outline_width",0)
+	view.parameter.font_ruby_outline_width = config.get_value("Font","ruby_outline_width",0)
 	
-	view.font_sleep_color = config.get_value("Font","sleep_color",Color.GRAY)
-	view.font_sleep_outline_color = config.get_value("Font","sleep_outline_color",Color.BLACK)
-	view.font_active_color = config.get_value("Font","active_color",Color.WHITE)
-	view.font_active_outline_color = config.get_value("Font","active_outline_color",Color.RED)
-	view.font_standby_color = config.get_value("Font","standby_color",Color.LIGHT_GRAY)
-	view.font_standby_outline_color = config.get_value("Font","standby_outline_color",Color.BLUE)
+#	view.font_sleep_color = config.get_value("Font","sleep_color",Color.GRAY)
+#	view.font_sleep_outline_color = config.get_value("Font","sleep_outline_color",Color.BLACK)
+#	view.font_active_color = config.get_value("Font","active_color",Color.WHITE)
+#	view.font_active_outline_color = config.get_value("Font","active_outline_color",Color.RED)
+#	view.font_standby_color = config.get_value("Font","standby_color",Color.LIGHT_GRAY)
+#	view.font_standby_outline_color = config.get_value("Font","standby_outline_color",Color.BLUE)
 	
 
-	view.alignment_ruby = config.get_value("Adjust","alignment_ruby",0)
-	view.alignment_parent = config.get_value("Adjust","alignment_parent",0)
-	view.left_padding = config.get_value("Adjust","left_padding",16)
-	view.right_padding = config.get_value("Adjust","right_padding",16)
-	view.line_height = config.get_value("Adjust","line_height",0)
-	view.ruby_distance = config.get_value("Adjust","ruby_distance",0)
-	view.no_ruby_space = config.get_value("Adjust","no_ruby_space",0)
+	view.parameter.alignment_ruby = config.get_value("Adjust","alignment_ruby",0)
+	view.parameter.alignment_parent = config.get_value("Adjust","alignment_parent",0)
+	view.parameter.left_padding = config.get_value("Adjust","left_padding",16)
+	view.parameter.right_padding = config.get_value("Adjust","right_padding",16)
+	view.parameter.line_height = config.get_value("Adjust","line_height",0)
+	view.parameter.ruby_distance = config.get_value("Adjust","ruby_distance",0)
+	view.parameter.no_ruby_space = config.get_value("Adjust","no_ruby_space",0)
 	
-	view.horizontal_alignment = config.get_value("Display","horizontal_alignment",0)
-	view.active_back_color = config.get_value("Display","active_back_color",Color(0,0.25,0,0.25))
+	view.parameter.horizontal_alignment = config.get_value("Display","horizontal_alignment",0)
 
 	view.fade_in_time = config.get_value("Scroll","fade_in_time",0.5)
 	view.fade_out_time = config.get_value("Scroll","fade_out_time",0.5)
