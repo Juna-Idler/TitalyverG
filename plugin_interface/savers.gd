@@ -74,13 +74,13 @@ class DefaultFileSaver extends ILyricsSaver:
 			file_path : String,_meta : Dictionary,
 			lyrics : PackedStringArray,index : int) -> String:
 		
-		if not file_path.is_absolute_path():
-			return "failed: not file path \"%s\"" % file_path
 		if file_path.begins_with("file://"):
 			var scheme = RegEx.create_from_string("file://+")
 			var m := scheme.search(file_path)
 			file_path = file_path.substr(m.get_end())
-		
+		if not file_path.is_absolute_path():
+			return "failed: not file path \"%s\"" % file_path
+
 		var text := lyrics[index]
 		var lc := LyricsContainer.new(text)
 		var ext : String

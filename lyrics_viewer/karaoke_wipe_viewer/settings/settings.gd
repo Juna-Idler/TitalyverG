@@ -22,13 +22,14 @@ func initialize(config_ : ConfigFile,view : KaraokeWipeView):
 	%SpinBoxBaseSize.value = view.parameter.font_size
 	%SpinBoxBaseOutline.value = view.parameter.font_outline_width
 	
-#	%ColorPickerActiveFill.color = view.font_active_color
-#	%ColorPickerStandbyFill.color = view.font_standby_color
-#	%ColorPickerSleepFill.color = view.font_sleep_color
-#
-#	%ColorPickerActiveStroke.color = view.font_active_outline_color
-#	%ColorPickerStandbyStroke.color = view.font_standby_outline_color
-#	%ColorPickerSleepStroke.color = view.font_sleep_outline_color
+	
+	%ColorPickerActiveFill.color = view.font_active_color
+	%ColorPickerStandbyFill.color = view.font_standby_color
+	%ColorPickerSleepFill.color = view.font_sleep_color
+	%ColorPickerActiveStroke.color = view.font_active_outline_color
+	%ColorPickerStandbyStroke.color = view.font_standby_outline_color
+	%ColorPickerSleepStroke.color = view.font_sleep_outline_color
+
 	
 #	%ColorPickerActiveBack.color = view.active_back_color
 	
@@ -53,44 +54,55 @@ func initialize(config_ : ConfigFile,view : KaraokeWipeView):
 
 func _on_spin_box_ruby_size_value_changed(value):
 	karaoke_wipe_view.parameter.font_ruby_size = value
+	karaoke_wipe_view.measure_lyrics()
 	config.set_value("Font","ruby_size",value)
 
 func _on_spin_box_base_size_value_changed(value):
 	karaoke_wipe_view.parameter.font_size = value
+	karaoke_wipe_view.measure_lyrics()
 	config.set_value("Font","size",value)
 
 func _on_spin_box_ruby_outline_value_changed(value):
 	karaoke_wipe_view.parameter.font_ruby_outline_width = value
+	karaoke_wipe_view.layout_lyrics()
 	config.set_value("Font","ruby_outline_width",value)
 
 func _on_spin_box_base_outline_value_changed(value):
 	karaoke_wipe_view.parameter.font_outline_width = value
+	karaoke_wipe_view.layout_lyrics()
 	config.set_value("Font","outline_width",value)
 
 
 func _on_color_picker_active_fill_color_changed(color):
 	karaoke_wipe_view.font_active_color = color
+	RenderingServer.global_shader_parameter_set("active_color",color)
 	config.set_value("Font","active_color",color)
 
 func _on_color_picker_standby_fill_color_changed(color):
 	karaoke_wipe_view.font_standby_color = color
 	config.set_value("Font","standby_color",color)
 
+	RenderingServer.global_shader_parameter_set("standby_color",color)
 func _on_color_picker_sleep_fill_color_changed(color):
 	karaoke_wipe_view.font_sleep_color = color
+	RenderingServer.global_shader_parameter_set("sleep_color",color)
 	config.set_value("Font","sleep_color",color)
 
 func _on_color_picker_active_stroke_color_changed(color):
 	karaoke_wipe_view.font_active_outline_color = color
+	RenderingServer.global_shader_parameter_set("active_outline_color",color)
 	config.set_value("Font","active_outline_color",color)
 
 func _on_color_picker_standby_stroke_color_changed(color):
 	karaoke_wipe_view.font_standby_outline_color = color
+	RenderingServer.global_shader_parameter_set("standby_outline_color",color)
 	config.set_value("Font","standby_outline_color",color)
 
 func _on_color_picker_sleep_stroke_color_changed(color):
 	karaoke_wipe_view.font_sleep_outline_color = color
+	RenderingServer.global_shader_parameter_set("sleep_outline_color",color)
 	config.set_value("Font","sleep_outline_color",color)
+
 
 func _on_color_picker_active_back_color_changed(color):
 	karaoke_wipe_view.active_back_color = color
@@ -124,6 +136,7 @@ func _on_spin_box_fade_out_value_changed(value):
 
 func _on_font_selector_font_changed(font : Font):
 	karaoke_wipe_view.parameter.font = font
+	karaoke_wipe_view.measure_lyrics()
 
 
 func _on_font_selector_font_switched(system : bool):
@@ -141,26 +154,32 @@ func _on_font_selector_file_font_changed(font_path):
 func _on_horizontal_layout_horizontal_alignment_changed(alignment : HorizontalLayoutSettings.Alignment):
 	var enum_number : int = alignment
 	karaoke_wipe_view.parameter.horizontal_alignment = enum_number # as WipeViewerLine.Parameter.HorizontalAlignment
+	karaoke_wipe_view.layout_lyrics()
 	config.set_value("Display","horizontal_alignment",enum_number)
 
 func _on_horizontal_layout_left_padding_changed(value):
 	karaoke_wipe_view.parameter.left_padding = value
+	karaoke_wipe_view.layout_lyrics()
 	config.set_value("Adjust","left_padding",value)
 
 func _on_horizontal_layout_right_padding_changed(value):
 	karaoke_wipe_view.parameter.right_padding = value
+	karaoke_wipe_view.layout_lyrics()
 	config.get_value("Adjust","right_padding",value)
 
 
 func _on_line_height_adjust_line_height_changed(value):
 	karaoke_wipe_view.parameter.line_height = value
+	karaoke_wipe_view.layout_lyrics()
 	config.set_value("Adjust","line_height",value)
 
 func _on_line_height_adjust_no_ruby_space_changed(value):
-	karaoke_wipe_view.parameter.ruby_distance = value
-	config.set_value("Adjust","ruby_distance",value)
+	karaoke_wipe_view.parameter.no_ruby_space = value
+	karaoke_wipe_view.layout_lyrics()
+	config.set_value("Adjust","no_ruby_space",value)
 
 func _on_line_height_adjust_ruby_distance_changed(value):
-	karaoke_wipe_view.parameter.no_ruby_space = value
-	config.set_value("Adjust","no_ruby_space",value)
+	karaoke_wipe_view.parameter.ruby_distance = value
+	karaoke_wipe_view.layout_lyrics()
+	config.set_value("Adjust","ruby_distance",value)
 

@@ -189,7 +189,7 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 	sync_mode = line.sync_mode
 	start_time = line.get_start_time()
 	end_time = line.get_end_time()
-	if end_time < 0 or end_time == start_time:
+	if end_time < next_line_start_time:
 		end_time = next_line_start_time
 	ruby_blocks = []
 	for u in line.units:
@@ -425,8 +425,8 @@ func layout_lyrics():
 			ruby.position = Vector2(align_x + r.x - font_ruby_outline_width,y - font_ruby_outline_width)
 		y += height
 
-	size.y = y
 	custom_minimum_size.y = y
+	size.y = y
 
 
 func calculate_aligned_x(base : Control) -> float:
@@ -446,31 +446,21 @@ func set_time(_time : float):
 		c.set_time(_time)
 		
 
-#	var last_time := time
-#	time = time_
-#
-#
-#	var target_time_y_offset = get_target_y_offset()
-#	if target_time_y_offset == time_y_offset and time == last_time:
-#		return
-#
-#	var distance = abs(target_time_y_offset - time_y_offset)
-#	if distance > scroll_limit:
-#		var move : float = 0.0
-#		for i in limits.size() / 2.0:
-#			if distance <= limits[i*2]:
-#				move = limits[i*2+1]
-#				break
-#		if move == 0:
-#			move = distance
-#		time_y_offset += sign(target_time_y_offset - time_y_offset) * move
-#	else:
-#		time_y_offset = target_time_y_offset
-#	queue_redraw()
+func set_fade_in(rate : float):
+	if sync_mode == LyricsContainer.SyncMode.LINE:
+		for c in get_children():
+			c.set_fade_out(1 - rate)
+	else:
+		for c in get_children():
+			c.set_fade_in(rate)
 
-	pass
+func set_fade_out(rate : float):
+	for c in get_children():
+		c.set_fade_out(rate)
 
-
+func set_sleep():
+	for c in get_children():
+		c.set_sleep()
 
 
 

@@ -114,13 +114,12 @@ class DefaultFileFinder extends ILyricsFinder:
 	func _find(_title : String,_artists : PackedStringArray,_album : String,
 			file_path : String,_meta : Dictionary) -> Node:
 		result = PackedStringArray()
-		if not file_path.is_absolute_path():
-			return null
-			
 		if file_path.begins_with("file://"):
 			var scheme = RegEx.create_from_string("file://+")
 			var m := scheme.search(file_path)
 			file_path = file_path.substr(m.get_end())
+		if not file_path.is_absolute_path():
+			return null
 		var base_name := file_path.get_basename()
 
 		var kra_path = base_name + ".kra"

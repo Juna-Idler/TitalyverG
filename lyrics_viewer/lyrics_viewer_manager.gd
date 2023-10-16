@@ -19,6 +19,7 @@ var sync_viewer_name : String
 
 var _viewer : I_LyricsViewer
 
+var current_lyrics : LyricsContainer
 
 func set_time(time : float):
 	if _viewer:
@@ -29,6 +30,7 @@ func set_user_offset(offset : float):
 		_viewer._set_user_offset(offset)
 
 func set_lyrics(lyrics : LyricsContainer) -> bool:
+	current_lyrics = lyrics
 	sync_mode = lyrics.sync_mode
 	var unsync : bool = sync_mode == LyricsContainer.SyncMode.UNSYNC
 	unsync_viewer._set_view_visible(unsync)
@@ -74,6 +76,8 @@ func change_sync_viewer(viewer_name : String,config : ConfigFile) -> bool:
 	var result := sync_viewer._initialize(self,settings_window.get_viewer_parent(),config)
 	if result:
 		sync_viewer_name = viewer_name
+		if current_lyrics:
+			set_lyrics(current_lyrics)
 		return true
 	sync_viewer_name = ""
 	sync_viewer = null

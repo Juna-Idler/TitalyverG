@@ -284,7 +284,7 @@ class AtTagContainer:
 						rubying.append(value)
 					"offset":
 						offset = float(value)
-						if not value.contains(".") and offset > 10:
+						if not value.contains(".") and abs(offset) > 10:
 							offset = int(value) / 1000.0
 					_:
 						pass
@@ -299,7 +299,7 @@ class AtTagContainer:
 				tags.append(Tag.new(Tag.TagType.BRACKET,i,name,value))
 				if name == "offset":
 					offset = float(value)
-					if not value.contains(".") and offset > 10:
+					if not value.contains(".") and abs(offset) > 10:
 						offset = int(value) / 1000.0
 				continue
 			other_lines.append(line)
