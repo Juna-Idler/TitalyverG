@@ -19,6 +19,8 @@ func initialize_receiver_settings(receiver : ReceiverManager):
 	receiver.change_receiver(receiver_name)
 
 func initialize_image_settings(image_manager : ImageManager):
+	image_manager.set_bg_color(config.get_value("Window","background_color",Color(0,0,0,0.8)))
+	
 	var plugins = config.get_value("Image","Finder_plug_in",[])
 	if plugins.is_empty():
 		image_manager.finders.plugins.append(ImageFinders.Plugin.create(ImageFinders.BUILTIN_FILE_PATH_FINDER))
@@ -42,7 +44,9 @@ func initialize_image_settings(image_manager : ImageManager):
 func initialize_viewer_settings(viewer : LyricsViewerManager):
 	viewer.initialize_unsync_viewer(config)
 	var viewer_name : String = config.get_value("LyricsViewer","viewer",LyricsViewerManager.VIEWERS.keys()[0])
-	viewer.change_sync_viewer(viewer_name,config)
+	if not viewer.change_sync_viewer(viewer_name,config):
+		viewer.change_sync_viewer(LyricsViewerManager.VIEWERS.keys()[0],config)
+		
 
 
 func initialize_finders_settings(finders : LyricsFinders):
@@ -81,11 +85,5 @@ func initialize_loader_settings(loader : LyricsLoaders,menu : PopupMenu):
 	for p in loader.plugins:
 		menu.add_item(p.loader._get_name())
 	
-	
-func get_background_color() -> Color:
-	return config.get_value("Window","background_color",Color(0,0,0,0.8))
-
-
-
 
 

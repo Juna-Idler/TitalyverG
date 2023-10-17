@@ -18,6 +18,7 @@ func initialize(settings_ : Settings,manager : ImageManager):
 	settings = settings_
 	image_manager = manager
 	
+	%ColorPickerButton.color = image_manager._bg_color
 	var processor_name := image_manager.get_processor()._get_name()
 	$VBoxContainer/Label.text = "now processor : " + processor_name
 	
@@ -70,3 +71,8 @@ func _on_button_delete_pressed():
 		item_list.remove_item(index)
 		image_manager.plugins.remove_at(index)
 		_set_config_plug_in()
+
+
+func _on_color_picker_button_color_changed(color):
+	image_manager.set_bg_color(color)
+

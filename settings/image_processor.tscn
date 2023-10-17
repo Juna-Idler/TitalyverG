@@ -18,6 +18,21 @@ script = ExtResource("1_h1cu3")
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Color"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Selected Processor"
@@ -75,6 +90,7 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.gd ; GDScript")
 
+[connection signal="color_changed" from="VBoxContainer/HBoxContainer3/ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ButtonChange" to="." method="_on_button_change_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer2/ButtonInsertPlugin" to="." method="_on_button_insert_plugin_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer2/ButtonDelete" to="." method="_on_button_delete_pressed"]

@@ -12,28 +12,31 @@ var x_table : PackedFloat64Array
 
 var invalid := true
 
+
 func initialize(block : Array[WipeViewerLine.MeasuredUnit],
 		font : Font,font_size : int,outline_size : int):
 	var x_start := block[0].x
 	var strings : PackedStringArray = []
 	var x_pos : PackedFloat32Array = []
 	for b in block:
-		timetable.append(b.start)
-		timetable.append(b.end)
-		x_table.append(b.x - x_start)
-		x_table.append(b.x + b.width - x_start)
-		
 		strings.append(b.cluster)
 		x_pos.append(b.x - x_start)
-
-	
 	control.initialize(strings,x_pos,font,font_size,outline_size)
-	
-	size = Vector2(block[-1].x - x_start + block[-1].width + outline_size * 2,
-			font.get_height(font_size) + outline_size * 2)
+	for b in block:
+		timetable.append(b.start)
+		timetable.append(b.end)
+		x_table.append(b.x - x_start + control.outline_offset)
+		x_table.append(b.x + b.width - x_start + control.outline_offset)
+	x_table[0] = 0
+	x_table[-1] += control.outline_offset
+	size = Vector2(block[-1].x - x_start + block[-1].width + control.outline_offset * 2,
+			font.get_height(font_size) + control.outline_offset * 2)
 	sub_viewport.size = size
 #	sub_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	invalid = true
+
+func get_outline_offset() -> int:
+	return control.outline_offset
 
 func activate():
 	if invalid:

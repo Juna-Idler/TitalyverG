@@ -20,4 +20,5 @@ func initialize(settings_ : Settings,viewer : LyricsViewerManager):
 func _on_button_pressed():
 	var viewer_name := option_button.get_item_text(option_button.selected)
 	
-	viewer_manager.change_sync_viewer(viewer_name,settings.config)
+	if viewer_manager.change_sync_viewer(viewer_name,settings.config):
+		settings.config.set_value("LyricsViewer","viewer",viewer_name)

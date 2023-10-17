@@ -195,11 +195,12 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 	for u in line.units:
 		var bases : Array[MeasuredUnit] = []
 		for t in u.base:
-			var clusters : PackedStringArray = splitter.call(t.text)
 			var index = bases.size()
-			for c in clusters:
-				bases.append(MeasuredUnit.new(c))
-			bases[index].start = t.start_time
+			if not t.text.is_empty():
+				var clusters : PackedStringArray = splitter.call(t.text)
+				for c in clusters:
+					bases.append(MeasuredUnit.new(c))
+				bases[index].start = t.start_time
 			if index - 1 >= 0 and bases[index - 1].end < 0:
 				bases[index - 1].end = t.start_time
 		var rubys : Array[MeasuredUnit] = []
@@ -211,7 +212,13 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 			rubys[index].start = t.start_time
 			if index - 1 >= 0 and rubys[index - 1].end < 0:
 				rubys[index - 1].end = t.start_time
-		ruby_blocks.append(MeasuredRubyBlock.new(bases,rubys,u.get_start_time(),u.get_end_time()))
+		if not bases.is_empty():
+			ruby_blocks.append(MeasuredRubyBlock.new(bases,rubys,u.get_start_time(),u.get_end_time()))
+	if ruby_blocks.is_empty():
+		var unit := MeasuredUnit.new("")
+		unit.start = start_time
+		unit.end = end_time
+		ruby_blocks.append(MeasuredRubyBlock.new([unit],[],start_time,end_time))
 
 	measure_lyrics()
 
@@ -383,12 +390,12 @@ func layout_lyrics():
 			add_child(base)
 			base.initialize(displayed_base,font,font_size,font_outline_width)
 			var align_x := calculate_aligned_x(base)
-			base.position = Vector2(align_x - font_outline_width,y + base_y_distance - font_outline_width)
+			base.position = Vector2(align_x - base.get_outline_offset(),y + base_y_distance - base.get_outline_offset())
 			for r in displayed_rubys:
 				var ruby := WipeUnit.instantiate()
 				add_child(ruby)
 				ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_width)
-				ruby.position = Vector2(align_x + r.x - font_ruby_outline_width,y - font_ruby_outline_width)
+				ruby.position = Vector2(align_x + r.x - ruby.get_outline_offset(),y - ruby.get_outline_offset())
 			
 			width = max(width,x)
 			x = 0
@@ -417,12 +424,12 @@ func layout_lyrics():
 		add_child(base)
 		base.initialize(displayed_base,font,font_size,font_outline_width)
 		var align_x := calculate_aligned_x(base)
-		base.position = Vector2(align_x - font_outline_width,y + base_y_distance - font_outline_width)
+		base.position = Vector2(align_x - base.get_outline_offset(),y + base_y_distance - base.get_outline_offset())
 		for r in displayed_rubys:
 			var ruby := WipeUnit.instantiate()
 			add_child(ruby)
 			ruby.initialize(r.ruby,font,font_ruby_size,font_ruby_outline_width)
-			ruby.position = Vector2(align_x + r.x - font_ruby_outline_width,y - font_ruby_outline_width)
+			ruby.position = Vector2(align_x + r.x - ruby.get_outline_offset(),y - ruby.get_outline_offset())
 		y += height
 
 	custom_minimum_size.y = y
@@ -432,11 +439,11 @@ func layout_lyrics():
 func calculate_aligned_x(base : Control) -> float:
 	match parameter.horizontal_alignment:
 		Parameter.HorizontalAlignment.LEFT:
-			return parameter.left_padding - parameter.font_outline_width * 2
+			return parameter.left_padding
 		Parameter.HorizontalAlignment.CENTER:
-			return (size.x - base.size.x) / 2
+			return (size.x - (base.size.x - base.get_outline_offset() * 2)) / 2
 		Parameter.HorizontalAlignment.RIGHT:
-			return size.x - base.size.x - parameter.font_outline_width * 2 - parameter.right_padding
+			return size.x - (base.size.x - base.get_outline_offset() * 2) - parameter.right_padding
 	assert(false)
 	return 0
 

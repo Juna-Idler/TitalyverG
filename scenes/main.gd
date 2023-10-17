@@ -60,7 +60,6 @@ func _ready():
 	
 	settings.initialize_receiver_settings(receiver)
 	
-	image_manager.set_bg_color(settings.get_background_color())
 	settings.initialize_image_settings(image_manager)
 	settings.initialize_viewer_settings(lyrics_viewer_manager)
 	settings.initialize_finders_settings(finders)

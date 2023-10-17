@@ -108,11 +108,6 @@ func _on_color_picker_active_back_color_changed(color):
 	karaoke_wipe_view.active_back_color = color
 	config.set_value("Display","active_back_color",color)
 
-func _on_color_picker_background_color_changed(color):
-	config.set_value("Window","background_color",color)
-	karaoke_wipe_view
-#	background_color_changed.emit(color)
-
 
 
 func _on_check_button_scroll_center_toggled(button_pressed):
@@ -165,7 +160,7 @@ func _on_horizontal_layout_left_padding_changed(value):
 func _on_horizontal_layout_right_padding_changed(value):
 	karaoke_wipe_view.parameter.right_padding = value
 	karaoke_wipe_view.layout_lyrics()
-	config.get_value("Adjust","right_padding",value)
+	config.set_value("Adjust","right_padding",value)
 
 
 func _on_line_height_adjust_line_height_changed(value):

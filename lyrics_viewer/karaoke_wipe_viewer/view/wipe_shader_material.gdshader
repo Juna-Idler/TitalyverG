@@ -42,6 +42,6 @@ void fragment() {
 			color = tex.r * standby_color + tex.g * standby_outline_color;
 		}
 	}
-	color.a = tex.a;
+	color.a *= tex.a;
 	COLOR = color;
 }
