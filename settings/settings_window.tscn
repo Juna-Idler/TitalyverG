@@ -38,7 +38,6 @@ size_flags_vertical = 3
 
 [node name="Viewer" parent="MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("3_8ay6i")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 
 [node name="Unsync" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
@@ -70,6 +69,7 @@ visible = false
 layout_mode = 2
 
 [node name="Image" type="TabContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+visible = false
 layout_mode = 2
 
 [node name="ImageProcessor" parent="MarginContainer/VBoxContainer/TabContainer/Image" instance=ExtResource("8_0bumj")]

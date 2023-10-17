@@ -92,9 +92,9 @@ func set_time(time : float):
 	var top := lines[active_top_index].position.y + lines[active_top_index].size.y * active_top_rate
 	if scroll_center:
 		var bottom := lines[active_bottom_index].position.y + lines[active_bottom_index].size.y * active_bottom_rate
-		control.position.y = (size.y - (top + bottom)) / 2
+		control.position.y = (size.y - (top + bottom)) / 2 + user_offset
 	else:
-		control.position.y = -top
+		control.position.y = -top + user_offset
 	
 	var view_rect := Rect2(Vector2(0,-control.position.y),size)
 	for l in lines:
@@ -164,7 +164,13 @@ func _calculate_active_line(c_time : float):
 
 func set_user_offset(offset : float):
 	user_offset = offset
-
+	if not lines.is_empty():
+		var top := lines[active_top_index].position.y + lines[active_top_index].size.y * active_top_rate
+		if scroll_center:
+			var bottom := lines[active_bottom_index].position.y + lines[active_bottom_index].size.y * active_bottom_rate
+			control.position.y = (size.y - (top + bottom)) / 2 + user_offset
+		else:
+			control.position.y = -top + user_offset
 
 func measure_lyrics():
 	if control:
@@ -181,9 +187,9 @@ func measure_lyrics():
 			var top := lines[active_top_index].position.y + lines[active_top_index].size.y * active_top_rate
 			if scroll_center:
 				var bottom := lines[active_bottom_index].position.y + lines[active_bottom_index].size.y * active_bottom_rate
-				control.position.y = (size.y - (top + bottom)) / 2
+				control.position.y = (size.y - (top + bottom)) / 2 + user_offset
 			else:
-				control.position.y = -top
+				control.position.y = -top + user_offset
 
 func layout_lyrics():
 	if control:
@@ -200,9 +206,9 @@ func layout_lyrics():
 			var top := lines[active_top_index].position.y + lines[active_top_index].size.y * active_top_rate
 			if scroll_center:
 				var bottom := lines[active_bottom_index].position.y + lines[active_bottom_index].size.y * active_bottom_rate
-				control.position.y = (size.y - (top + bottom)) / 2
+				control.position.y = (size.y - (top + bottom)) / 2 + user_offset
 			else:
-				control.position.y = -top
+				control.position.y = -top + user_offset
 
 func _on_resized():
 	if control:
@@ -221,7 +227,7 @@ func _on_resized():
 			var top := lines[active_top_index].position.y + lines[active_top_index].size.y * active_top_rate
 			if scroll_center:
 				var bottom := lines[active_bottom_index].position.y + lines[active_bottom_index].size.y * active_bottom_rate
-				control.position.y = (size.y - (top + bottom)) / 2
+				control.position.y = (size.y - (top + bottom)) / 2 + user_offset
 			else:
-				control.position.y = -top
+				control.position.y = -top + user_offset
 
