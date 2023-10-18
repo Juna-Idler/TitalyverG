@@ -84,10 +84,15 @@ class MeasuredRubyBlock:
 	var end : float
 	var base_width : float = 0
 	var ruby_width : float = 0
-	func _init(b : Array[MeasuredUnit],r : Array[MeasuredUnit],s : float,e : float):
+	func _init(b : Array[MeasuredUnit],r : Array[MeasuredUnit],e : float):
 		base = b
 		ruby = r
-		start = s
+		var b_start := -1.0 if b.is_empty() else b[0].start
+		var r_start := -1.0 if r.is_empty() else r[0].start
+		if b_start >= 0 and r_start >= 0:
+			start = minf(b_start,r_start)
+		else:
+			start = maxf(b_start,r_start)
 		end = e
 	
 	func get_width() -> float:
@@ -192,6 +197,7 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 	if end_time < next_line_start_time:
 		end_time = next_line_start_time
 	ruby_blocks = []
+	var blank_time : float = -1
 	for u in line.units:
 		var bases : Array[MeasuredUnit] = []
 		for t in u.base:
@@ -200,7 +206,10 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 				var clusters : PackedStringArray = splitter.call(t.text)
 				for c in clusters:
 					bases.append(MeasuredUnit.new(c))
-				bases[index].start = t.start_time
+				bases[index].start = t.start_time if t.start_time >= 0 else blank_time
+				blank_time = -1
+			else:
+				blank_time = t.start_time
 			if index - 1 >= 0 and bases[index - 1].end < 0:
 				bases[index - 1].end = t.start_time
 		var rubys : Array[MeasuredUnit] = []
@@ -213,12 +222,14 @@ func set_lyrics(line : LyricsContainer.LyricsLine,next_line_start_time : float):
 			if index - 1 >= 0 and rubys[index - 1].end < 0:
 				rubys[index - 1].end = t.start_time
 		if not bases.is_empty():
-			ruby_blocks.append(MeasuredRubyBlock.new(bases,rubys,u.get_start_time(),u.get_end_time()))
+			ruby_blocks.append(MeasuredRubyBlock.new(bases,rubys,u.get_end_time()))
 	if ruby_blocks.is_empty():
 		var unit := MeasuredUnit.new("")
 		unit.start = start_time
 		unit.end = end_time
-		ruby_blocks.append(MeasuredRubyBlock.new([unit],[],start_time,end_time))
+		ruby_blocks.append(MeasuredRubyBlock.new([unit],[],end_time))
+
+
 
 	measure_lyrics()
 
