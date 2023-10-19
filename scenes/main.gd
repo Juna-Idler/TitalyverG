@@ -204,18 +204,26 @@ func _on_receiver_received(data : PlaybackData):
 	
 	lyrics_viewer_manager.set_song_duration(data.duration)
 
-	find_lyrics_async(data)
-	image_manager.find_async(data.title,data.artists,data.album,data.file_path,data.meta_data)
+	find_lyrics_async()
+	image_manager.find_async(playback_data.title,playback_data.artists,playback_data.album,playback_data.file_path,playback_data.meta_data)
 
-func find_lyrics_async(data : PlaybackData):
+func find_lyrics_async():
+	var file_path : String = playback_data.file_path
+	var title : String = playback_data.title
+	var artists : PackedStringArray = playback_data.artists.duplicate()
+	var album : String = playback_data.album
+	
 	var first := true
 	var it := finders.get_iterator(self)
 	while not it.is_end():
-		var result := await it.find_async(data.title,data.artists,data.album,data.file_path,data.meta_data)
+		var result := await it.find_async(title,artists,album,file_path,playback_data.meta_data)
+		if (file_path != playback_data.file_path or title != playback_data.title
+				or artists != playback_data.artists or album != playback_data.album):
+			return
 		if not result.is_empty():
 			if first:
 				var msec := int(Time.get_unix_time_from_system() * 1000) % (24*60*60*1000)
-				var time_ : float = data.seek_time + float(msec - data.time_of_day) / 1000.0
+				var time_ : float = playback_data.seek_time + float(msec - playback_data.time_of_day) / 1000.0
 				reset_lyrics(result,time_)
 				first = false
 			else:

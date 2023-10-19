@@ -15,7 +15,7 @@ func _get_settings(_config : ConfigFile) -> Control:
 	return null
 
 
-func _set_images(_images : Array):
+func _set_images(_images : Array[Image]):
 	return null
 
 func _set_bg_color(_color : Color):
