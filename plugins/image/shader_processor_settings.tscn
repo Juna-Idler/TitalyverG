@@ -60,6 +60,7 @@ title = "Select gd shader"
 position = Vector2i(0, 64)
 size = Vector2i(600, 400)
 unresizable = true
+ok_button_text = "開く"
 mode_overrides_title = false
 file_mode = 0
 access = 2

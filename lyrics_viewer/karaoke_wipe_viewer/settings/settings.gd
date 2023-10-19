@@ -144,11 +144,9 @@ func _on_font_selector_file_font_changed(font_path):
 	config.set_value("Font","font_file",font_path)
 
 
-
-
 func _on_horizontal_layout_horizontal_alignment_changed(alignment : HorizontalLayoutSettings.Alignment):
 	var enum_number : int = alignment
-	karaoke_wipe_view.parameter.horizontal_alignment = enum_number # as WipeViewerLine.Parameter.HorizontalAlignment
+	karaoke_wipe_view.parameter.horizontal_alignment = enum_number as WipeViewerLine.Parameter.HorizontalAlignment
 	karaoke_wipe_view.layout_lyrics()
 	config.set_value("Display","horizontal_alignment",enum_number)
 

@@ -86,6 +86,9 @@ func _find(title : String,artists : PackedStringArray,_album : String,
 	if title.is_empty() or artists.is_empty():
 		return null
 
+	if title == "ad" and artists.size() == 1 and artists.has("Spotify"):
+		return null
+
 	search_title = title.uri_encode()
 	search_artist = artists[0].uri_encode()
 	lyrics_block_regex = RegEx.create_from_string(site_param["lyrics_block_regex"])
@@ -231,25 +234,21 @@ func get_lyrics_response(result : int,response_code : int,
 		arranger = NCR.decode_ncr(m.get_string(1))
 
 	m = lyrics_block_regex.search(response)
-	if not m:
-		get_lyrics()
-		return
-	var lyrics := m.get_string(1)
-	for r in site_param["lyrics_replacers"]:
-		var replace_regex = RegEx.create_from_string(r[0])
-		lyrics = replace_regex.sub(lyrics,r[1],true)
-		
-	var output : PackedStringArray = [url,title,artist]
-	if not lyricist.is_empty():
-		output.append("作詞:" + lyricist)
-	if not composer.is_empty():
-		output.append("作曲:" + composer)
-	if not arranger.is_empty():
-		output.append("編曲:" + arranger)
-
-	lyrics = NCR.decode_ncr(lyrics)
-
-	finder_result.append("\n".join(output) + "\n\n" + lyrics)
+	if m:
+		var lyrics := m.get_string(1)
+		for r in site_param["lyrics_replacers"]:
+			var replace_regex = RegEx.create_from_string(r[0])
+			lyrics = replace_regex.sub(lyrics,r[1],true)
+			
+		var output : PackedStringArray = [url,title,artist]
+		if not lyricist.is_empty():
+			output.append("作詞:" + lyricist)
+		if not composer.is_empty():
+			output.append("作曲:" + composer)
+		if not arranger.is_empty():
+			output.append("編曲:" + arranger)
+		lyrics = NCR.decode_ncr(lyrics)
+		finder_result.append("\n".join(output) + "\n\n" + lyrics)
 
 	OS.shell_open(url)
 	get_lyrics()

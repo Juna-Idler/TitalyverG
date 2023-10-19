@@ -152,12 +152,11 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ColorPickerBackground" type="ColorPickerButton" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+[node name="ColorPickerBackground" type="Control" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
-disabled = true
 
 [node name="HorizontalLayout" parent="ScrollContainer/VBoxContainer" instance=ExtResource("3_fbuwg")]
 unique_name_in_owner = true
@@ -230,7 +229,6 @@ alignment = 1
 [connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ColorPickerStandbyStroke" to="." method="_on_color_picker_standby_stroke_color_changed"]
 [connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer2/ColorPickerSleepStroke" to="." method="_on_color_picker_sleep_stroke_color_changed"]
 [connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/ColorPickerActiveBack" to="." method="_on_color_picker_active_back_color_changed"]
-[connection signal="color_changed" from="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3/ColorPickerBackground" to="." method="_on_color_picker_background_color_changed"]
 [connection signal="horizontal_alignment_changed" from="ScrollContainer/VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_horizontal_alignment_changed"]
 [connection signal="left_padding_changed" from="ScrollContainer/VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_left_padding_changed"]
 [connection signal="right_padding_changed" from="ScrollContainer/VBoxContainer/HorizontalLayout" to="." method="_on_horizontal_layout_right_padding_changed"]

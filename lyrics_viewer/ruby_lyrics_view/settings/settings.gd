@@ -96,11 +96,7 @@ func _on_color_picker_active_back_color_changed(color):
 	ruby_lyrics_view.active_back_color = color
 	config.set_value("Display","active_back_color",color)
 
-func _on_color_picker_background_color_changed(color):
-	config.set_value("Window","background_color",color)
-	ruby_lyrics_view
-#	background_color_changed.emit(color)
-
+ 
 
 
 func _on_check_button_scroll_center_toggled(button_pressed):

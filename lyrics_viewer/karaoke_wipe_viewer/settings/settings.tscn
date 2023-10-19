@@ -139,6 +139,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 
 [node name="Label" type="Label" parent="ScrollContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]

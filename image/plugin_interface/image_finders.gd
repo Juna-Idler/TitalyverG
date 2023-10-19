@@ -37,8 +37,21 @@ class Plugin:
 			return null
 		return Plugin.new(finder_,file_path_)
 
+class FindingData:
+	var title : String
+	var artists : PackedStringArray
+	var album : String
+	var file_path : String
+	
+	func _init(t : String,ar : PackedStringArray,al : String,path : String):
+		title = t
+		artists = ar.duplicate()
+		album = al
+		file_path = path
 
 var plugins : Array[Plugin] = [] # of Plugin
+
+var finding_data : FindingData
 
 
 func _init():
@@ -57,9 +70,10 @@ func deserialize(strings : PackedStringArray):
 		if p:
 			plugins.append(p)
 
-
 func find_async(title : String,artists : PackedStringArray,album : String,
-			file_path : String,meta : Dictionary,parent_node : Node) -> Array[Image]:
+			file_path : String,meta : Dictionary,parent_node : Node) -> Variant:# Array[Image]:
+	finding_data = FindingData.new(title,artists,album,file_path)
+
 	var result : Array[Image] = []
 	var index : int = 0
 	while index < plugins.size():
@@ -78,6 +92,9 @@ func find_async(title : String,artists : PackedStringArray,album : String,
 		if node:
 			parent_node.add_child(node)
 			await plugin.finder.finished
+			if (file_path != finding_data.file_path or title != finding_data.title
+					or artists != finding_data.artists or album != finding_data.album):
+				return null
 			parent_node.remove_child(node)
 		result.append_array(plugin.finder._get_result())
 		index += 1

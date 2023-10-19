@@ -97,9 +97,10 @@ func set_processor(p_name : String) -> bool:
 
 func find_async(title : String,artists : PackedStringArray,album : String,
 			file_path : String,meta : Dictionary):
-	var images := await finders.find_async(title,artists,album,file_path,meta,self)
-	_current_images = images
-	_processor._set_images(images)
+	var images = await finders.find_async(title,artists,album,file_path,meta,self)
+	if images != null:
+		_current_images = images
+		_processor._set_images(_current_images)
 
 
 func serialize_processors() -> PackedStringArray:
