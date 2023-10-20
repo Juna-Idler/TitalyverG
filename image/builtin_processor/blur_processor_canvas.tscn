@@ -1,0 +1,78 @@
+[gd_scene load_steps=5 format=3 uid="uid://bndbgsps1i8ys"]
+
+[sub_resource type="Shader" id="Shader_axwbf"]
+code = "shader_type canvas_item;
+
+uniform int strength: hint_range(1, 512) = 2;
+uniform float alpha : hint_range(0.0, 1.0, 0.01) = 1.0;
+
+
+vec4 blur_size(sampler2D tex,vec2 fragCoord, vec2 pixelSize) {
+    
+    vec4 color = vec4(0.,0.,0.,0.);
+    float strengthFloat = float(strength);
+
+    vec2 pixel = fragCoord/pixelSize;
+    int x_min = max(int(pixel.x-strengthFloat), 0);
+    int x_max = min(int(pixel.x+strengthFloat), int(1./pixelSize.x));
+    int y_min = max(int(pixel.y-strengthFloat), 0);
+    int y_max = min(int(pixel.y+strengthFloat), int(1./pixelSize.y));
+
+    int count =0;
+
+    // Sum the pixels colors
+    for(int x=x_min; x <= x_max; x++) {
+        for(int y = y_min; y <= y_max; y++) {           
+            color += texture(tex, vec2(float(x), float(y)) * pixelSize);
+            count++;
+        }
+    }
+    
+    // Divide the color by the number of colors you summed up
+    color /= float(count);
+    color.a *= alpha;
+    return color;
+}
+
+void fragment() {
+    COLOR = blur_size(TEXTURE,UV,TEXTURE_PIXEL_SIZE);
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_imabo"]
+shader = SubResource("Shader_axwbf")
+shader_parameter/strength = 1
+shader_parameter/alpha = 1.0
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_w15q0"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_lq10i"]
+noise = SubResource("FastNoiseLite_w15q0")
+
+[node name="shader_processor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_imabo")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("NoiseTexture2D_lq10i")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.498039)

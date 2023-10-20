@@ -5,6 +5,13 @@ class_name ImageManager
 
 const BUILTIN_NO_IMAGE_PROCESSOR := "[Built-in] No Image Processor"
 const BUILTIN_DEFAULT_IMAGE_PROCESSOR := "[Built-in] Default Image Processor"
+const BUILTIN_BLUR_IMAGE_PROCESSOR := "[Built-in] Blur Image Processor"
+
+const BUILTINS : Dictionary = {
+	BUILTIN_NO_IMAGE_PROCESSOR:NoImageProcessor,
+	BUILTIN_DEFAULT_IMAGE_PROCESSOR:preload("res://image/builtin_processor/default_image_processor.gd"),
+	BUILTIN_BLUR_IMAGE_PROCESSOR:preload("res://image/builtin_processor/blur_processor.gd"),
+}
 
 class Plugin:
 	var processor : I_ImageProcessor
@@ -15,12 +22,8 @@ class Plugin:
 		file_path = fp
 		
 	static func create(file_path_ : String) -> Plugin:
-		if file_path_ == BUILTIN_NO_IMAGE_PROCESSOR:
-			var p := NoImageProcessor.new()
-			p._initialize("")
-			return Plugin.new(p,file_path_)
-		elif file_path_ == BUILTIN_DEFAULT_IMAGE_PROCESSOR:
-			var p := DefaultImageProcessor.new()
+		if BUILTINS.has(file_path_):
+			var p : I_ImageProcessor = BUILTINS.get(file_path_).new()
 			p._initialize("")
 			return Plugin.new(p,file_path_)
 		
@@ -49,6 +52,7 @@ var _bg_color : Color
 
 
 func _ready():
+	
 	pass
 
 func get_processor() -> I_ImageProcessor:
@@ -106,11 +110,17 @@ func find_async(title : String,artists : PackedStringArray,album : String,
 func serialize_processors() -> PackedStringArray:
 	var result := PackedStringArray()
 	for p in plugins:
-		result.append((p as Plugin).file_path)
+		var file_path := (p as Plugin).file_path
+		if not BUILTINS.has(file_path):
+			result.append(file_path)
 	return result
 
 func deserialize_processors(strings : PackedStringArray):
 	plugins.clear()
+	for b in BUILTINS:
+		var p : I_ImageProcessor = BUILTINS[b].new()
+		p._initialize("")
+		plugins.append(Plugin.new(p,b))
 	for s in strings:
 		var p = Plugin.create(s)
 		if p:

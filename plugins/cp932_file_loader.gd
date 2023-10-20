@@ -9,7 +9,7 @@ func _initialize(_script_path : String):
 
 
 func _get_name() -> String:
-	return "CP932_LYRICS_FILE_FINDER" + "(filename + .kra;.lrc:.txt)"
+	return "Shift-JIS LyricsFileLoader" + "(filename + .kra;.lrc;.txt)"
 
 func _close():
 	pass

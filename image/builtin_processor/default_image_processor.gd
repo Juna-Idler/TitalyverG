@@ -6,8 +6,7 @@ var canvas : Control
 var texture_rect : TextureRect
 var color_rect : ColorRect
 
-const DIPSettings = preload("res://image/default_image_processor_settings.tscn")
-
+const DIPSettings := preload("res://image/builtin_processor/default_image_processor_settings.tscn")
 var settings : Control
 
 func _notification(what):

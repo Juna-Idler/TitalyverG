@@ -6,7 +6,7 @@ uniform int strength: hint_range(1, 512) = 2;
 vec4 blur_size(sampler2D tex,vec2 fragCoord, vec2 pixelSize) {
     
     vec4 color = vec4(0.,0.,0.,0.);
-    float strengthFloat = float(strength);	
+    float strengthFloat = float(strength);
 
     vec2 pixel = fragCoord/pixelSize;
     int x_min = max(int(pixel.x-strengthFloat), 0);

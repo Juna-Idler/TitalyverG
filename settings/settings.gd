@@ -34,6 +34,7 @@ func initialize_image_settings(image_manager : ImageManager):
 	if plugins.is_empty():
 		image_manager.plugins.append(ImageManager.Plugin.create(ImageManager.BUILTIN_NO_IMAGE_PROCESSOR))
 		image_manager.plugins.append(ImageManager.Plugin.create(ImageManager.BUILTIN_DEFAULT_IMAGE_PROCESSOR))
+		image_manager.plugins.append(ImageManager.Plugin.create(ImageManager.BUILTIN_BLUR_IMAGE_PROCESSOR))
 	else:
 		image_manager.deserialize_processors(plugins)
 		#正常に読めたもののみ書き戻す
